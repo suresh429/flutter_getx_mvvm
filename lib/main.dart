@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
 import 'package:flutter_getx_mvvm/view/user_list_screen.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => LoginView()),
         GetPage(name: '/home', page: () => MainScreen()), // Define your home screen
+        GetPage(name: '/explore', page: () => const ExploreScreen()),
       ],
     );
   }

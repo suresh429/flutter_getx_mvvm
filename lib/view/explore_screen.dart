@@ -5,8 +5,18 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Explore Screen'),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text('Explore Screen'),
+      ),
+      body: const Center(
+        child: Text(
+          'Explore Screen Content',
+          style: TextStyle(fontSize: 18, color: Colors.black), // Styling the text
+        ),
+      ),
     );
-}
+  }
 }
