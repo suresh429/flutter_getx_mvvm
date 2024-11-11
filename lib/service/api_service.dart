@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 
@@ -16,7 +17,7 @@ class ApiService {
 // New method for user login
   Future<LoginModel> login(LoginPayload payload) async {
     final response = await _dio.post(
-      '${baseUrl1}login', // Adjust this URL as per your API endpoint
+      '${AppEnvironment.baseApiUrl}login', // Adjust this URL as per your API endpoint
       data: payload.toJson(),
     );
 
@@ -31,7 +32,7 @@ class ApiService {
 
   Future<List<ExploreModel>> fetchRecommendations() async {
     final response = await _dio.get(
-      "${baseUrl1}donationRequest",
+      "${AppEnvironment.baseApiUrl}donationRequest",
       queryParameters: {
         'limit': 3,
         'user_id': '645230409a97be6b22c7081e',
@@ -52,28 +53,4 @@ class ApiService {
 
 
 
-  Future<List<User>> fetchUsers() async {
-    final response = await _dio.get(baseUrl);
-    return (response.data as List).map((user) => User.fromJson(user)).toList();
-  }
-
-  Future<User> createUser(User user) async {
-    final response = await _dio.post(
-      baseUrl,
-      data: user.toJson(),
-    );
-    return User.fromJson(response.data);
-  }
-
-  Future<User> updateUser(User user) async {
-    final response = await _dio.put(
-      '$baseUrl/${user.id}',
-      data: user.toJson(),
-    );
-    return User.fromJson(response.data);
-  }
-
-  Future<void> deleteUser(int id) async {
-    await _dio.delete('$baseUrl/$id');
-  }
 }

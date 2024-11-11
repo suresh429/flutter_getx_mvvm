@@ -4,7 +4,10 @@ class ExploreModel {
   final String requestType;
   final String requestedFor;
   final String defaultImageUrl;
+  final int startDate;
+  final int dueDate;
   final int likesCount;
+  final int commentsCount;
   final int sharesCount;
   final String city;
   final String state;
@@ -20,7 +23,10 @@ class ExploreModel {
     required this.requestType,
     required this.requestedFor,
     required this.defaultImageUrl,
+    required this.startDate,
+    required this.dueDate,
     required this.likesCount,
+    required this.commentsCount,
     required this.sharesCount,
     required this.city,
     required this.state,
@@ -38,7 +44,10 @@ class ExploreModel {
       requestType: json['request_type'],
       requestedFor: json['requested_for'],
       defaultImageUrl: json['defaultImageUrl'] ?? '',
+      startDate: json['start_date'] ?? '',
+      dueDate: json['due_date'] ?? '',
       likesCount: json['likesCount'] ?? 0,
+      commentsCount: json['commentsCount'] ?? 0,
       sharesCount: json['sharesCount'] ?? 0,
       city: json['user_info']['address']['city'] ?? '',
       state: json['user_info']['address']['state'] ?? '',
