@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
-import 'package:flutter_getx_mvvm/view/user_list_screen.dart';
 import 'package:get/get.dart';
 
-void main() {
+void commonMain() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.white, // Change this to your desired color
     statusBarIconBrightness: Brightness.dark, // Change icon brightness
@@ -35,12 +35,14 @@ class MyApp extends StatelessWidget {
           onSurface: Colors.black, // Text color on background
           onError: Colors.white, // Text color on error
           brightness: Brightness.light, // Light or dark theme
+
         ),
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white, // Solid color for all AppBars
           foregroundColor: Colors.black, // Text and icon color
           elevation: 1, // Customize elevation if desired
+          surfaceTintColor: Colors.white, // Avoids overlay effects in Material 3
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFFEC1C24), // Solid color for all FABs
