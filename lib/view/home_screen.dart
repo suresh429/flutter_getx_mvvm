@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
+import '../env/app_env.dart';
 import '../view_model/bottom_nav_controller.dart';
 import '../view_model/recommendation_controller.dart';
 import 'explore_screen.dart';
@@ -180,8 +181,8 @@ class HomeScreen extends StatelessWidget {
                           OutlinedButton.icon(
                             onPressed: () {
                               // Action for Copy Link button
-                              const String link = 'https://talleaders-dev.vercel.app/becomeTalLeaderHome';
-                              Clipboard.setData(const ClipboardData(text: link));
+                              String link = '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
+                              Clipboard.setData(ClipboardData(text: link));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Link copied!')),
                               );

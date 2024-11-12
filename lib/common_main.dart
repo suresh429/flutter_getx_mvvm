@@ -5,12 +5,17 @@ import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
-void commonMain() {
+void commonMain() async{
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.white, // Change this to your desired color
     statusBarIconBrightness: Brightness.dark, // Change icon brightness
   ));
+
+  // local storage
+  await GetStorage.init();
+
   runApp(const MyApp());
 }
 
@@ -20,6 +25,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final storage = GetStorage(); // Access GetStorage
+    bool isLoggedIn  = storage.read('isLoggedIn') ?? false;
     return GetMaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
@@ -55,9 +62,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: LoginView(),
+      home: isLoggedIn ? MainScreen() : const LoginView(),
       getPages: [
-        GetPage(name: '/', page: () => LoginView()),
+        GetPage(name: '/', page: () => const LoginView()),
         GetPage(name: '/home', page: () => MainScreen()), // Define your home screen
         GetPage(name: '/explore', page: () => const ExploreScreen()),
       ],

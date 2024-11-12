@@ -4,15 +4,15 @@ import 'package:get/get.dart';
 import '../view_model/login_controller.dart';
 
 class LoginView extends StatelessWidget {
-  final LoginController controller = Get.put(LoginController());
+   const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Lazily initializes the controller the first time it's accessed
+    final LoginController controller = Get.put(LoginController());
+
     return Scaffold(
-     /* appBar: AppBar(
-        title: const Text('Login'),
-       // backgroundColor: Colors.deepPurple,
-      ),*/
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -56,7 +56,7 @@ class LoginView extends StatelessWidget {
                         ? null
                         : controller.login,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 45), // Full-width button
+                      minimumSize: const Size(double.infinity, 45), // Full-width button
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5), // Set the radius to 5
                       ),

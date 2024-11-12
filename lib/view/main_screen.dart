@@ -3,12 +3,14 @@ import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../view_model/bottom_nav_controller.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatelessWidget {
   final BottomNavController bottomNavController = Get.put(BottomNavController());
+  final storage = GetStorage(); // Access GetStorage
 
   final List<Widget> _pages = [
      HomeScreen(),
@@ -39,10 +41,10 @@ class MainScreen extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text("Settings"),
+                leading: const Icon(Icons.logout),
+                title: const Text("Logout"),
                 onTap: () {
-                  Navigator.pop(context);
+                  logout();
                 },
               ),
             ],
@@ -76,6 +78,13 @@ class MainScreen extends StatelessWidget {
       );
     });
   }
+
+  void logout() {
+    storage.remove('isLoggedIn');
+    Get.offAllNamed('/login');
+  }
 }
+
+
 
 

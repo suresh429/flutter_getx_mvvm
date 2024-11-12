@@ -11,10 +11,8 @@ import '../payload/login_payload.dart';
 
 class ApiService {
   final Dio _dio = Dio();
-  final String baseUrl = "https://jsonplaceholder.typicode.com/users";
-  final String baseUrl1 = "https://touch-a-life-dev.web.app/api/v1/";
 
-// New method for user login
+//  login
   Future<LoginModel> login(LoginPayload payload) async {
     final response = await _dio.post(
       '${AppEnvironment.baseApiUrl}login', // Adjust this URL as per your API endpoint
@@ -30,6 +28,8 @@ class ApiService {
     }
   }
 
+
+  // fetch recommendations
   Future<List<ExploreModel>> fetchRecommendations() async {
     final response = await _dio.get(
       "${AppEnvironment.baseApiUrl}donationRequest",
