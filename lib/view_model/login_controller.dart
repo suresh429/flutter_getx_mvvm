@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../payload/login_payload.dart';
 import '../service/api_service.dart';
 
 
 class LoginController extends GetxController {
+
+  final storage = GetStorage(); // Access GetStorage
+
   // Text controllers for email and password
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -22,8 +26,8 @@ class LoginController extends GetxController {
     // Set default text when initializing
     emailController.text = "chandralekha@touchalife.org";
     passwordController.text = "Youknowbts@7";
-  }
 
+  }
 
   // Method to handle login API call
   Future<void> login() async {
@@ -49,6 +53,9 @@ class LoginController extends GetxController {
       // Call the login method in ApiService with your specific payload
       await _apiService.login(payload);
 
+      // Assume login is successful and save login status
+      storage.write('isLoggedIn', true);
+
       // If login is successful, navigate to home screen
       Get.snackbar('Success', 'Login successful!');
       Get.offNamed('/home'); // Navigate to home screen
@@ -66,4 +73,6 @@ class LoginController extends GetxController {
     passwordController.dispose();
     super.onClose();
   }
+
+
 }
