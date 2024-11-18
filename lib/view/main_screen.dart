@@ -14,7 +14,7 @@ class MainScreen extends StatelessWidget {
 
   final List<Widget> _pages = [
      HomeScreen(),
-    const ExploreScreen(),
+     ExploreScreen(),
     const MyActivityScreen(),
     const VoteLeadersScreen(),
   ];

@@ -6,6 +6,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../env/app_env.dart';
+import '../utilites/colors.dart';
 import '../view_model/bottom_nav_controller.dart';
 import '../view_model/recommendation_controller.dart';
 import 'explore_screen.dart';
@@ -22,7 +23,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white10,
+      backgroundColor: colorSurface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -68,18 +69,18 @@ class HomeScreen extends StatelessWidget {
                         onTap: () {
                           bottomNavController.changeIndex(1);
                         },
-                        child: const Text(
+                        child:  Text(
                           "View All",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16.0,
-                              color: Color(0xFFEC1C24)),
+                              color: colorPrimary),
                         )),
                   ],
                 ),
               ),
               SizedBox(
-                height: 300,
+                height: 320,
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
@@ -184,7 +185,7 @@ class HomeScreen extends StatelessWidget {
                               String link = '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
                               Clipboard.setData(ClipboardData(text: link));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Link copied!')),
+                                const SnackBar(content: Text('Link copied!'),duration: Duration(seconds: 2),),
                               );
                             },
                             icon: const Icon(
