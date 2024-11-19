@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view_model/tab_controller.dart';
+import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
 import 'package:get/get.dart';
 
 import '../utilites/colors.dart';
 import '../widget/explore_card.dart';
 
 class ExploreScreen extends StatelessWidget {
-  final TabViewController controller = Get.put(TabViewController());
+  final ExploreController controller = Get.put(ExploreController());
 
   ExploreScreen({Key? key}) : super(key: key);
 
@@ -59,46 +59,45 @@ class ExploreScreen extends StatelessWidget {
               height: 30,
               color: Colors.white,
               child: Obx(() => TabBar(
-                controller: controller.tabController,
-                isScrollable: true,
-                physics: const ClampingScrollPhysics(),
-                unselectedLabelColor: Colors.black,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: colorPrimary,
-                ),
-                tabs: controller.tabTitles.map((title) {
-                  final int index = controller.tabTitles.indexOf(title);
-                  final bool isSelected =
-                      controller.selectedIndex.value == index;
-
-                  return Tab(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      margin: const EdgeInsets.symmetric(horizontal: 1),
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.transparent
-                              : colorGray,
-                          width: 1,
-                        ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          title,
-                          style: const TextStyle(fontSize: 14),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                    controller: controller.tabController,
+                    isScrollable: true,
+                    physics: const ClampingScrollPhysics(),
+                    unselectedLabelColor: Colors.black,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: colorPrimary,
                     ),
-                  );
-                }).toList(),
-              )),
+                    tabs: controller.tabTitles.map((title) {
+                      final int index = controller.tabTitles.indexOf(title);
+                      final bool isSelected =
+                          controller.selectedIndex.value == index;
+
+                      return Tab(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color:
+                                  isSelected ? Colors.transparent : colorGray,
+                              width: 1,
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              title,
+                              style: const TextStyle(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  )),
             ),
           ),
           const SizedBox(height: 10),
@@ -110,12 +109,12 @@ class ExploreScreen extends StatelessWidget {
                 children: controller.tabTitles.map((title) {
                   final int tabIndex = controller.tabTitles.indexOf(title);
                   return Obx(() {
-                    final isLoading =
-                        controller.isLoading[tabIndex] ?? false;
+                    final isLoading = controller.isLoading[tabIndex] ?? false;
                     final data = controller.tabData[tabIndex] ?? [];
 
                     if (data.isEmpty && !isLoading) {
-                      return const Center(child: Text("No Explore Data found."));
+                      return const Center(
+                          child: Text("No Explore Data found."));
                     }
 
                     return CustomScrollView(
@@ -124,7 +123,7 @@ class ExploreScreen extends StatelessWidget {
                         // List of items
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                                (context, index) {
+                            (context, index) {
                               if (index < data.length) {
                                 final exploreModel = data[index];
                                 return ExploreCard(exploreModel: exploreModel);

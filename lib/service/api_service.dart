@@ -4,15 +4,14 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/env/app_env.dart';
+import 'package:flutter_getx_mvvm/model/CommonResponse.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
-
-import '../model/user.dart';
+import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import '../payload/login_payload.dart';
 
 class ApiService {
   final Dio _dio = Dio();
-
 
 //  login
   Future<LoginModel> login(LoginPayload payload) async {
@@ -53,6 +52,38 @@ class ApiService {
 
     // Map the data to ExploreModel objects
     return data.map((explore) => ExploreModel.fromJson(explore)).toList();
+  }
+
+
+  //  Favorite
+  Future<CommonResponse> addToFavorite(FavPayload payload) async {
+    try {
+
+      // Prepare the headers with the Bearer token
+      final headers = {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjQ1MjMwNDA5YTk3YmU2YjIyYzcwODFlIiwiaWF0IjoxNzMxNTY0NTYyLCJleHAiOjE4MTc5NjQ1NjJ9.mFNDi40dM7eBOrBAekXlwUQevQpbceVtyv_3gpuZCmg',
+      };
+      final response = await _dio.post(
+        '${AppEnvironment.baseApiUrl}donation/request/favourite',
+        data: payload.toJson(),
+        options: Options(headers: headers), // Set the headers here
+      );
+
+      if (response.statusCode == 200) {
+        return CommonResponse.fromJson(response.data['data']);
+      } else {
+        // Print the whole response to inspect errors more closely
+        throw Exception('Failed to add to favorites: ${response.data}');
+      }
+    } catch (e) {
+      // Handle Dio-specific errors
+      if (e is DioException) {
+        print('Dio error: ${e.response?.data}'); // Log Dio error details
+      } else {
+        print('Error: $e');
+      }
+      rethrow;  // Rethrow error for further handling
+    }
   }
 
 // Fetch recommendations with pagination

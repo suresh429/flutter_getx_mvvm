@@ -1,11 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:get/get.dart';
 import '../model/ExploreModel.dart';
 import '../service/api_service.dart';
+import '../service/network_checker.dart';
 import '../utilites/constants.dart';
+import '../utilites/error_handler.dart';
 
-class TabViewController extends GetxController with GetSingleTickerProviderStateMixin {
+class ExploreController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  var errorMessage = ''.obs;
+
   // Observable list to hold explore data
   final exploreData = <ExploreModel>[].obs;
 
@@ -38,7 +45,8 @@ class TabViewController extends GetxController with GetSingleTickerProviderState
     "Podcast",
   ];
 
-  final ApiService apiService = ApiService(); // Create an instance of ApiService
+  final ApiService apiService =
+      ApiService(); // Create an instance of ApiService
 
   @override
   void onInit() {
@@ -95,13 +103,16 @@ class TabViewController extends GetxController with GetSingleTickerProviderState
       case "Event Speaker":
         return buildRequestTypeData(["eventSpeaker"]);
       default:
-        return buildRequestTypeData(["board member", "podcast", "mentoring", "eventSpeaker"]);
+        return buildRequestTypeData(
+            ["board member", "podcast", "mentoring", "eventSpeaker"]);
     }
   }
 
   // Method to fetch data for a specific tab and page
   Future<void> fetchDataForTab(int tabIndex) async {
-    if (isLoading[tabIndex] == true || !tabHasMore[tabIndex]!) return; // Don't fetch if already loading or no more data
+    if (isLoading[tabIndex] == true || !tabHasMore[tabIndex]!) {
+      return; // Don't fetch if already loading or no more data
+    }
 
     // Set loading state to true for the specific tab
     isLoading[tabIndex] = true;
@@ -132,7 +143,8 @@ class TabViewController extends GetxController with GetSingleTickerProviderState
 
         // Filter out duplicates based on a unique identifier, such as `id`
         final uniqueData = fetchedData.where((newItem) {
-          return !currentData.any((existingItem) => existingItem.id == newItem.id);
+          return !currentData
+              .any((existingItem) => existingItem.id == newItem.id);
         }).toList();
 
         // Append only unique items to the current list
@@ -149,6 +161,42 @@ class TabViewController extends GetxController with GetSingleTickerProviderState
       }
     }
   }
+
+
+  // add to fav
+  Future<void> addToFav(List<String> requestId, String type, String userId) async {
+    if (await NetworkChecker.isConnected()) {
+      final payload = FavPayload(
+        requestId: requestId,
+        type: type,
+        userId: userId,
+      );
+      if (kDebugMode) {
+        print("payload  :   $payload");
+      }
+      try {
+        // isLoading(true);
+
+        // Call the login method in ApiService with your specific payload
+        await apiService.addToFavorite(payload);
+
+      } catch (e) {
+        if (e is DioException) {
+          errorMessage.value = await ErrorHandler.handleError(e);
+        } else {
+          errorMessage.value = 'An unexpected error occurred: $e';
+        }
+
+      } finally {
+        // isLoading(false);
+      }
+    } else {
+      errorMessage.value = "No internet connection";
+    }
+
+    Get.snackbar('',errorMessage.value);
+  }
+
 
   // Reset pagination when switching to a new tab
   void resetPaginationForTab(int tabIndex) {

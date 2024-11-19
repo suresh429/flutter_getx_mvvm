@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:dio/dio.dart';
 
 import '../payload/login_payload.dart';
 import '../service/api_service.dart';
-
+import '../utilites/error_handler.dart';
 
 class LoginController extends GetxController {
-
-  final storage = GetStorage(); // Access GetStorage
+  final storage = GetStorage();
 
   // Text controllers for email and password
   final emailController = TextEditingController();
@@ -26,7 +26,6 @@ class LoginController extends GetxController {
     // Set default text when initializing
     emailController.text = "chandralekha@touchalife.org";
     passwordController.text = "Youknowbts@7";
-
   }
 
   // Method to handle login API call
@@ -34,7 +33,6 @@ class LoginController extends GetxController {
     final email = emailController.text;
     final password = passwordController.text;
 
-    // Basic validation
     if (email.isEmpty || password.isEmpty) {
       Get.snackbar('Error', 'Email and password are required.');
       return;
@@ -50,18 +48,19 @@ class LoginController extends GetxController {
     try {
       isLoading(true);
 
-      // Call the login method in ApiService with your specific payload
+      // Call the API login method
       await _apiService.login(payload);
 
-      // Assume login is successful and save login status
+      // On success, save login status
       storage.write('isLoggedIn', true);
 
-      // If login is successful, navigate to home screen
       Get.snackbar('Success', 'Login successful!');
-      Get.offNamed('/home'); // Navigate to home screen
+      Get.offNamed('/home');
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
-      print("ERROR  :   $e");
+      // Use the updated error handler
+      String errorMessage = await ErrorHandler.handleError(e);
+      print('DioException caught: $errorMessage');
+      Get.snackbar('Error', errorMessage);  // Show the error message
     } finally {
       isLoading(false);
     }
@@ -73,6 +72,4 @@ class LoginController extends GetxController {
     passwordController.dispose();
     super.onClose();
   }
-
-
 }

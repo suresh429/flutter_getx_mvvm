@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../model/ExploreModel.dart';
 import '../utilites/colors.dart';
 import '../utilites/constants.dart';
+import '../view_model/explore_controller.dart';
 
 class ExploreCard extends StatefulWidget {
   final ExploreModel exploreModel;
@@ -14,18 +16,10 @@ class ExploreCard extends StatefulWidget {
 }
 
 class _ExploreCardState extends State<ExploreCard> {
-  late bool isFavorite;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the favorite status directly from the model
-    isFavorite = widget.exploreModel.isFavorite;
-    print('Favorite status in initState: $isFavorite');
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ExploreController controller = Get.find<ExploreController>();
+    print("object ${widget.exploreModel.isFavorite}");
     final timeLeft = calculateTimeLeft(
       widget.exploreModel.startDate ?? 0,
       widget.exploreModel.dueDate ?? 0,
@@ -48,14 +42,7 @@ class _ExploreCardState extends State<ExploreCard> {
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
                   ),
-                  child: Image.network(
-                    widget.exploreModel.defaultImageUrl.isNotEmpty
-                        ? widget.exploreModel.defaultImageUrl
-                        : 'assets/card_default_image.webp',
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: _buildImage(),
                 ),
                 Positioned(
                   top: 8,
@@ -67,22 +54,32 @@ class _ExploreCardState extends State<ExploreCard> {
                       color: Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isFavorite = !isFavorite;
-                          widget.exploreModel.isFavorite = isFavorite; // Update model
-                          print('Favorite status updated to: $isFavorite');
-                        });
-                      },
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
-                        size: 15,
-                        color: isFavorite ? Colors.red : Colors.grey,
+                    child: Obx(
+                      // still OK, but rebuilds Column unnecessarily
+                      () => IconButton(
+                        onPressed: () {
+                          widget.exploreModel.isFavorite.value =
+                              !widget.exploreModel.isFavorite.value;
+                          controller.addToFav(
+                              [widget.exploreModel.id],
+                              widget.exploreModel.isFavorite.value
+                                  ? "favourite"
+                                  : 'unfavourite',
+                              '645230409a97be6b22c7081e');
+                        },
+                        icon: Icon(
+                          widget.exploreModel.isFavorite.value
+                              ? Icons.favorite
+                              : Icons.favorite_border_outlined,
+                          size: 15,
+                          color: widget.exploreModel.isFavorite.value
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
                       ),
                     ),
                   ),
-                ),
+                )
               ],
             ),
             Padding(
@@ -104,12 +101,14 @@ class _ExploreCardState extends State<ExploreCard> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const Icon(Icons.location_on,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 1),
                       Flexible(
                         child: Text(
                           "${widget.exploreModel.city.isNotEmpty ? widget.exploreModel.city : 'Unknown City'}, ${widget.exploreModel.country.isNotEmpty ? widget.exploreModel.country : 'Unknown Country'}",
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ),
                     ],
@@ -120,9 +119,12 @@ class _ExploreCardState extends State<ExploreCard> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
+                          const Icon(Icons.timer_outlined,
+                              size: 16, color: Colors.grey),
                           const SizedBox(width: 3),
-                          Text(timeLeft, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(timeLeft,
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
                         ],
                       ),
                       ElevatedButton(
@@ -159,7 +161,8 @@ class _ExploreCardState extends State<ExploreCard> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.thumb_up, size: 20, color: Colors.grey),
+                              icon: const Icon(Icons.thumb_up,
+                                  size: 20, color: Colors.grey),
                               onPressed: () {},
                             ),
                             Text(widget.exploreModel.likesCount.toString()),
@@ -168,7 +171,8 @@ class _ExploreCardState extends State<ExploreCard> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
+                              icon: const Icon(Icons.comment,
+                                  size: 20, color: Colors.grey),
                               onPressed: () {},
                             ),
                             Text(widget.exploreModel.commentsCount.toString()),
@@ -179,7 +183,8 @@ class _ExploreCardState extends State<ExploreCard> {
                           child: Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.share, size: 20, color: Colors.grey),
+                                icon: const Icon(Icons.share,
+                                    size: 20, color: Colors.grey),
                                 onPressed: () {},
                               ),
                               Text(widget.exploreModel.sharesCount.toString()),
@@ -196,5 +201,23 @@ class _ExploreCardState extends State<ExploreCard> {
         ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    if (widget.exploreModel.defaultImageUrl.isNotEmpty) {
+      return Image.network(
+        widget.exploreModel.defaultImageUrl,
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.asset(
+        'assets/card_default_image.webp',
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    }
   }
 }

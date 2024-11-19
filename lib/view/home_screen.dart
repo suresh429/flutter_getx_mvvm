@@ -20,6 +20,8 @@ class HomeScreen extends StatelessWidget {
     'assets/banner_image.png', // Example image paths
   ];
 
+   HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,11 +87,25 @@ class HomeScreen extends StatelessWidget {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
-        
+
+                  // Show error message
+                  if (controller.errorMessage.value.isNotEmpty) {
+                    return Center(
+                      child: Text(
+                        controller.errorMessage.value,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+
                   if (controller.recommendations.isEmpty) {
                     return const Center(child: Text("No recommendations found."));
                   }
-        
+
                   return ListView.builder(
                     scrollDirection: Axis.horizontal, // Make it horizontal
                     itemCount: controller.recommendations.length,

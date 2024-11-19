@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:get/get.dart';
 import '../view_model/login_controller.dart';
 
@@ -10,6 +9,7 @@ class LoginView extends StatelessWidget {
   Widget build(BuildContext context) {
     // Lazily initializes the controller the first time it's accessed
     final LoginController controller = Get.put(LoginController());
+
 
     return Scaffold(
       backgroundColor: Colors.white,
