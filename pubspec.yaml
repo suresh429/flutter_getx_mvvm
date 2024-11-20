@@ -39,6 +39,12 @@ dependencies:
   dio: ^5.0.0
   internet_connection_checker: ^0.0.1
   flutter_native_splash: ^2.4.2
+  get_storage: ^2.0.3
+  flutter_launcher_icons: ^0.14.1
+  connectivity_plus: ^4.0.1
+
+flutter_launcher_icons:
+  config_file: "flutter_launcher_icons.yaml"
 
 dev_dependencies:
   flutter_test:

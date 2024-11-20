@@ -5,23 +5,30 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
+import '../env/app_env.dart';
+import '../utilites/colors.dart';
 import '../view_model/bottom_nav_controller.dart';
+import '../view_model/explore_controller.dart';
 import '../view_model/recommendation_controller.dart';
 import 'explore_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final BottomNavController bottomNavController = Get.find();
-  final RecommendationController controller =
-      Get.put(RecommendationController());
+  final RecommendationController controller = Get.put(RecommendationController());
+
+  final ExploreController exploreController = Get.put(ExploreController());
 
   final List<String> bannerImages = [
     'assets/banner_image.png', // Example image paths
   ];
 
+  HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    controller.fetchData();
     return Scaffold(
-      backgroundColor: Colors.white10,
+      backgroundColor: colorSurface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -60,34 +67,49 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Text(
                       "Recommendations for You",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16.0),
                     ),
                     GestureDetector(
                         onTap: () {
                           bottomNavController.changeIndex(1);
                         },
-                        child: const Text(
+                        child: Text(
                           "View All",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16.0,
-                              color: Color(0xFFEC1C24)),
+                              color: colorPrimary),
                         )),
                   ],
                 ),
               ),
               SizedBox(
-                height: 300,
+                height: 320,
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
-        
-                  if (controller.recommendations.isEmpty) {
-                    return const Center(child: Text("No recommendations found."));
+
+                  // Show error message
+                  if (controller.errorMessage.value.isNotEmpty) {
+                    return Center(
+                      child: Text(
+                        controller.errorMessage.value,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
                   }
-        
+
+                  if (controller.recommendations.isEmpty) {
+                    return const Center(
+                        child: Text("No recommendations found."));
+                  }
+
                   return ListView.builder(
                     scrollDirection: Axis.horizontal, // Make it horizontal
                     itemCount: controller.recommendations.length,
@@ -95,6 +117,7 @@ class HomeScreen extends StatelessWidget {
                       final recommendation = controller.recommendations[index];
                       return ExploreCard(
                         exploreModel: recommendation,
+                        controller: controller,
                       );
                     },
                   );
@@ -104,9 +127,9 @@ class HomeScreen extends StatelessWidget {
                 height: 20,
               ),
               Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
-                 // margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                  // margin: const EdgeInsets.symmetric(horizontal: 10.0),
                   decoration: BoxDecoration(
                     image: const DecorationImage(
                       image: AssetImage('assets/send_email_image.png'),
@@ -176,14 +199,17 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                         
                           OutlinedButton.icon(
                             onPressed: () {
                               // Action for Copy Link button
-                              const String link = 'https://talleaders-dev.vercel.app/becomeTalLeaderHome';
-                              Clipboard.setData(const ClipboardData(text: link));
+                              String link =
+                                  '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
+                              Clipboard.setData(ClipboardData(text: link));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Link copied!')),
+                                const SnackBar(
+                                  content: Text('Link copied!'),
+                                  duration: Duration(seconds: 2),
+                                ),
                               );
                             },
                             icon: const Icon(
@@ -207,7 +233,8 @@ class HomeScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
-                              side: const BorderSide(color: Colors.black, width: 1),
+                              side: const BorderSide(
+                                  color: Colors.black, width: 1),
                             ),
                           ),
                         ],

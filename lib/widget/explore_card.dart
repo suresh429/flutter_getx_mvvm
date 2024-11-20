@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
+import 'package:get/get.dart';
 
+import '../model/ExploreModel.dart';
+import '../utilites/colors.dart';
 import '../utilites/constants.dart';
+import '../view_model/explore_controller.dart';
 
-class ExploreCard extends StatelessWidget {
+class ExploreCard extends StatefulWidget {
   final ExploreModel exploreModel;
-
-  const ExploreCard({Key? key, required this.exploreModel}) : super(key: key);
+  final dynamic controller; // Accepts either controller
+  const ExploreCard({super.key, required this.exploreModel,required this.controller,});
 
   @override
+  State<ExploreCard> createState() => _ExploreCardState();
+}
+
+class _ExploreCardState extends State<ExploreCard> {
+  @override
   Widget build(BuildContext context) {
-    final timeLeft = calculateTimeLeft(exploreModel.startDate, exploreModel.dueDate);
+    final ExploreController controller = Get.find<ExploreController>();
+    print("object ${widget.exploreModel.isFavorite}");
+    final timeLeft = calculateTimeLeft(
+      widget.exploreModel.startDate ?? 0,
+      widget.exploreModel.dueDate ?? 0,
+    );
+
     return SizedBox(
-      width: 300, // Set a fixed width for horizontal orientation
+      width: 320,
       child: Card(
         color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -21,36 +35,14 @@ class ExploreCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Stack(
               children: [
-                // Image
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
                   ),
-                  child: Image.network(
-                    exploreModel.defaultImageUrl,
-                    height: 100, // Adjust the height as needed
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; // Image is loaded
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/card_default_image.webp', // Placeholder image
-                        height: 100,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
+                  child: _buildImage(),
                 ),
                 // Positioned label at the bottom left of the image
                 Positioned(
@@ -58,17 +50,53 @@ class ExploreCard extends StatelessWidget {
                   left: 8, // Position 8px from the left
                   child: Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      exploreModel.requestType,
-                      style: const TextStyle(color: Colors.black, fontSize: 12),
+                      widget.exploreModel.requestType,
+                      style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
                 ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Obx(
+                      // still OK, but rebuilds Column unnecessarily
+                      () => IconButton(
+                        onPressed: () {
+                          widget.exploreModel.isFavorite.value =
+                              !widget.exploreModel.isFavorite.value;
+                          controller.addToFav(
+                              [widget.exploreModel.id],
+                              widget.exploreModel.isFavorite.value
+                                  ? "favourite"
+                                  : 'unfavourite',
+                              '645230409a97be6b22c7081e');
+                        },
+                        icon: Icon(
+                          widget.exploreModel.isFavorite.value
+                              ? Icons.favorite
+                              : Icons.favorite_border_outlined,
+                          size: 15,
+                          color: widget.exploreModel.isFavorite.value
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
             Padding(
@@ -76,79 +104,72 @@ class ExploreCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
                   Text(
-                    exploreModel.title,
+                    widget.exploreModel.title.isNotEmpty
+                        ? widget.exploreModel.title
+                        : 'No Title Available',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14),
-                    maxLines: 2, // Limit to avoid overflow
-                    overflow:
-                        TextOverflow.ellipsis, // Add ellipsis for overflow text
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  // Location and Country
                   Row(
                     children: [
                       const Icon(Icons.location_on,
                           size: 16, color: Colors.grey),
                       const SizedBox(width: 1),
                       Flexible(
-                        // Use Flexible to allow dynamic sizing
                         child: Text(
-                            "${exploreModel.city},${exploreModel.country}",
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey)),
+                          "${widget.exploreModel.city.isNotEmpty ? widget.exploreModel.city : 'Unknown City'}, ${widget.exploreModel.country.isNotEmpty ? widget.exploreModel.country : 'Unknown Country'}",
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // times ago and details button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                       Row(
+                      Row(
                         children: [
                           const Icon(Icons.timer_outlined,
                               size: 16, color: Colors.grey),
                           const SizedBox(width: 3),
                           Text(timeLeft,
-                              style: const TextStyle(fontSize: 12, color: Colors.grey))
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
                         ],
                       ),
-
-                      SizedBox(
-                        width: 100, // Set button width
-                        height: 35,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              // Define what happens when the button is pressed
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: const Color(0xFFEC1C24), backgroundColor: const Color(0xFFF3D9DA), side: const BorderSide(color: Colors.transparent),
-                              // Outline color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10), // Text color
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("Details"),
-                                SizedBox(width: 5), // Space between text and icon
-                                Icon(Icons.arrow_forward, size: 16), // Icon on the right side
-                              ],
-                            ),),
-                      )
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: colorPrimary,
+                          backgroundColor: colorButtonCard,
+                          side: const BorderSide(color: Colors.transparent),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Details"),
+                            SizedBox(width: 5),
+                            Icon(Icons.arrow_forward, size: 16),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Action buttons
                   Container(
-                    decoration :BoxDecoration(
-                      color: const Color(0x82F1EEF1), // Background color of the container
+                    decoration: BoxDecoration(
+                      color: const Color(0x82F1EEF1),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
@@ -161,7 +182,7 @@ class ExploreCard extends StatelessWidget {
                                   size: 20, color: Colors.grey),
                               onPressed: () {},
                             ),
-                            Text(exploreModel.likesCount.toString()),
+                            Text(widget.exploreModel.likesCount.toString()),
                           ],
                         ),
                         Row(
@@ -171,7 +192,7 @@ class ExploreCard extends StatelessWidget {
                                   size: 20, color: Colors.grey),
                               onPressed: () {},
                             ),
-                            Text(exploreModel.commentsCount.toString()),
+                            Text(widget.exploreModel.commentsCount.toString()),
                           ],
                         ),
                         Padding(
@@ -183,7 +204,7 @@ class ExploreCard extends StatelessWidget {
                                     size: 20, color: Colors.grey),
                                 onPressed: () {},
                               ),
-                              Text(exploreModel.sharesCount.toString()),
+                              Text(widget.exploreModel.sharesCount.toString()),
                             ],
                           ),
                         ),
@@ -197,5 +218,23 @@ class ExploreCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    if (widget.exploreModel.defaultImageUrl.isNotEmpty) {
+      return Image.network(
+        widget.exploreModel.defaultImageUrl,
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.asset(
+        'assets/card_default_image.webp',
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    }
   }
 }

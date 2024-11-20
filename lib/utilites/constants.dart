@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 String calculateTimeLeft(int startDate, int dueDate) {
   // Get the current time
   final currentTime = DateTime.now().millisecondsSinceEpoch;
@@ -27,3 +29,13 @@ String calculateTimeLeft(int startDate, int dueDate) {
     return "0 days left"; // or "Expired" if you prefer
   }
 }
+
+
+// Helper method to format request types into the expected string format
+String buildRequestTypeData(List<String> requestTypes) {
+  // Convert each request type to the desired JSON-like format and join with commas
+  return jsonEncode(
+    requestTypes.map((type) => {"request_type": type}).toList(),
+  );
+}
+
