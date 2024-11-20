@@ -12,6 +12,7 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.resetTab();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -112,6 +113,20 @@ class ExploreScreen extends StatelessWidget {
                     final isLoading = controller.isLoading[tabIndex] ?? false;
                     final data = controller.tabData[tabIndex] ?? [];
 
+                    // Show error message
+                    if (controller.errorMessage.value.isNotEmpty) {
+                      return Center(
+                        child: Text(
+                          controller.errorMessage.value,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
+
                     if (data.isEmpty && !isLoading) {
                       return const Center(
                           child: Text("No Explore Data found."));
@@ -126,7 +141,7 @@ class ExploreScreen extends StatelessWidget {
                             (context, index) {
                               if (index < data.length) {
                                 final exploreModel = data[index];
-                                return ExploreCard(exploreModel: exploreModel);
+                                return ExploreCard(exploreModel: exploreModel,controller: controller,);
                               }
 
                               // The extra space for loading indicator at the bottom

@@ -1,41 +1,30 @@
-import 'package:dio/dio.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:get/get.dart';
 import '../model/ExploreModel.dart';
+import '../payload/fav_payload.dart';
 import '../service/api_service.dart';
-import '../service/network_checker.dart';
 import '../utilites/constants.dart';
 import '../utilites/error_handler.dart';
 
 class ExploreController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  var errorMessage = ''.obs;
-
-  // Observable list to hold explore data
-  final exploreData = <ExploreModel>[].obs;
-
-  // Loading state for each tab
-  final isLoading = <int, bool>{}.obs;
-
-  // Tab controller
+  final errorMessage = ''.obs;
+  final exploreData =
+      <ExploreModel>[].obs; // Observable list to hold explore data
+  final isLoading = <int, bool>{}.obs; // Loading state for each tab
   late TabController tabController;
+  var selectedIndex = 0.obs; // Track the selected tab index
+  var tabPage = <int, int>{}.obs; // Track the current page for each tab
+  var tabHasMore =
+      <int, bool>{}.obs; // Store if there is more data to fetch for each tab
+  var tabData = <int, List<ExploreModel>>{}.obs; // Store data for each tab
+  final scrollControllers =
+      <int, ScrollController>{}.obs; // Scroll controllers for each tab
 
-  // Track the selected tab index
-  var selectedIndex = 0.obs;
-
-  // Track the current page for each tab (pagination)
-  var tabPage = <int, int>{}.obs;
-
-  // Store if there is more data to fetch for each tab
-  var tabHasMore = <int, bool>{}.obs;
-
-  // Store data for each tab
-  var tabData = <int, List<ExploreModel>>{}.obs;
-
-  // Scroll controllers for each tab
-  final scrollControllers = <int, ScrollController>{}.obs;
+  final ApiService apiService = ApiService(); // API service instance
+  final Connectivity _connectivity = Connectivity(); // Connectivity instance
 
   final List<String> tabTitles = [
     "All",
@@ -45,44 +34,43 @@ class ExploreController extends GetxController
     "Podcast",
   ];
 
-  final ApiService apiService =
-      ApiService(); // Create an instance of ApiService
-
   @override
   void onInit() {
     super.onInit();
+
     tabController = TabController(length: tabTitles.length, vsync: this);
 
-    // Initialize scroll controllers for each tab
+    // Initialize scroll controllers and pagination for each tab
     for (int i = 0; i < tabTitles.length; i++) {
       scrollControllers[i] = ScrollController();
       scrollControllers[i]?.addListener(() {
-        // Check if the user has scrolled to the bottom
         if (scrollControllers[i]?.position.pixels ==
             scrollControllers[i]?.position.maxScrollExtent) {
-          fetchDataForTab(i);
+          fetchDataForTab(i); // Fetch more data on scroll to the bottom
         }
       });
 
-      // Initialize pagination state for each tab
       tabPage[i] ??= 1;
       tabHasMore[i] ??= true;
       tabData[i] ??= [];
       isLoading[i] ??= false;
     }
 
-    // Load data for the initially selected tab ("All" or index 0)
+    // Fetch data for the initially selected tab
     fetchDataForTab(0);
 
-    // Update selectedIndex whenever the tab changes
+    // Tab selection listener
     tabController.addListener(() {
       final newIndex = tabController.index;
       if (newIndex != selectedIndex.value) {
-        resetPaginationForTab(newIndex); // Reset pagination when switching tabs
+        resetPaginationForTab(newIndex);
+        selectedIndex.value = newIndex;
+        fetchDataForTab(newIndex); // Fetch data when tab changes
       }
-      selectedIndex.value = newIndex;
-      fetchDataForTab(newIndex);
     });
+
+    // Check connectivity on initialization and whenever it changes
+    checkAndFetchData(selectedIndex.value);
   }
 
   @override
@@ -91,7 +79,107 @@ class ExploreController extends GetxController
     super.onClose();
   }
 
-  // Method to get the request type data based on the tab title
+  Future<void> checkAndFetchData(int newIndex) async {
+    // Listen to connectivity changes
+    _connectivity.onConnectivityChanged.listen((ConnectivityResult result) async {
+      if (result != ConnectivityResult.none) {
+        errorMessage.value = ''; // Clear the error when internet is back
+        // Reset pagination and fetch data for the given tab
+        resetPaginationForTab(newIndex);
+        await fetchDataForTab(newIndex);  // Attempt to fetch data if connection is restored
+      } else {
+        errorMessage.value = 'No internet connection. Please check your network settings.';
+      }
+    });
+
+    // Optionally, check immediately if needed
+    var connectivityResult = await _connectivity.checkConnectivity();
+    if (connectivityResult != ConnectivityResult.none) {
+      resetPaginationForTab(newIndex);
+      await fetchDataForTab(newIndex);
+    }
+  }
+
+  Future<void> fetchDataForTab(int tabIndex) async {
+    // Check connectivity before making API call
+    var connectivityResult = await _connectivity.checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      errorMessage.value =
+      'No internet connection. Please check your network settings.';
+      return; // Skip API call if no internet
+    }
+
+    if (isLoading[tabIndex] == true || !tabHasMore[tabIndex]!) {
+      return; // Skip if already loading or no more data
+    }
+
+    isLoading[tabIndex] = true;
+
+    String requestTypeData = getRequestTypeData(tabTitles[tabIndex]);
+    int offset = (tabPage[tabIndex]! - 1) * 5;
+
+    try {
+      List<ExploreModel> fetchedData = await apiService.fetchExploreRequests(
+        requestTypes: requestTypeData,
+        limit: 5,
+        offset: offset,
+        page: tabPage[tabIndex]!,
+      );
+
+      print("Fetched Data for tab $tabIndex: $fetchedData"); // Log the fetched data
+
+      if (fetchedData.isEmpty) {
+        tabHasMore[tabIndex] = false; // No more data for this tab
+        print("No more data for tab: $tabIndex");
+      } else {
+        final currentData = tabData[tabIndex] ?? [];
+        final uniqueData = fetchedData.where((newItem) {
+          return !currentData
+              .any((existingItem) => existingItem.id == newItem.id);
+        }).toList();
+
+        // Ensure the tabData is initialized properly for this tab
+        if (tabData[tabIndex] == null) {
+          tabData[tabIndex] = [];
+        }
+
+        tabData[tabIndex]?.addAll(uniqueData); // Add new data to tab's data list
+        tabPage[tabIndex] = tabPage[tabIndex]! + 1;
+
+        print("Data added to tabData for tab $tabIndex: ${tabData[tabIndex]}"); // Verify data added
+      }
+
+      // Update the UI to reflect the changes in data
+      update(); // Or tabData.refresh() if you're observing the tabData
+
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      errorMessage.value = errorMsg;
+    } finally {
+      isLoading[tabIndex] = false;
+    }
+  }
+
+  // Add to favorite method (unchanged)
+  Future<void> addToFav(
+      List<String> requestId, String type, String userId) async {
+    final payload = FavPayload(
+      requestId: requestId,
+      type: type,
+      userId: userId,
+    );
+    if (kDebugMode) {
+      print("payload  :   $payload");
+    }
+    try {
+      await apiService.addToFavorite(payload);
+    } catch (e) {
+      String errorMessage = await ErrorHandler.handleError(e);
+      print('DioException caught: $errorMessage');
+      Get.snackbar('Error', errorMessage);
+    }
+  }
+
   String getRequestTypeData(String tabTitle) {
     switch (tabTitle) {
       case "Podcast":
@@ -108,100 +196,17 @@ class ExploreController extends GetxController
     }
   }
 
-  // Method to fetch data for a specific tab and page
-  Future<void> fetchDataForTab(int tabIndex) async {
-    if (isLoading[tabIndex] == true || !tabHasMore[tabIndex]!) {
-      return; // Don't fetch if already loading or no more data
-    }
-
-    // Set loading state to true for the specific tab
-    isLoading[tabIndex] = true;
-
-    // Get the request type data based on the selected tab
-    String requestTypeData = getRequestTypeData(tabTitles[tabIndex]);
-
-    // Calculate the offset for pagination: offset = (page - 1) * limit
-    int offset = (tabPage[tabIndex]! - 1) * 5; // Assuming 'limit' is 5
-
-    try {
-      // Fetch data from the API for the selected tab and page
-      List<ExploreModel> fetchedData = await apiService.fetchExploreRequests(
-        requestTypes: requestTypeData, // Pass the specific tab type as a list
-        limit: 5, // Assuming a limit of 5 items per page
-        offset: offset, // Pass the calculated offset
-        page: tabPage[tabIndex]!, // Pass the current page number
-      );
-
-      // Update loading state after the data is fetched
-      isLoading[tabIndex] = false;
-
-      if (fetchedData.isEmpty) {
-        tabHasMore[tabIndex] = false; // No more data for this tab
-      } else {
-        // Get the current data for this tab
-        final currentData = tabData[tabIndex] ?? [];
-
-        // Filter out duplicates based on a unique identifier, such as `id`
-        final uniqueData = fetchedData.where((newItem) {
-          return !currentData
-              .any((existingItem) => existingItem.id == newItem.id);
-        }).toList();
-
-        // Append only unique items to the current list
-        tabData[tabIndex]?.addAll(uniqueData);
-
-        // Increment the page for the next fetch
-        tabPage[tabIndex] = tabPage[tabIndex]! + 1;
-      }
-    } catch (e) {
-      // Update loading state after the data is fetched
-      isLoading[tabIndex] = false;
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
-    }
-  }
-
-
-  // add to fav
-  Future<void> addToFav(List<String> requestId, String type, String userId) async {
-    if (await NetworkChecker.isConnected()) {
-      final payload = FavPayload(
-        requestId: requestId,
-        type: type,
-        userId: userId,
-      );
-      if (kDebugMode) {
-        print("payload  :   $payload");
-      }
-      try {
-        // isLoading(true);
-
-        // Call the login method in ApiService with your specific payload
-        await apiService.addToFavorite(payload);
-
-      } catch (e) {
-        if (e is DioException) {
-          errorMessage.value = await ErrorHandler.handleError(e);
-        } else {
-          errorMessage.value = 'An unexpected error occurred: $e';
-        }
-
-      } finally {
-        // isLoading(false);
-      }
-    } else {
-      errorMessage.value = "No internet connection";
-    }
-
-    Get.snackbar('',errorMessage.value);
-  }
-
-
-  // Reset pagination when switching to a new tab
   void resetPaginationForTab(int tabIndex) {
-    tabPage[tabIndex] = 1;
-    tabHasMore[tabIndex] = true;
-    tabData[tabIndex]?.clear(); // Clear data to start fresh when switching tabs
+    tabPage[tabIndex] = 1;  // Reset to first page
+    tabHasMore[tabIndex] = true;  // Allow more data
+    tabData[tabIndex]?.clear();  // Clear the existing data
+    isLoading[tabIndex] = false;  // Set loading state to false
+  }
+
+  // Method to reset the tab and load data
+  void resetTab() {
+    tabController.animateTo(0);  // Reset to the first tab (index 0)
+    selectedIndex.value = 0;     // Update the selected index
+    fetchDataForTab(0);          // Fetch data for the first tab
   }
 }

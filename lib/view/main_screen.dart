@@ -12,13 +12,6 @@ class MainScreen extends StatelessWidget {
   final BottomNavController bottomNavController = Get.put(BottomNavController());
   final storage = GetStorage(); // Access GetStorage
 
-  final List<Widget> _pages = [
-     HomeScreen(),
-     ExploreScreen(),
-    const MyActivityScreen(),
-    const VoteLeadersScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -30,7 +23,7 @@ class MainScreen extends StatelessWidget {
                 accountName: Text("User Name"),
                 accountEmail: Text("user@example.com"),
                 currentAccountPicture: CircleAvatar(
-                  backgroundImage: AssetImage('assets/user.png'), // Path to user icon
+                  backgroundImage: AssetImage('assets/user.png'),
                 ),
               ),
               ListTile(
@@ -50,12 +43,33 @@ class MainScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: _pages[bottomNavController.selectedIndex.value],
+        body: GetBuilder<BottomNavController>(
+          id: 'page', // Refresh pages when this ID is updated
+          builder: (controller) {
+            // Control which page is displayed
+            switch (controller.selectedIndex.value) {
+              case 0:
+                return HomeScreen(); // Refresh HomeScreen
+              case 1:
+                return ExploreScreen(); // Refresh ExploreScreen
+              case 2:
+                return const MyActivityScreen(); // Refresh MyActivityScreen
+              case 3:
+                return const VoteLeadersScreen(); // Refresh VoteLeadersScreen
+              default:
+                return Container();
+            }
+          },
+        ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
           currentIndex: bottomNavController.selectedIndex.value,
-          onTap: (index) => bottomNavController.changeIndex(index),
+          onTap: (index) {
+            bottomNavController.changeIndex(index);
+            // Trigger a refresh for the specific tab
+            bottomNavController.update(['page']);
+          },
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
@@ -84,7 +98,3 @@ class MainScreen extends StatelessWidget {
     Get.offAllNamed('/login');
   }
 }
-
-
-
-

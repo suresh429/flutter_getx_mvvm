@@ -8,8 +8,8 @@ import '../view_model/explore_controller.dart';
 
 class ExploreCard extends StatefulWidget {
   final ExploreModel exploreModel;
-
-  const ExploreCard({super.key, required this.exploreModel});
+  final dynamic controller; // Accepts either controller
+  const ExploreCard({super.key, required this.exploreModel,required this.controller,});
 
   @override
   State<ExploreCard> createState() => _ExploreCardState();
@@ -43,6 +43,23 @@ class _ExploreCardState extends State<ExploreCard> {
                     topRight: Radius.circular(12),
                   ),
                   child: _buildImage(),
+                ),
+                // Positioned label at the bottom left of the image
+                Positioned(
+                  bottom: 8, // Position 8px from the bottom
+                  left: 8, // Position 8px from the left
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      widget.exploreModel.requestType,
+                      style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ),
                 ),
                 Positioned(
                   top: 8,

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
@@ -30,6 +32,8 @@ class RecommendationController extends GetxController {
     });
   }
 
+
+
   // Method to fetch data from API
   Future<void> fetchData() async {
     // Check connectivity before making API request
@@ -54,4 +58,5 @@ class RecommendationController extends GetxController {
       isLoading(false);
     }
   }
-}
+
+  }

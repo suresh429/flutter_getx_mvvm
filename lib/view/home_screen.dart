@@ -8,22 +8,25 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import '../env/app_env.dart';
 import '../utilites/colors.dart';
 import '../view_model/bottom_nav_controller.dart';
+import '../view_model/explore_controller.dart';
 import '../view_model/recommendation_controller.dart';
 import 'explore_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final BottomNavController bottomNavController = Get.find();
-  final RecommendationController controller =
-      Get.put(RecommendationController());
+  final RecommendationController controller = Get.put(RecommendationController());
+
+  final ExploreController exploreController = Get.put(ExploreController());
 
   final List<String> bannerImages = [
     'assets/banner_image.png', // Example image paths
   ];
 
-   HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchData();
     return Scaffold(
       backgroundColor: colorSurface,
       appBar: AppBar(
@@ -64,14 +67,14 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Text(
                       "Recommendations for You",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16.0),
                     ),
                     GestureDetector(
                         onTap: () {
                           bottomNavController.changeIndex(1);
                         },
-                        child:  Text(
+                        child: Text(
                           "View All",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -103,7 +106,8 @@ class HomeScreen extends StatelessWidget {
                   }
 
                   if (controller.recommendations.isEmpty) {
-                    return const Center(child: Text("No recommendations found."));
+                    return const Center(
+                        child: Text("No recommendations found."));
                   }
 
                   return ListView.builder(
@@ -113,6 +117,7 @@ class HomeScreen extends StatelessWidget {
                       final recommendation = controller.recommendations[index];
                       return ExploreCard(
                         exploreModel: recommendation,
+                        controller: controller,
                       );
                     },
                   );
@@ -122,9 +127,9 @@ class HomeScreen extends StatelessWidget {
                 height: 20,
               ),
               Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
-                 // margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                  // margin: const EdgeInsets.symmetric(horizontal: 10.0),
                   decoration: BoxDecoration(
                     image: const DecorationImage(
                       image: AssetImage('assets/send_email_image.png'),
@@ -194,14 +199,17 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                         
                           OutlinedButton.icon(
                             onPressed: () {
                               // Action for Copy Link button
-                              String link = '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
+                              String link =
+                                  '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
                               Clipboard.setData(ClipboardData(text: link));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Link copied!'),duration: Duration(seconds: 2),),
+                                const SnackBar(
+                                  content: Text('Link copied!'),
+                                  duration: Duration(seconds: 2),
+                                ),
                               );
                             },
                             icon: const Icon(
@@ -225,7 +233,8 @@ class HomeScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
-                              side: const BorderSide(color: Colors.black, width: 1),
+                              side: const BorderSide(
+                                  color: Colors.black, width: 1),
                             ),
                           ),
                         ],
