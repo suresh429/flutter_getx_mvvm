@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import 'utilites/colors.dart';
 
 void commonMain() async{

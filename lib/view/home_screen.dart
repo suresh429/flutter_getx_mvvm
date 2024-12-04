@@ -7,14 +7,23 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../env/app_env.dart';
 import '../utilites/colors.dart';
+import '../utilites/constants_Utils.dart';
 import '../view_model/bottom_nav_controller.dart';
 import '../view_model/explore_controller.dart';
 import '../view_model/recommendation_controller.dart';
-import 'explore_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
-  final RecommendationController controller = Get.put(RecommendationController());
+
+  final RecommendationController controller =
+      Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
 
@@ -22,11 +31,20 @@ class HomeScreen extends StatelessWidget {
     'assets/banner_image.png', // Example image paths
   ];
 
-  HomeScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  // initial call
+  Future<void> fetchData() async {
+    var loginResponse = await ConstantsUtils.getStoredLoginResponse();
+    controller.fetchData(loginResponse?.data?.uniqueId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchData();
     return Scaffold(
       backgroundColor: colorSurface,
       appBar: AppBar(

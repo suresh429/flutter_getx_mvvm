@@ -1,7 +1,7 @@
 class FavPayload {
   final List<String> requestId; // Use List<String> instead of String[]
   final String type;
-  final String userId;
+  final String? userId;
 
   FavPayload({
     required this.requestId,

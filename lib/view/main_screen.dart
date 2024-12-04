@@ -8,10 +8,16 @@ import 'package:get_storage/get_storage.dart';
 import '../view_model/bottom_nav_controller.dart';
 import 'home_screen.dart';
 
-class MainScreen extends StatelessWidget {
-  final BottomNavController bottomNavController = Get.put(BottomNavController());
-  final storage = GetStorage(); // Access GetStorage
+class MainScreen extends StatefulWidget {
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
 
+class _MainScreenState extends State<MainScreen> {
+  final BottomNavController bottomNavController = Get.put(BottomNavController());
+
+  final storage = GetStorage();
+ // Access GetStorage
   @override
   Widget build(BuildContext context) {
     return Obx(() {
