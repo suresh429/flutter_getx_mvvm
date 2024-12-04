@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../model/ExploreModel.dart';
 import '../utilites/colors.dart';
-import '../utilites/constants.dart';
+import '../utilites/constants_Utils.dart';
 import '../view_model/explore_controller.dart';
 
 class ExploreCard extends StatefulWidget {
@@ -20,7 +20,7 @@ class _ExploreCardState extends State<ExploreCard> {
   Widget build(BuildContext context) {
     final ExploreController controller = Get.find<ExploreController>();
     print("object ${widget.exploreModel.isFavorite}");
-    final timeLeft = calculateTimeLeft(
+    final timeLeft = ConstantsUtils.calculateTimeLeft(
       widget.exploreModel.startDate ?? 0,
       widget.exploreModel.dueDate ?? 0,
     );
@@ -81,8 +81,7 @@ class _ExploreCardState extends State<ExploreCard> {
                               [widget.exploreModel.id],
                               widget.exploreModel.isFavorite.value
                                   ? "favourite"
-                                  : 'unfavourite',
-                              '645230409a97be6b22c7081e');
+                                  : 'unfavourite');
                         },
                         icon: Icon(
                           widget.exploreModel.isFavorite.value

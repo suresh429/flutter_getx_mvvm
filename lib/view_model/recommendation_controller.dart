@@ -1,11 +1,11 @@
-import 'dart:ui';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../model/ExploreModel.dart';
 import '../service/api_service.dart';
+import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
 class RecommendationController extends GetxController {
@@ -15,17 +15,23 @@ class RecommendationController extends GetxController {
 
   final ApiService _apiService = ApiService();
   final Connectivity _connectivity = Connectivity();
+  final storage = GetStorage();
+
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+
+    // Call the function to retrieve the login response
+    var loginResponse = await ConstantsUtils.getStoredLoginResponse();
+
     // Fetch data initially
-    fetchData();
+    fetchData(loginResponse?.data?.uniqueId);
 
     // Listen to connectivity changes
     _connectivity.onConnectivityChanged.listen((ConnectivityResult result) async {
       if (result != ConnectivityResult.none) {
-        await fetchData();  // Attempt to fetch data if connection is restored
+        await fetchData(loginResponse?.data?.uniqueId);  // Attempt to fetch data if connection is restored
       } else {
         errorMessage.value = 'No internet connection. Please check your network settings.';
       }
@@ -35,7 +41,7 @@ class RecommendationController extends GetxController {
 
 
   // Method to fetch data from API
-  Future<void> fetchData() async {
+  Future<void> fetchData(String? uniqueId) async {
     // Check connectivity before making API request
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -48,7 +54,7 @@ class RecommendationController extends GetxController {
       errorMessage.value = ''; // Reset previous errors
 
       // Fetch recommendations from the API
-      final fetchedRecommendations = await _apiService.fetchRecommendations();
+      final fetchedRecommendations = await _apiService.fetchRecommendations(uniqueId);
       recommendations.assignAll(fetchedRecommendations);
     } catch (e) {
       // Use the updated error handler

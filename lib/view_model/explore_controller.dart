@@ -1,11 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:get/get.dart';
 import '../model/ExploreModel.dart';
 import '../payload/fav_payload.dart';
 import '../service/api_service.dart';
-import '../utilites/constants.dart';
+import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
 class ExploreController extends GetxController
@@ -15,6 +16,7 @@ class ExploreController extends GetxController
       <ExploreModel>[].obs; // Observable list to hold explore data
   final isLoading = <int, bool>{}.obs; // Loading state for each tab
   late TabController tabController;
+  late LoginModel? loginResponse;
   var selectedIndex = 0.obs; // Track the selected tab index
   var tabPage = <int, int>{}.obs; // Track the current page for each tab
   var tabHasMore =
@@ -35,8 +37,9 @@ class ExploreController extends GetxController
   ];
 
   @override
-  void onInit() {
+  void onInit() async{
     super.onInit();
+     loginResponse = await ConstantsUtils.getStoredLoginResponse();
 
     tabController = TabController(length: tabTitles.length, vsync: this);
 
@@ -101,6 +104,7 @@ class ExploreController extends GetxController
   }
 
   Future<void> fetchDataForTab(int tabIndex) async {
+
     // Check connectivity before making API call
     var connectivityResult = await _connectivity.checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -124,13 +128,11 @@ class ExploreController extends GetxController
         limit: 5,
         offset: offset,
         page: tabPage[tabIndex]!,
+        userId: loginResponse?.data?.uniqueId
       );
-
-      print("Fetched Data for tab $tabIndex: $fetchedData"); // Log the fetched data
 
       if (fetchedData.isEmpty) {
         tabHasMore[tabIndex] = false; // No more data for this tab
-        print("No more data for tab: $tabIndex");
       } else {
         final currentData = tabData[tabIndex] ?? [];
         final uniqueData = fetchedData.where((newItem) {
@@ -146,7 +148,6 @@ class ExploreController extends GetxController
         tabData[tabIndex]?.addAll(uniqueData); // Add new data to tab's data list
         tabPage[tabIndex] = tabPage[tabIndex]! + 1;
 
-        print("Data added to tabData for tab $tabIndex: ${tabData[tabIndex]}"); // Verify data added
       }
 
       // Update the UI to reflect the changes in data
@@ -162,36 +163,35 @@ class ExploreController extends GetxController
 
   // Add to favorite method (unchanged)
   Future<void> addToFav(
-      List<String> requestId, String type, String userId) async {
+      List<String> requestId, String type) async {
     final payload = FavPayload(
       requestId: requestId,
       type: type,
-      userId: userId,
+      userId: loginResponse?.data?.uniqueId,
     );
     if (kDebugMode) {
       print("payload  :   $payload");
     }
     try {
-      await apiService.addToFavorite(payload);
+      await apiService.addToFavorite(payload,loginResponse?.data?.tokenDetail?.token);
     } catch (e) {
       String errorMessage = await ErrorHandler.handleError(e);
-      print('DioException caught: $errorMessage');
-      Get.snackbar('Error', errorMessage);
+      ConstantsUtils.showErrorSnackbar(errorMessage);
     }
   }
 
   String getRequestTypeData(String tabTitle) {
     switch (tabTitle) {
       case "Podcast":
-        return buildRequestTypeData(["podcast"]);
+        return ConstantsUtils.buildRequestTypeData(["podcast"]);
       case "Mentoring":
-        return buildRequestTypeData(["mentoring"]);
+        return ConstantsUtils.buildRequestTypeData(["mentoring"]);
       case "Board Member":
-        return buildRequestTypeData(["board member"]);
+        return ConstantsUtils.buildRequestTypeData(["board member"]);
       case "Event Speaker":
-        return buildRequestTypeData(["eventSpeaker"]);
+        return ConstantsUtils.buildRequestTypeData(["eventSpeaker"]);
       default:
-        return buildRequestTypeData(
+        return ConstantsUtils.buildRequestTypeData(
             ["board member", "podcast", "mentoring", "eventSpeaker"]);
     }
   }

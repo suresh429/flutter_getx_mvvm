@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';  // Ensure this package is imported
-import 'package:get/get.dart';
+
 
 class ErrorHandler {
   // Generic error handling method to work for both Login and Recommendation controllers

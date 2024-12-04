@@ -10,40 +10,55 @@ import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import '../payload/login_payload.dart';
 
+
 class ApiService {
   final Dio _dio = Dio();
+  static const String _login = "login";
+  static const String _donationRequest = "donationRequest";
+  static const String _addToFav = "donation/request/favourite";
 
-//  login
+
+
   Future<LoginModel> login(LoginPayload payload) async {
-    final response = await _dio.post(
-      '${AppEnvironment.baseApiUrl}login',
-      // Adjust this URL as per your API endpoint
-      data: payload.toJson(),
-    );
+    try {
+      final response = await _dio.post(
+        '${AppEnvironment.baseApiUrl}$_login',
+        data: payload.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      // Assuming your API returns a User object in the response
-      return LoginModel.fromJson(
-          response.data['data']); // Adjust according to your response structure
-    } else {
-      throw Exception('Failed to log in: ${response.data['message']}');
+      if (response.statusCode == 200) {
+        return LoginModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
     }
   }
 
+
+
+
   // fetch recommendations
-  Future<List<ExploreModel>> fetchRecommendations() async {
+  Future<List<ExploreModel>> fetchRecommendations(String? uniqueId) async {
     final response = await _dio.get(
-      "${AppEnvironment.baseApiUrl}donationRequest",
+      "${AppEnvironment.baseApiUrl}$_donationRequest",
       queryParameters: {
         'limit': 3,
-        'user_id': '645230409a97be6b22c7081e',
+        'user_id': uniqueId,
         'status': 1,
         'sortBy': 'createdAt',
         'sortOrder': -1,
         'requestType': jsonEncode([
           {'request_type': 'podcast'}
         ]),
-        'loginId': '645230409a97be6b22c7081e',
+        'loginId': uniqueId,
         'languagePreferences': '',
       },
     );
@@ -55,16 +70,18 @@ class ApiService {
   }
 
 
-  //  Favorite
-  Future<CommonResponse> addToFavorite(FavPayload payload) async {
-    try {
 
+
+  //  Favorite
+  Future<CommonResponse> addToFavorite(FavPayload payload,String? token) async {
+    try {
       // Prepare the headers with the Bearer token
       final headers = {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjQ1MjMwNDA5YTk3YmU2YjIyYzcwODFlIiwiaWF0IjoxNzMxNTY0NTYyLCJleHAiOjE4MTc5NjQ1NjJ9.mFNDi40dM7eBOrBAekXlwUQevQpbceVtyv_3gpuZCmg',
+        'Authorization':
+            'Bearer $token',
       };
       final response = await _dio.post(
-        '${AppEnvironment.baseApiUrl}donation/request/favourite',
+        '${AppEnvironment.baseApiUrl}$_addToFav',
         data: payload.toJson(),
         options: Options(headers: headers), // Set the headers here
       );
@@ -82,37 +99,39 @@ class ApiService {
       } else {
         print('Error: $e');
       }
-      rethrow;  // Rethrow error for further handling
+      rethrow; // Rethrow error for further handling
     }
   }
 
-// Fetch recommendations with pagination
+
+
+
+// Fetch Explore data with pagination
   Future<List<ExploreModel>> fetchExploreRequests(
       {required String requestTypes,
       required int limit,
       required int offset,
-      required int page}) async {
+      required int page,
+      required String? userId}
+      ) async {
     try {
-      // URL-encode the requestType string (important for spaces and special characters)
-      /* const requestType = '[{"request_type":"board member"}]';
-      final encodedRequestType = Uri.encodeComponent(requestType);*/
+
       final queryParameters = {
         'limit': limit,
         'offset': offset,
-        'user_id': '645230409a97be6b22c7081e',
+        'user_id': userId,
         'status': 1,
         'sortBy': 'createdAt',
         'sortOrder': -1,
         'requestType': requestTypes,
-        'loginId': '645230409a97be6b22c7081e',
+        'loginId': userId,
         'languagePreferences': '',
-        //'page': page,
+
       };
 
-      print("Query Parameters: $queryParameters");
 
       final response = await _dio.get(
-        "${AppEnvironment.baseApiUrl}donationRequest",
+        "${AppEnvironment.baseApiUrl}$_donationRequest",
         queryParameters: queryParameters,
         options: Options(
           headers: {
@@ -122,7 +141,7 @@ class ApiService {
         ),
       );
 
-     // print("Response Body: ${response.data}");
+      // print("Response Body: ${response.data}");
       debugPrint(response.data.toString(), wrapWidth: 1024);
       print(response.realUri.toString());
       if (response.statusCode == 200) {
