@@ -34,7 +34,7 @@ static void showInfoSnackbar(String message) {
     'Info',
     message,
     snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.black,
     colorText: Colors.white,
       margin: const EdgeInsets.all(15)
   );

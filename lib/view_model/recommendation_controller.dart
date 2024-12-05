@@ -1,5 +1,6 @@
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -16,6 +17,12 @@ class RecommendationController extends GetxController {
   final ApiService _apiService = ApiService();
   final Connectivity _connectivity = Connectivity();
   final storage = GetStorage();
+
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final emailController = TextEditingController();
+
+
 
 
   @override

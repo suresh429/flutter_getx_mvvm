@@ -14,10 +14,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final BottomNavController bottomNavController = Get.put(BottomNavController());
+  final BottomNavController bottomNavController =
+      Get.put(BottomNavController());
 
   final storage = GetStorage();
- // Access GetStorage
+
+  // Access GetStorage
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -25,11 +27,33 @@ class _MainScreenState extends State<MainScreen> {
         drawer: Drawer(
           child: ListView(
             children: [
-              const UserAccountsDrawerHeader(
-                accountName: Text("User Name"),
-                accountEmail: Text("user@example.com"),
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: AssetImage('assets/user.png'),
+              const SizedBox(
+                height: 90,
+                child: Center(
+                  child: UserAccountsDrawerHeader(
+                    accountName: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: AssetImage('assets/user.png'),
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("User Name"),
+                            Text("user@example.com"),
+                          ],
+                        ),
+
+                      ],
+                    ),
+                    accountEmail: null,
+                    currentAccountPicture: null,
+
+                  ),
                 ),
               ),
               ListTile(

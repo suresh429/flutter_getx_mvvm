@@ -67,7 +67,7 @@ class ExploreScreen extends StatelessWidget {
                     indicatorSize: TabBarIndicatorSize.label,
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
-                      color: colorPrimary,
+                      color: ColorUtils.colorPrimary,
                     ),
                     tabs: controller.tabTitles.map((title) {
                       final int index = controller.tabTitles.indexOf(title);
@@ -83,7 +83,7 @@ class ExploreScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
                               color:
-                                  isSelected ? Colors.transparent : colorGray,
+                                  isSelected ? Colors.transparent : ColorUtils.colorGray,
                               width: 1,
                             ),
                           ),
