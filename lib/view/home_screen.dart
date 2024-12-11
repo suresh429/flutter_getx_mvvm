@@ -22,8 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
 
-  final RecommendationController controller =
-      Get.put(RecommendationController());
+  final RecommendationController controller = Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
 
@@ -46,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorSurface,
+      backgroundColor: ColorUtils.colorSurface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -97,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16.0,
-                              color: colorPrimary),
+                              color: ColorUtils.colorPrimary),
                         )),
                   ],
                 ),
@@ -193,6 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ElevatedButton.icon(
                             onPressed: () {
                               // Action for Send Email Invite button
+                              openBottomSheet(context);
                             },
                             icon: const Icon(
                               Icons.email_outlined,
@@ -223,12 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               String link =
                                   '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
                               Clipboard.setData(ClipboardData(text: link));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Link copied!'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
+                              ConstantsUtils.showInfoSnackbar('Link copied!');
                             },
                             icon: const Icon(
                               Icons.link,
@@ -289,6 +284,117 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void openBottomSheet(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+               Padding(
+                padding: const EdgeInsets.only(left: 16,right: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Invite ', style: TextStyle(fontSize: 20)),
+                    InkWell(child: const Icon(Icons.close,size: 24,),
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                color: ColorUtils.colorGray,
+                height: 1,
+                width: double.maxFinite,
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Obx(()  {
+                        return TextField(
+                          controller: controller.firstNameController,
+                          decoration:  InputDecoration(
+                            labelText: 'First Name',
+                            border: OutlineInputBorder(),
+                            errorText: controller.firstNameError.value,
+                          ),
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                        return TextField(
+                          controller: controller.lastNameController,
+                          decoration:  InputDecoration(
+                            labelText: 'Last Name',
+                            border: OutlineInputBorder(),
+                            errorText: controller.lastNameError.value,
+                          ),
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx((){
+                        return TextField(
+                          controller: controller.emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            border: const OutlineInputBorder(),
+                            errorText: controller.emailError.value,
+                          ),
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                        return ElevatedButton(
+                          onPressed: controller.isLoading.value ? null :() { controller.inviteMember(context); },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 45),
+                            // Full-width button
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(5), // Set the radius to 5
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  'Invite',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        );
+                      }
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      isDismissible: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
     );
   }

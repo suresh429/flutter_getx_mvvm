@@ -4,10 +4,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/env/app_env.dart';
-import 'package:flutter_getx_mvvm/model/CommonResponse.dart';
+import 'package:flutter_getx_mvvm/model/CommonModel.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
+import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
 import '../payload/login_payload.dart';
 
 
@@ -16,6 +17,7 @@ class ApiService {
   static const String _login = "login";
   static const String _donationRequest = "donationRequest";
   static const String _addToFav = "donation/request/favourite";
+  static const String _inviteTalLeaders = "user/inviteTalLeaders";
 
 
 
@@ -43,7 +45,30 @@ class ApiService {
   }
 
 
+  Future<CommonModel> inviteMember(InvitePayload payload,String? token) async {
+    try {
+      final response = await _dio.post(
+        '${AppEnvironment.baseApiUrl}$_inviteTalLeaders',
+        data: payload.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':
+            'Bearer $token',
+          },
+        ),
+      );
 
+      if (response.statusCode == 200) {
+        return CommonModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
+    }
+  }
 
   // fetch recommendations
   Future<List<ExploreModel>> fetchRecommendations(String? uniqueId) async {
@@ -73,7 +98,7 @@ class ApiService {
 
 
   //  Favorite
-  Future<CommonResponse> addToFavorite(FavPayload payload,String? token) async {
+  Future<CommonModel> addToFavorite(FavPayload payload,String? token) async {
     try {
       // Prepare the headers with the Bearer token
       final headers = {
@@ -87,7 +112,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        return CommonResponse.fromJson(response.data['data']);
+        return CommonModel.fromJson(response.data['data']);
       } else {
         // Print the whole response to inspect errors more closely
         throw Exception('Failed to add to favorites: ${response.data}');

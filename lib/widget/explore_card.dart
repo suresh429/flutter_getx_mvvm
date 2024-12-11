@@ -146,8 +146,8 @@ class _ExploreCardState extends State<ExploreCard> {
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: colorPrimary,
-                          backgroundColor: colorButtonCard,
+                          foregroundColor: ColorUtils.colorPrimary,
+                          backgroundColor: ColorUtils.colorButtonCard,
                           side: const BorderSide(color: Colors.transparent),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
