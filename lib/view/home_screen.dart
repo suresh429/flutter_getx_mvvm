@@ -22,8 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
 
-  final RecommendationController controller =
-      Get.put(RecommendationController());
+  final RecommendationController controller = Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
 
@@ -193,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ElevatedButton.icon(
                             onPressed: () {
                               // Action for Send Email Invite button
-                              openBottomSheet();
+                              openBottomSheet(context);
                             },
                             icon: const Icon(
                               Icons.email_outlined,
@@ -289,92 +288,106 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void openBottomSheet() {
+  void openBottomSheet(BuildContext context) {
     Get.bottomSheet(
       Container(
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 20),
-             Padding(
-              padding: EdgeInsets.only(left: 16,right: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Invite ', style: TextStyle(fontSize: 20)),
-                  InkWell(child: Icon(Icons.close,size: 24,),
-                    onTap: (){
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+               Padding(
+                padding: const EdgeInsets.only(left: 16,right: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Invite ', style: TextStyle(fontSize: 20)),
+                    InkWell(child: const Icon(Icons.close,size: 24,),
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              color: ColorUtils.colorGray,
-              height: 1,
-              width: double.maxFinite,
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: controller.firstNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'First Name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: controller.lastNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Last Name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: controller.emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Obx(() {
-                      return ElevatedButton(
-                        onPressed: controller.isLoading.value ? null : null,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 45),
-                          // Full-width button
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(5), // Set the radius to 5
+              const SizedBox(height: 20),
+              Container(
+                color: ColorUtils.colorGray,
+                height: 1,
+                width: double.maxFinite,
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Obx(()  {
+                        return TextField(
+                          controller: controller.firstNameController,
+                          decoration:  InputDecoration(
+                            labelText: 'First Name',
+                            border: OutlineInputBorder(),
+                            errorText: controller.firstNameError.value,
                           ),
-                        ),
-                        child: controller.isLoading.value
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                'Invite',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                      );
-                    }
-                  )
-                ],
-              ),
-            )
-          ],
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                        return TextField(
+                          controller: controller.lastNameController,
+                          decoration:  InputDecoration(
+                            labelText: 'Last Name',
+                            border: OutlineInputBorder(),
+                            errorText: controller.lastNameError.value,
+                          ),
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx((){
+                        return TextField(
+                          controller: controller.emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            border: const OutlineInputBorder(),
+                            errorText: controller.emailError.value,
+                          ),
+                        );
+                      }
+                    ),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                        return ElevatedButton(
+                          onPressed: controller.isLoading.value ? null :() { controller.inviteMember(context); },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 45),
+                            // Full-width button
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(5), // Set the radius to 5
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  'Invite',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        );
+                      }
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
       isDismissible: true,

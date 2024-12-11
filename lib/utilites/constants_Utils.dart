@@ -7,10 +7,10 @@ import 'package:get_storage/get_storage.dart';
 
 class ConstantsUtils{
 
-static void showSuccessSnackbar(String message) {
+static void showSuccessSnackbar(String? message) {
   Get.snackbar(
     'Success',
-    message,
+    message.toString(),
     snackPosition: SnackPosition.BOTTOM,
     backgroundColor: Colors.green,
     colorText: Colors.white,

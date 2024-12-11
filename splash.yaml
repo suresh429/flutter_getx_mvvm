@@ -4,6 +4,6 @@ flutter_native_splash:
   image: "assets/app_logo.png"
   image_dark: "assets/app_logo.png"
   android_12: true
-
+  android_gravity: center # Options include fill, center, top, bottom, etc
 
   web: false
