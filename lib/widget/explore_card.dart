@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../model/ExploreModel.dart';
 import '../utilites/colors.dart';
@@ -9,7 +11,11 @@ import '../view_model/explore_controller.dart';
 class ExploreCard extends StatefulWidget {
   final ExploreModel exploreModel;
   final dynamic controller; // Accepts either controller
-  const ExploreCard({super.key, required this.exploreModel,required this.controller,});
+  const ExploreCard({
+    super.key,
+    required this.exploreModel,
+    required this.controller,
+  });
 
   @override
   State<ExploreCard> createState() => _ExploreCardState();
@@ -50,14 +56,17 @@ class _ExploreCardState extends State<ExploreCard> {
                   left: 8, // Position 8px from the left
                   child: Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
                       widget.exploreModel.requestType,
-                      style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontSize: 12),
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
                     ),
                   ),
                 ),
@@ -174,37 +183,74 @@ class _ExploreCardState extends State<ExploreCard> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.thumb_up,
-                                  size: 20, color: Colors.grey),
-                              onPressed: () {},
-                            ),
-                            Text(widget.exploreModel.likesCount.toString()),
-                          ],
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Obx(() {
+                                return IconButton(
+                                  icon: Icon(
+                                    Icons.thumb_up,
+                                    size: 20,
+                                    color: widget.exploreModel.isLike.value
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    widget.exploreModel.isLike.value =
+                                        !widget.exploreModel.isLike.value;
+                                    if (widget.exploreModel.isLike.value) {
+                                      widget.exploreModel.likesCount++;
+                                    } else {
+                                      widget.exploreModel.likesCount--;
+                                    }
+                                    controller.likeUnlikeRequest(
+                                        widget.exploreModel.id,
+                                        widget.exploreModel.isLike.value
+                                            ? "like"
+                                            : 'unlike');
+                                  },
+                                );
+                              }),
+                              Obx(() {
+                                return Text(
+                                  widget.exploreModel.likesCount.toString(),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(fontSize: 16),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.comment,
-                                  size: 20, color: Colors.grey),
-                              onPressed: () {},
-                            ),
-                            Text(widget.exploreModel.commentsCount.toString()),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
+                        Flexible(
                           child: Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.share,
+                                icon: const Icon(Icons.comment,
                                     size: 20, color: Colors.grey),
                                 onPressed: () {},
                               ),
-                              Text(widget.exploreModel.sharesCount.toString()),
+                              Text(widget.exploreModel.commentsCount.toString()),
                             ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
+                          child: Flexible(
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.share,
+                                      size: 20, color: Colors.grey),
+                                  onPressed: () {
+                                    var title = widget.exploreModel.title.replaceAll(' ', '-');
+                                    var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                    Share.share(url, subject: 'TALLeaders');
+                                  },
+                                ),
+                                Text(widget.exploreModel.sharesCount.toString()),
+                              ],
+                            ),
                           ),
                         ),
                       ],

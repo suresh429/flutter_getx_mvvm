@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
 import 'package:get/get.dart';
-
 import '../utilites/colors.dart';
 import '../widget/explore_card.dart';
 
@@ -13,6 +12,7 @@ class ExploreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     controller.resetTab();
+   // controller.resetPaginationForTab(0);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -60,45 +60,45 @@ class ExploreScreen extends StatelessWidget {
               height: 30,
               color: Colors.white,
               child: Obx(() => TabBar(
-                    controller: controller.tabController,
-                    isScrollable: true,
-                    physics: const ClampingScrollPhysics(),
-                    unselectedLabelColor: Colors.black,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: ColorUtils.colorPrimary,
-                    ),
-                    tabs: controller.tabTitles.map((title) {
-                      final int index = controller.tabTitles.indexOf(title);
-                      final bool isSelected =
-                          controller.selectedIndex.value == index;
+                controller: controller.tabController,
+                isScrollable: true,
+                physics: const ClampingScrollPhysics(),
+                unselectedLabelColor: Colors.black,
+                indicatorSize: TabBarIndicatorSize.label,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: ColorUtils.colorPrimary,
+                ),
+                tabs: controller.tabTitles.map((title) {
+                  final int index = controller.tabTitles.indexOf(title);
+                  final bool isSelected =
+                      controller.selectedIndex.value == index;
 
-                      return Tab(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          margin: const EdgeInsets.symmetric(horizontal: 1),
-                          height: 30,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color:
-                                  isSelected ? Colors.transparent : ColorUtils.colorGray,
-                              width: 1,
-                            ),
-                          ),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              title,
-                              style: const TextStyle(fontSize: 14),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                  return Tab(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      margin: const EdgeInsets.symmetric(horizontal: 1),
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color:
+                          isSelected ? Colors.transparent : ColorUtils.colorGray,
+                          width: 1,
                         ),
-                      );
-                    }).toList(),
-                  )),
+                      ),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          title,
+                          style: const TextStyle(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              )),
             ),
           ),
           const SizedBox(height: 10),
@@ -138,7 +138,7 @@ class ExploreScreen extends StatelessWidget {
                         // List of items
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) {
+                                (context, index) {
                               if (index < data.length) {
                                 final exploreModel = data[index];
                                 return ExploreCard(exploreModel: exploreModel,controller: controller,);

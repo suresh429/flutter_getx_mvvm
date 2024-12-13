@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -39,6 +40,25 @@ static void showInfoSnackbar(String message) {
       margin: const EdgeInsets.all(15)
   );
 }
+
+static void launchURL(String url,BuildContext context) async {
+  final theme = Theme.of(context);
+  try {
+    await launchUrl(
+      Uri.parse(url),
+      options: LaunchOptions(
+        barColor: theme.colorScheme.surface,
+        onBarColor: theme.colorScheme.onSurface,
+        barFixingEnabled: false,
+      ),
+    );
+  } catch (e) {
+    // If the URL launch fails, an exception will be thrown. (For example, if no browser app is installed on the Android device.)
+    debugPrint(e.toString());
+  }
+}
+
+
 
 static String calculateTimeLeft(int startDate, int dueDate) {
 // Get the current time
