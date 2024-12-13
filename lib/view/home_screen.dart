@@ -22,7 +22,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
 
-  final RecommendationController controller = Get.put(RecommendationController());
+  final RecommendationController controller =
+      Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
 
@@ -53,17 +54,51 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Image.asset(
               'assets/app_logo.png', // Path to your app logo
-              height: 40,
+              height: 30,
             ),
             const Spacer(),
-            IconButton(
-              icon: const Icon(
-                Icons.person,
-                color: Colors.black, // Icon color
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // Opens navigation drawer
+            GestureDetector(
+              onTap: () {
+                Scaffold.of(context)
+                    .openDrawer(); // Opens the navigation drawer
               },
+              child: Obx(() {
+                final loginResponse = bottomNavController.loginResponse.value!;
+                return Stack(children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.red,
+                    backgroundImage: NetworkImage(
+                      loginResponse.data?.profileImageUrl ??
+                          'https://via.placeholder.com/150',
+                    ),
+                    radius: 18.0,
+                  ),
+                  Positioned(
+                      left: 0.0, // Adjust the horizontal position
+                      bottom: 0.0, // Adjust the vertical position
+                      child: Container(
+                        width: 18, // Adjust the width of the circle
+                        height: 18, // Adjust the height of the circle
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          // Background color of the circle
+                          shape: BoxShape.circle,
+                          // Ensures the container is circular
+                          border: Border.all(
+                            color: Colors.black, // Outline color
+                            width: 0.5, // Width of the outline
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.menu,
+                            size: 12,
+                            color: Colors.black, // Icon color
+                          ),
+                        ),
+                      )),
+                ]);
+              }),
             ),
           ],
         ),
@@ -144,6 +179,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               Card(
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
                   // margin: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -300,14 +339,18 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 20),
-               Padding(
-                padding: const EdgeInsets.only(left: 16,right: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Invite ', style: TextStyle(fontSize: 20)),
-                    InkWell(child: const Icon(Icons.close,size: 24,),
-                      onTap: (){
+                    InkWell(
+                      child: const Icon(
+                        Icons.close,
+                        size: 24,
+                      ),
+                      onTap: () {
                         Navigator.pop(context);
                       },
                     ),
@@ -325,64 +368,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    Obx(()  {
-                        return TextField(
-                          controller: controller.firstNameController,
-                          decoration:  InputDecoration(
-                            labelText: 'First Name',
-                            border: OutlineInputBorder(),
-                            errorText: controller.firstNameError.value,
-                          ),
-                        );
-                      }
-                    ),
+                    Obx(() {
+                      return TextField(
+                        controller: controller.firstNameController,
+                        decoration: InputDecoration(
+                          labelText: 'First Name',
+                          border: OutlineInputBorder(),
+                          errorText: controller.firstNameError.value,
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 20),
                     Obx(() {
-                        return TextField(
-                          controller: controller.lastNameController,
-                          decoration:  InputDecoration(
-                            labelText: 'Last Name',
-                            border: OutlineInputBorder(),
-                            errorText: controller.lastNameError.value,
-                          ),
-                        );
-                      }
-                    ),
-                    const SizedBox(height: 20),
-                    Obx((){
-                        return TextField(
-                          controller: controller.emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            border: const OutlineInputBorder(),
-                            errorText: controller.emailError.value,
-                          ),
-                        );
-                      }
-                    ),
+                      return TextField(
+                        controller: controller.lastNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Last Name',
+                          border: OutlineInputBorder(),
+                          errorText: controller.lastNameError.value,
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 20),
                     Obx(() {
-                        return ElevatedButton(
-                          onPressed: controller.isLoading.value ? null :() { controller.inviteMember(context); },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 45),
-                            // Full-width button
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(5), // Set the radius to 5
-                            ),
+                      return TextField(
+                        controller: controller.emailController,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          border: const OutlineInputBorder(),
+                          errorText: controller.emailError.value,
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                      return ElevatedButton(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : () {
+                                controller.inviteMember(context);
+                              },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 45),
+                          // Full-width button
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(5), // Set the radius to 5
                           ),
-                          child: controller.isLoading.value
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  'Invite',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                        );
-                      }
-                    )
+                        ),
+                        child: controller.isLoading.value
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                'Invite',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                      );
+                    })
                   ],
                 ),
               )
