@@ -74,6 +74,8 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ],
                             ),
+                            const SizedBox(width: 5),
+                            IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 20,))
                           ],
                         );
                       }
@@ -109,6 +111,7 @@ class _MainScreenState extends State<MainScreen> {
                 title: const Text("Manage Preferences"),
                 onTap: () {
                   Navigator.pop(context);
+                  Get.toNamed('/managePref');
                 },
               ),
               ListTile(

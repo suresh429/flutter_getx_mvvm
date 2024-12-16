@@ -9,6 +9,7 @@ import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
+import '../model/ShareModel.dart';
 import '../payload/like_unlike_payload.dart';
 import '../payload/login_payload.dart';
 
@@ -20,6 +21,7 @@ class ApiService {
   static const String _addToFav = "donation/request/favourite";
   static const String _inviteTalLeaders = "user/inviteTalLeaders";
   static const String _likeUnlike = "donation/request/like";
+  static const String _share = "donationRequest/analytics";
 
 
 
@@ -76,7 +78,7 @@ class ApiService {
   // like unlike
   Future<CommonModel> likeUnlikeRequest(LikeUnlikePayload payload,String? token) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.put(
         '${AppEnvironment.baseApiUrl}$_likeUnlike',
         data: payload.toJson(),
         options: Options(
@@ -90,6 +92,32 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return CommonModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
+    }
+  }
+
+  // like unlike
+  Future<ShareModel> shareRequest(String? token,String id) async {
+    try {
+      final response = await _dio.put(
+        '${AppEnvironment.baseApiUrl}$_share/$id/share',
+      //  data: payload.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':
+            'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return ShareModel.fromJson(response.data);
       } else {
         throw Exception('Failed to log in: ${response.data['message']}');
       }
@@ -122,8 +150,6 @@ class ApiService {
     // Map the data to ExploreModel objects
     return data.map((explore) => ExploreModel.fromJson(explore)).toList();
   }
-
-
 
 
   //  Favorite

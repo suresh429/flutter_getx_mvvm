@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
+import 'package:flutter_getx_mvvm/view/manage_preferences.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'utilites/colors.dart';
@@ -101,6 +102,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => MainScreen()),
         // Define your home screen
         GetPage(name: '/explore', page: () => ExploreScreen()),
+        GetPage(name: '/managePref', page: () => const ManagePreferences()),
       ],
     );
   }

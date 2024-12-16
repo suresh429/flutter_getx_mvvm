@@ -253,4 +253,27 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
     }
   }
 
+  Future<void> shareRequest(String reqId) async {
+    try {
+      final dataResponse = await apiService.shareRequest(loginResponse?.data?.tokenDetail?.token,reqId);
+
+      if (dataResponse.statusCode == 200) {
+        ConstantsUtils.showSuccessSnackbar(dataResponse.message);
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMessage;
+      if (e is DioException) {
+        errorMessage = 'Network error occurred. Please try again later.';
+      } else {
+        errorMessage = e.toString();
+      }
+      ConstantsUtils.showErrorSnackbar(errorMessage);
+    } finally {
+
+    }
+  }
+
+
 }

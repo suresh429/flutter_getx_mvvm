@@ -181,9 +181,9 @@ class _ExploreCardState extends State<ExploreCard> {
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Flexible(
+                        Expanded(
                           child: Row(
                             children: [
                               Obx(() {
@@ -197,7 +197,7 @@ class _ExploreCardState extends State<ExploreCard> {
                                   ),
                                   onPressed: () {
                                     widget.exploreModel.isLike.value =
-                                        !widget.exploreModel.isLike.value;
+                                    !widget.exploreModel.isLike.value;
                                     if (widget.exploreModel.isLike.value) {
                                       widget.exploreModel.likesCount++;
                                     } else {
@@ -205,57 +205,72 @@ class _ExploreCardState extends State<ExploreCard> {
                                     }
                                     controller.likeUnlikeRequest(
                                         widget.exploreModel.id,
-                                        widget.exploreModel.isLike.value
-                                            ? "like"
-                                            : 'unlike');
+                                        widget.exploreModel.isLike.value ? "like" : 'unlike');
                                   },
                                 );
                               }),
-                              Obx(() {
-                                return Text(
-                                  widget.exploreModel.likesCount.toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(fontSize: 16),
-                                );
-                              }),
+                              Flexible(
+                                child: Obx(() {
+                                  return Text(
+                                    widget.exploreModel.likesCount.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 16),
+                                  );
+                                }),
+                              ),
                             ],
                           ),
                         ),
-                        Flexible(
+                        Expanded(
                           child: Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.comment,
-                                    size: 20, color: Colors.grey),
+                                icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
                                 onPressed: () {},
                               ),
-                              Text(widget.exploreModel.commentsCount.toString()),
+                              Flexible(
+                                child: Text(
+                                  widget.exploreModel.commentsCount.toString(),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
-                          child: Flexible(
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.share,
-                                      size: 20, color: Colors.grey),
-                                  onPressed: () {
-                                    var title = widget.exploreModel.title.replaceAll(' ', '-');
-                                    var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
-                                    Share.share(url, subject: 'TALLeaders');
-                                  },
-                                ),
-                                Text(widget.exploreModel.sharesCount.toString()),
-                              ],
-                            ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.share, size: 20, color: Colors.grey),
+                                onPressed: () {
+                                  // share content
+                                  widget.exploreModel.sharesCount++;
+                                  controller.shareRequest(widget.exploreModel.id);
+                                  var title = widget.exploreModel.title.replaceAll(' ', '-');
+                                  var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                  Share.share(url, subject: 'TALLeaders');
+                                },
+                              ),
+                              Flexible(
+                                child: Obx(() {
+                                  return Text(
+                                    widget.exploreModel.sharesCount.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 16),
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
+                  )
+
                 ],
               ),
             ),
