@@ -10,7 +10,7 @@ class ExploreModel {
   final int? dueDate; // Nullable for optional dates
   RxInt likesCount; // Changed from late final RxInt to final RxInt
   final int commentsCount;
-  final int sharesCount;
+  RxInt sharesCount;
   final String city;
   final String state;
   final String country;
@@ -31,7 +31,7 @@ class ExploreModel {
     this.dueDate,
     required int likesCount, // Pass an int and convert to RxInt
     required this.commentsCount,
-    required this.sharesCount,
+    required int sharesCount,
     required this.city,
     required this.state,
     required this.country,
@@ -41,7 +41,9 @@ class ExploreModel {
     required this.languages,
     required bool isFavorite,
     required bool isLike,
-  }) : likesCount = likesCount.obs, // Convert to RxInt
+  })  : likesCount = likesCount.obs,
+        sharesCount = sharesCount.obs,
+        // Convert to RxInt
         isFavorite = isFavorite.obs,
         isLike = isLike.obs;
 
@@ -53,9 +55,12 @@ class ExploreModel {
       requestType: json['request_type'] ?? '',
       requestedFor: json['requested_for'] ?? '',
       defaultImageUrl: json['defaultImageUrl'] ?? '',
-      startDate: json['start_date'] as int?, // Ensure startDate is nullable
-      dueDate: json['due_date'] as int?, // Ensure dueDate is nullable
-      likesCount: json['likesCount'] ?? 0, // Pass int
+      startDate: json['start_date'] as int?,
+      // Ensure startDate is nullable
+      dueDate: json['due_date'] as int?,
+      // Ensure dueDate is nullable
+      likesCount: json['likesCount'] ?? 0,
+      // Pass int
       commentsCount: json['commentsCount'] ?? 0,
       sharesCount: json['sharesCount'] ?? 0,
       city: (json['user_info']?['address']?['city'] ?? '') as String,
