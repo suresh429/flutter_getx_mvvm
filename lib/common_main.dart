@@ -102,7 +102,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => MainScreen()),
         // Define your home screen
         GetPage(name: '/explore', page: () => ExploreScreen()),
-        GetPage(name: '/managePref', page: () => const ManagePreferences()),
+        GetPage(name: '/managePref', page: () => ManagePreferences()),
       ],
     );
   }
