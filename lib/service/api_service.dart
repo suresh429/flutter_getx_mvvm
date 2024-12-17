@@ -12,6 +12,7 @@ import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
 import '../model/ShareModel.dart';
 import '../payload/like_unlike_payload.dart';
 import '../payload/login_payload.dart';
+import '../payload/user_update_payload.dart';
 
 
 class ApiService {
@@ -22,6 +23,7 @@ class ApiService {
   static const String _inviteTalLeaders = "user/inviteTalLeaders";
   static const String _likeUnlike = "donation/request/like";
   static const String _share = "donationRequest/analytics";
+  static const String _user = "user";
 
 
 
@@ -101,7 +103,7 @@ class ApiService {
     }
   }
 
-  // like unlike
+  // share request
   Future<ShareModel> shareRequest(String? token,String id) async {
     try {
       final response = await _dio.put(
@@ -126,6 +128,46 @@ class ApiService {
       rethrow;
     }
   }
+
+  // manage preferences
+  Future<LoginModel> managePreferencesRequest(String? token,String? userId,UserUpdatePayload payload) async {
+    try {
+      final response = await _dio.put(
+        '${AppEnvironment.baseApiUrl}$_user/$userId',
+        data: payload.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':
+            'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return LoginModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
+    }
+  }
+
+
+  // get profile
+  Future<LoginModel> getProfile(String? uniqueId) async {
+    final response = await _dio.get(
+      "${AppEnvironment.baseApiUrl}$_user/$uniqueId",
+    );
+
+    final data = response.data['data'] ; // Accessing 'data' directly
+
+    // Map the data to ExploreModel objects
+    return data.map((explore) => LoginModel.fromJson(explore));
+  }
+
 
   // fetch recommendations
   Future<List<ExploreModel>> fetchRecommendations(String? uniqueId) async {
