@@ -20,7 +20,6 @@ class ManagePreferencesController extends GetxController {
   var errorMessage = ''.obs;
 
   final ApiService _apiService = ApiService();
-  final Connectivity _connectivity = Connectivity();
 
   final categories = <Category>[
     Category(
@@ -75,31 +74,26 @@ class ManagePreferencesController extends GetxController {
   var selectedLanguages = <String>[].obs;
   var selectedAreasOfInterest = <AreaOption>[].obs;
 
-
   bool get isPodcastSelected => selectedCategoriesIndices
       .any((index) => categories[index].title == "Podcast");
 
   @override
-  Future<void> onInit() async {
+  void onInit() {
     super.onInit();
-    loginResponse = await ConstantsUtils.getStoredLoginResponse();
-// Add debugging print statements to track the login response
-    print("Login Response: ${loginResponse?.data?.uniqueId}");
-
-    if (loginResponse?.data?.uniqueId != null) {
-      // Proceed with fetching profile data only if uniqueId is available
-      getProfileData(loginResponse?.data?.uniqueId);
-    } else {
-      print("Login Response or UniqueId is null");
-    }
-    setInitialAppCategories();
-    setInitialLanguages();
-    setInitialAreasOfInterest();
+    _initializeController();
   }
 
-   // set categories
-  void setInitialAppCategories() {
-    final storedCategories = loginResponse?.data?.talLeaderPreferences ?? [];
+  void _initializeController() async {
+    loginResponse = await ConstantsUtils.getStoredLoginResponse();
+    if (loginResponse?.data?.uniqueId != null) {
+      // Proceed with fetching profile data only if uniqueId is available
+      await getProfileData(loginResponse?.data?.uniqueId);
+    }
+  }
+
+  // set categories
+  void setInitialAppCategories(List<String> talLeaderPreferences) {
+    final storedCategories = talLeaderPreferences ?? [];
     // Clear previously selected indices before assigning new ones
     selectedCategoriesIndices.clear();
 
@@ -109,42 +103,38 @@ class ManagePreferencesController extends GetxController {
           .asMap() // Convert the list to a map of index-value pairs
           .entries
           .where((entry) {
-        // Perform case-insensitive comparison
-        bool isMatch = storedCategories
-            .any((storedCategory) => storedCategory.toLowerCase() == entry.value.title.toLowerCase());
-        return isMatch;
-      }) // Filter categories based on titles
+            // Perform case-insensitive comparison
+            bool isMatch = storedCategories.any((storedCategory) =>
+                storedCategory.toLowerCase() ==
+                entry.value.title.toLowerCase());
+            return isMatch;
+          }) // Filter categories based on titles
           .map((entry) => entry.key) // Get the index (key)
           .toList(),
     );
-
   }
 
-  void setInitialLanguages() {
-
-    final storedLanguages = loginResponse?.data?.languagePreferences ?? [];
+  // set languages
+  void setInitialLanguages(List<String> languagePreferences) {
+    final storedLanguages = languagePreferences ?? [];
 
     // Clear previously selected languages before assigning new ones
     selectedLanguages.clear();
 
-
     // Find the selected languages and assign them to selectedLanguages
     selectedLanguages.addAll(
-      languages
-          .where((language) {
+      languages.where((language) {
         // Check if the language exists in the stored preferences (case-insensitive)
         bool isMatch = storedLanguages.any((storedLanguage) =>
-        storedLanguage.toLowerCase() == language.toLowerCase());
+            storedLanguage.toLowerCase() == language.toLowerCase());
         return isMatch;
-      })
-          .toList(),
+      }).toList(),
     );
-
   }
 
   // set Areas
-  void setInitialAreasOfInterest() {
-    final storedAreas = loginResponse?.data?.areasOfInterest ?? [];
+  void setInitialAreasOfInterest(List<String>? areasOfInterests) {
+    final storedAreas = areasOfInterests ?? [];
     selectedAreasOfInterest.assignAll(
       areasOfInterest.where((area) => storedAreas.contains(area.name)).toList(),
     );
@@ -174,7 +164,9 @@ class ManagePreferencesController extends GetxController {
     }
   }
 
-  Future<void> updateUserPreferences(List<String> selectedCategoryNames, List<String> selectedLanguageNames, List<String> selectedAreas) async {
+  // update preferences
+  Future<void> updateUserPreferences(List<String> selectedCategoryNames,
+      List<String> selectedLanguageNames, List<String> selectedAreas) async {
     final payload = UserUpdatePayload(
       areasOfInterest: selectedAreas,
       languagePreferences: selectedLanguageNames,
@@ -211,13 +203,13 @@ class ManagePreferencesController extends GetxController {
     }
   }
 
-
+  // get profile
   Future<void> getProfileData(String? uniqueId) async {
     // Check connectivity before making API request
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       errorMessage.value =
-      'No internet connection. Please check your network settings.';
+          'No internet connection. Please check your network settings.';
       return; // Skip API call if no internet
     }
 
@@ -225,13 +217,15 @@ class ManagePreferencesController extends GetxController {
       isLoading(true);
       errorMessage.value = ''; // Reset previous errors
 
-      // Fetch recommendations from the API
+      // Fetch profile data from the API
       final getProfile = await _apiService.getProfile(uniqueId);
-      print("areasOfInterest  ${getProfile.data?.areasOfInterest}");
 
-      await storage.write('userData', jsonEncode(getProfile.toJson()));
+      setInitialAppCategories(getProfile.data.talLeaderPreferences);
+      setInitialLanguages(getProfile.data.languagePreferences);
+      setInitialAreasOfInterest(getProfile.data.areasOfInterest);
 
-
+      // Example storage operation
+      // await storage.write('userData', jsonEncode(getProfile.toJson()));
     } catch (e) {
       // Use the updated error handler
       String errorMsg = await ErrorHandler.handleError(e);

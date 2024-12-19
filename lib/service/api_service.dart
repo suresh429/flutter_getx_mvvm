@@ -10,6 +10,7 @@ import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
 import '../model/ShareModel.dart';
+import '../model/UserModel.dart';
 import '../payload/like_unlike_payload.dart';
 import '../payload/login_payload.dart';
 import '../payload/user_update_payload.dart';
@@ -157,16 +158,21 @@ class ApiService {
 
 
   // get profile
-  Future<LoginModel> getProfile(String? uniqueId) async {
-    final response = await _dio.get(
-      "${AppEnvironment.baseApiUrl}$_user/$uniqueId",
-    );
+  Future<UserModel> getProfile(String? uniqueId) async {
+    try {
+      final response = await _dio.get("${AppEnvironment.baseApiUrl}$_user/$uniqueId");
 
-    final data = response.data['data'] ; // Accessing 'data' directly
-
-    // Map the data to ExploreModel objects
-    return data.map((explore) => LoginModel.fromJson(explore));
+      if (response.statusCode == 200) {
+       // print("Full API response: ${response.data}");
+        return UserModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      throw Exception('Failed to log in: $e');
+    }
   }
+
 
 
   // fetch recommendations
