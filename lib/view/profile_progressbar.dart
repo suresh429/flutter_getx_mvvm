@@ -24,40 +24,38 @@ class ProfileWithProgressBar extends StatelessWidget {
             height: 50,
             child: CircularProgressIndicator(
               value: progressPercentage / 100, // Convert percentage to 0-1 range
-              strokeWidth: 2, // Width of the progress bar
+              strokeWidth: 1.5, // Width of the progress bar
               backgroundColor: Colors.grey.shade300, // Background color of the circle
               valueColor: AlwaysStoppedAnimation<Color>(
-                     progressPercentage < 40
+                progressPercentage < 40
                     ? Colors.red // For progress less than 40%
                     : progressPercentage < 75
                     ? Colors.orange // For progress between 40% and 74%
                     : Colors.green, // For progress greater than or equal to 75%
               ), // Progress color
-
             ),
           ),
           // Circle Avatar with Profile Image
           CircleAvatar(
             backgroundColor: Colors.red,
             backgroundImage: NetworkImage(data.data?.profileImageUrl ?? 'https://via.placeholder.com/150'),
-            radius: 23, // Size of the avatar
+            radius: 22, // Size of the avatar
           ),
           // Percentage Text at the bottom
           Positioned(
-            bottom: -3,
+            bottom: -2,
             child: Container(
-              padding: const EdgeInsets.all(3), // Padding around the text
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6), // Adjust padding for better fit
               decoration: BoxDecoration(
                 color: Colors.white, // Background color
-                borderRadius: BorderRadius.circular(6), // Corner radius
+                borderRadius: BorderRadius.circular(12), // Increased corner radius for rounded effect
               ),
               child: Text(
                 '${progressPercentage.toInt()}%', // Display percentage
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 7,
-                  color: Colors.black,
-                  backgroundColor: Colors.white
+                  color: Colors.green,
                 ),
               ),
             ),
@@ -65,6 +63,7 @@ class ProfileWithProgressBar extends StatelessWidget {
         ],
       ),
     );
+
   }
 
   // Method to calculate profile completion
