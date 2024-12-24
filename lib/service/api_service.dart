@@ -14,6 +14,7 @@ import '../model/UserModel.dart';
 import '../payload/like_unlike_payload.dart';
 import '../payload/login_payload.dart';
 import '../payload/user_update_payload.dart';
+import '../utilites/constants_Utils.dart';
 
 
 class ApiService {
@@ -174,9 +175,9 @@ class ApiService {
   }
 
 
-
   // fetch recommendations
-  Future<List<ExploreModel>> fetchRecommendations(String? uniqueId) async {
+  Future<List<ExploreModel>> fetchRecommendations(String? uniqueId,String requestType,String language) async {
+
     final response = await _dio.get(
       "${AppEnvironment.baseApiUrl}$_donationRequest",
       queryParameters: {
@@ -185,13 +186,13 @@ class ApiService {
         'status': 1,
         'sortBy': 'createdAt',
         'sortOrder': -1,
-        'requestType': jsonEncode([
-          {'request_type': 'podcast'}
-        ]),
+        'requestType': requestType,
         'loginId': uniqueId,
-        'languagePreferences': '',
+        'languagePreferences': language,
       },
     );
+
+    print("object. $requestType   $language");
     // Update this line to get the actual list of recommendations
     final data = response.data['data'] as List; // Accessing 'data' directly
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
+import 'package:flutter_getx_mvvm/view/profile_progressbar.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -44,38 +45,44 @@ class _MainScreenState extends State<MainScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.red,
-                              backgroundImage: NetworkImage(
-                                  loginResponse.data?.profileImageUrl ??
-                                      'https://via.placeholder.com/150'),
-                              radius:
-                                  25.0, // Adjust the size of the avatar if needed
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  loginResponse.data?.username ?? 'User Name',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                            SizedBox(
+                              width: 50,
+                                height: 70,
+                                child: ProfileWithProgressBar(data: loginResponse,)),
+                            // CircleAvatar(
+                            //   backgroundColor: Colors.red,
+                            //   backgroundImage: NetworkImage(
+                            //       loginResponse.data?.profileImageUrl ??
+                            //           'https://via.placeholder.com/150'),
+                            //   radius:
+                            //       20.0, // Adjust the size of the avatar if needed
+                            // ),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    loginResponse.data?.username ?? 'User Name',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  loginResponse.data?.email ?? 'User@email.com',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
+                                  Text(
+                                    loginResponse.data?.email ?? 'User@email.com',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 10,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                            const SizedBox(width: 5),
-                            IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 20,))
+                            const SizedBox(width: 2),
+                            IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 15,))
                           ],
                         );
                       }
