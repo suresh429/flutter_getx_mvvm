@@ -38,12 +38,12 @@ class RecommendationController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
 
-    _initializeController();
+    initializeController();
 
   }
 
   // initialize
-  void _initializeController() async {
+  Future<void> initializeController() async {
     loginResponse = await ConstantsUtils.getStoredLoginResponse();
     if (loginResponse?.data?.uniqueId != null) {
       // Proceed with fetching profile data only if uniqueId is available

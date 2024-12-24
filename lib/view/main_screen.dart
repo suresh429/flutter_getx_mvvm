@@ -196,7 +196,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 title: const Text("Logout"),
                 onTap: () {
-                  logout();
+                  showGetXDialog(context);
+                  //logout();
                 },
               ),
             ],
@@ -255,5 +256,32 @@ class _MainScreenState extends State<MainScreen> {
   void logout() {
     storage.remove('isLoggedIn');
     Get.offAllNamed('/login');
+  }
+
+  void showGetXDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Do you want to proceed to Logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Cancel action
+              Get.back(); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // OK action
+              // Add the action you want to take when the OK button is clicked
+              logout();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+    );
   }
 }

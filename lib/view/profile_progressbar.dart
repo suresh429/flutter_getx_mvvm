@@ -40,7 +40,7 @@ class ProfileWithProgressBar extends StatelessWidget {
           CircleAvatar(
             backgroundColor: Colors.red,
             backgroundImage: NetworkImage(data.data?.profileImageUrl ?? 'https://via.placeholder.com/150'),
-            radius: 22, // Size of the avatar
+            radius: 23, // Size of the avatar
           ),
           // Percentage Text at the bottom
           Positioned(
