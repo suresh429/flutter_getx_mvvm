@@ -187,6 +187,7 @@ class ManagePreferencesController extends GetxController {
         // Save the entire login response to storage
         await storage.write('userData', jsonEncode(dataResponse.toJson()));
         ConstantsUtils.showSuccessSnackbar(dataResponse.message);
+        Get.offNamed('/home');
       } else {
         throw Exception("data is missing or invalid");
       }

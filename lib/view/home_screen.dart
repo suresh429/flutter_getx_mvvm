@@ -34,14 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    controller.initializeController();
   }
 
-  // initial call
-  Future<void> fetchData() async {
-    var loginResponse = await ConstantsUtils.getStoredLoginResponse();
-    controller.fetchData(loginResponse?.data?.uniqueId);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(
-                height: 320,
+                height: 325,
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());

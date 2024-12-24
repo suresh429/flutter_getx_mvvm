@@ -32,7 +32,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('D:\\jetpackProjects\\flutter_getx_mvvm\\talleaders.jks')
+            storeFile file('/Users/misteam/Documents/AndroidStudioProjects/flutter_getx_mvvm/talleaders.jks')
             storePassword 'touchalife2022'
             keyPassword 'touchalife2022'
             keyAlias 'talleaders'
