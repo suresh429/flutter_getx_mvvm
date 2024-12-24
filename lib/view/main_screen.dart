@@ -46,9 +46,10 @@ class _MainScreenState extends State<MainScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 50,
-                                height: 70,
-                                child: ProfileWithProgressBar(data: loginResponse,)),
+                              width: 60,
+                                height: 60,
+                                child: ProfileWithProgressBar(data: loginResponse,)
+                            ),
                             // CircleAvatar(
                             //   backgroundColor: Colors.red,
                             //   backgroundImage: NetworkImage(
@@ -58,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
                             //       20.0, // Adjust the size of the avatar if needed
                             // ),
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
