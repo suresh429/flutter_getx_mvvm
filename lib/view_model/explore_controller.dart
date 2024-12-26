@@ -11,17 +11,23 @@ import '../service/api_service.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
-class ExploreController extends GetxController with GetSingleTickerProviderStateMixin {
+class ExploreController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  RxString title = ''.obs;
+  var subtitle = ''.obs;
   final errorMessage = ''.obs;
-  final exploreData = <ExploreModel>[].obs; // Observable list to hold explore data
+  final exploreData =
+      <ExploreModel>[].obs; // Observable list to hold explore data
   final isLoading = <int, bool>{}.obs; // Loading state for each tab
   late TabController tabController;
   late LoginModel? loginResponse;
   var selectedIndex = 0.obs; // Track the selected tab index
   var tabPage = <int, int>{}.obs; // Track the current page for each tab
-  var tabHasMore = <int, bool>{}.obs; // Store if there is more data to fetch for each tab
+  var tabHasMore =
+      <int, bool>{}.obs; // Store if there is more data to fetch for each tab
   var tabData = <int, List<ExploreModel>>{}.obs; // Store data for each tab
-  final scrollControllers = <int, ScrollController>{}.obs; // Scroll controllers for each tab
+  final scrollControllers =
+      <int, ScrollController>{}.obs; // Scroll controllers for each tab
 
   final ApiService apiService = ApiService(); // API service instance
   final Connectivity _connectivity = Connectivity(); // Connectivity instance
@@ -83,15 +89,17 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
 
   Future<void> checkAndFetchData(int newIndex) async {
     // Listen to connectivity changes
-    _connectivity.onConnectivityChanged.listen((ConnectivityResult result) async {
+    _connectivity.onConnectivityChanged
+        .listen((ConnectivityResult result) async {
       if (result != ConnectivityResult.none) {
         errorMessage.value = ''; // Clear the error when internet is back
         // Reset pagination and fetch data for the given tab
         resetPaginationForTab(newIndex);
-        await fetchDataForTab(newIndex); // Attempt to fetch data if connection is restored
+        await fetchDataForTab(
+            newIndex); // Attempt to fetch data if connection is restored
       } else {
         errorMessage.value =
-        'No internet connection. Please check your network settings.';
+            'No internet connection. Please check your network settings.';
       }
     });
 
@@ -109,13 +117,14 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
     var connectivityResult = await _connectivity.checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       errorMessage.value =
-      'No internet connection. Please check your network settings.';
+          'No internet connection. Please check your network settings.';
       print(errorMessage.value); // Debugging log
       return; // Skip API call if no internet
     }
 
     if (isLoading[tabIndex] == true || !tabHasMore[tabIndex]!) {
-      print('Skipping fetch. isLoading: ${isLoading[tabIndex]}, tabHasMore: ${tabHasMore[tabIndex]}'); // Debugging log
+      print(
+          'Skipping fetch. isLoading: ${isLoading[tabIndex]}, tabHasMore: ${tabHasMore[tabIndex]}'); // Debugging log
       return; // Skip if already loading or no more data
     }
 
@@ -131,9 +140,10 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
           limit: 5,
           offset: offset,
           page: tabPage[tabIndex]!,
-          userId: loginResponse?.data?.uniqueId);
+          userId: loginResponse?.data?.uniqueId,title: title.value);
 
-      print('Fetched data length for tab index $tabIndex: ${fetchedData.length}'); // Debugging log
+      print(
+          'Fetched data length for tab index $tabIndex: ${fetchedData.length}'); // Debugging log
 
       if (fetchedData.isEmpty) {
         tabHasMore[tabIndex] = false; // No more data for this tab
@@ -154,7 +164,8 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
             ?.addAll(uniqueData); // Add new data to tab's data list
         tabPage[tabIndex] = tabPage[tabIndex]! + 1;
 
-        print('Unique data added for tab index $tabIndex: ${uniqueData.length}'); // Debugging log
+        print(
+            'Unique data added for tab index $tabIndex: ${uniqueData.length}'); // Debugging log
       }
 
       // Update the UI to reflect the changes in data
@@ -214,48 +225,49 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
 
   // Method to reset the tab and load data
   void resetTab() {
+    final args = Get.arguments as Map<String, String>?;
+
+    title.value = args?['title'] ?? 'Explore Requests';
+    subtitle.value = args?['subtitle'] ??
+        'Unleash your expertise on epic missions! Spark lasting change!';
+
     tabController.animateTo(0); // Reset to the first tab (index 0)
     selectedIndex.value = 0; // Update the selected index
     resetPaginationForTab(0);
     fetchDataForTab(0); // Fetch data for the first tab
   }
 
-  Future<void> likeUnlikeRequest(String reqId,String typeStatus) async {
-
+  Future<void> likeUnlikeRequest(String reqId, String typeStatus) async {
     final payload = LikeUnlikePayload(
       requestId: reqId,
       type: typeStatus,
       userId: loginResponse!.data!.uniqueId.toString(),
     );
-
+    print("likeUnlikeRequest :  $payload");
     try {
-
-
       final dataResponse = await apiService.likeUnlikeRequest(
           payload, loginResponse?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
         ConstantsUtils.showSuccessSnackbar(dataResponse.message);
-
       } else {
         throw Exception("data is missing or invalid");
       }
     } catch (e) {
       String errorMessage;
       if (e is DioException) {
-        errorMessage = 'Network error occurred. Please try again later.';
+        errorMessage = e.toString();
       } else {
         errorMessage = e.toString();
       }
       ConstantsUtils.showErrorSnackbar(errorMessage);
-    } finally {
-
-    }
+    } finally {}
   }
 
   Future<void> shareRequest(String reqId) async {
     try {
-      final dataResponse = await apiService.shareRequest(loginResponse?.data?.tokenDetail?.token,reqId);
+      final dataResponse = await apiService.shareRequest(
+          loginResponse?.data?.tokenDetail?.token, reqId);
 
       if (dataResponse.statusCode == 200) {
         ConstantsUtils.showSuccessSnackbar(dataResponse.message);
@@ -270,10 +282,6 @@ class ExploreController extends GetxController with GetSingleTickerProviderState
         errorMessage = e.toString();
       }
       ConstantsUtils.showErrorSnackbar(errorMessage);
-    } finally {
-
-    }
+    } finally {}
   }
-
-
 }

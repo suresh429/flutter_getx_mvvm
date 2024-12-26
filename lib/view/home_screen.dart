@@ -368,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         controller: controller.firstNameController,
                         decoration: InputDecoration(
                           labelText: 'First Name',
-                          border: OutlineInputBorder(),
+                         // border: OutlineInputBorder(),
                           errorText: controller.firstNameError.value,
                         ),
                       );
@@ -379,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         controller: controller.lastNameController,
                         decoration: InputDecoration(
                           labelText: 'Last Name',
-                          border: OutlineInputBorder(),
+                          //border: OutlineInputBorder(),
                           errorText: controller.lastNameError.value,
                         ),
                       );
@@ -390,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         controller: controller.emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          border: const OutlineInputBorder(),
+                         // border: const OutlineInputBorder(),
                           errorText: controller.emailError.value,
                         ),
                       );

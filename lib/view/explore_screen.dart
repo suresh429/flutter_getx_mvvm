@@ -11,7 +11,9 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.resetTab();
+
+   controller.resetTab();
+
    // controller.resetPaginationForTab(0);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -26,23 +28,29 @@ class ExploreScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  const Text(
-                    "Explore Requests",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Obx(() {
+                      return Text(
+                        controller.title.value,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
                   ),
                   const SizedBox(height: 5),
-                  Text(
-                    "Unleash your expertise on epic missions! Spark lasting change!",
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 12,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Obx(() {
+                      return Text(
+                        controller.subtitle.value,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 12,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    }
                   ),
                   const SizedBox(height: 12),
                 ],
