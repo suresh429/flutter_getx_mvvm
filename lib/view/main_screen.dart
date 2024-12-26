@@ -109,6 +109,7 @@ class _MainScreenState extends State<MainScreen> {
                 title: const Text("Favorites"),
                 onTap: () {
                   Navigator.pop(context);
+                  Get.toNamed('/explore',arguments: {'title': 'My Favorites','subtitle':'Opportunities you marked as your favorites.'});
                 },
               ),
               ListTile(

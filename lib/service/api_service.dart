@@ -16,7 +16,6 @@ import '../payload/login_payload.dart';
 import '../payload/user_update_payload.dart';
 import '../utilites/constants_Utils.dart';
 
-
 class ApiService {
   final Dio _dio = Dio();
   static const String _login = "login";
@@ -26,8 +25,6 @@ class ApiService {
   static const String _likeUnlike = "donation/request/like";
   static const String _share = "donationRequest/analytics";
   static const String _user = "user";
-
-
 
   Future<LoginModel> login(LoginPayload payload) async {
     try {
@@ -52,9 +49,8 @@ class ApiService {
     }
   }
 
-
   // invite member
-  Future<CommonModel> inviteMember(InvitePayload payload,String? token) async {
+  Future<CommonModel> inviteMember(InvitePayload payload, String? token) async {
     try {
       final response = await _dio.post(
         '${AppEnvironment.baseApiUrl}$_inviteTalLeaders',
@@ -62,8 +58,7 @@ class ApiService {
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':
-            'Bearer $token',
+            'Authorization': 'Bearer $token',
           },
         ),
       );
@@ -79,43 +74,54 @@ class ApiService {
     }
   }
 
-  // like unlike
-  Future<CommonModel> likeUnlikeRequest(LikeUnlikePayload payload,String? token) async {
+  Future<CommonModel> likeUnlikeRequest(
+      LikeUnlikePayload payload, String? token) async {
     try {
-      final response = await _dio.put(
+      // Validate token
+      if (token == null || token.isEmpty) {
+        throw Exception('Authorization token is required.');
+      }
+
+      // Construct request
+      final response = await _dio.post(
         '${AppEnvironment.baseApiUrl}$_likeUnlike',
         data: payload.toJson(),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':
-            'Bearer $token',
+            'Authorization': 'Bearer $token',
           },
         ),
       );
 
+      // Check response status
       if (response.statusCode == 200) {
         return CommonModel.fromJson(response.data);
       } else {
-        throw Exception('Failed to log in: ${response.data['message']}');
+        final errorMessage =
+            response.data['message'] ?? 'Unknown error occurred.';
+        throw Exception(
+            'Error: $errorMessage (Status Code: ${response.statusCode})');
       }
+    } on DioException catch (dioError) {
+      print('Dio error: ${dioError.response?.data}');
+      rethrow;
     } catch (e) {
-      print("Error occurred during login: $e");
+      print('Unexpected error: $e');
       rethrow;
     }
   }
 
   // share request
-  Future<ShareModel> shareRequest(String? token,String id) async {
+  Future<ShareModel> shareRequest(String? token, String id) async {
     try {
       final response = await _dio.put(
         '${AppEnvironment.baseApiUrl}$_share/$id/share',
-      //  data: payload.toJson(),
+        //  data: payload.toJson(),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':
-            'Bearer $token',
+            'Authorization': 'Bearer $token',
           },
         ),
       );
@@ -132,7 +138,8 @@ class ApiService {
   }
 
   // manage preferences
-  Future<LoginModel> managePreferencesRequest(String? token,String? userId,UserUpdatePayload payload) async {
+  Future<LoginModel> managePreferencesRequest(
+      String? token, String? userId, UserUpdatePayload payload) async {
     try {
       final response = await _dio.put(
         '${AppEnvironment.baseApiUrl}$_user/$userId',
@@ -140,8 +147,7 @@ class ApiService {
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':
-            'Bearer $token',
+            'Authorization': 'Bearer $token',
           },
         ),
       );
@@ -157,14 +163,14 @@ class ApiService {
     }
   }
 
-
   // get profile
   Future<UserModel> getProfile(String? uniqueId) async {
     try {
-      final response = await _dio.get("${AppEnvironment.baseApiUrl}$_user/$uniqueId");
+      final response =
+          await _dio.get("${AppEnvironment.baseApiUrl}$_user/$uniqueId");
 
       if (response.statusCode == 200) {
-       // print("Full API response: ${response.data}");
+        // print("Full API response: ${response.data}");
         return UserModel.fromJson(response.data);
       } else {
         throw Exception('Failed to log in: ${response.data['message']}');
@@ -174,10 +180,9 @@ class ApiService {
     }
   }
 
-
   // fetch recommendations
-  Future<List<ExploreModel>> fetchRecommendations(String? uniqueId,String requestType,String language) async {
-
+  Future<List<ExploreModel>> fetchRecommendations(
+      String? uniqueId, String requestType, String language) async {
     final response = await _dio.get(
       "${AppEnvironment.baseApiUrl}$_donationRequest",
       queryParameters: {
@@ -200,14 +205,12 @@ class ApiService {
     return data.map((explore) => ExploreModel.fromJson(explore)).toList();
   }
 
-
   //  Favorite
-  Future<CommonModel> addToFavorite(FavPayload payload,String? token) async {
+  Future<CommonModel> addToFavorite(FavPayload payload, String? token) async {
     try {
       // Prepare the headers with the Bearer token
       final headers = {
-        'Authorization':
-            'Bearer $token',
+        'Authorization': 'Bearer $token',
       };
       final response = await _dio.post(
         '${AppEnvironment.baseApiUrl}$_addToFav',
@@ -232,32 +235,31 @@ class ApiService {
     }
   }
 
-
-
-
 // Fetch Explore data with pagination
   Future<List<ExploreModel>> fetchExploreRequests(
       {required String requestTypes,
       required int limit,
       required int offset,
       required int page,
-      required String? userId}
-      ) async {
-    try {
+      required String? userId,
+      required String title}) async {
 
+    final favSearchValue = title == 'My Favorites' ? 'true' : '';
+    final status = title == 'My Favorites' ? '' : '1';
+    print("object $status");
+    try {
       final queryParameters = {
         'limit': limit,
         'offset': offset,
         'user_id': userId,
-        'status': 1,
+        'status': status,
         'sortBy': 'createdAt',
         'sortOrder': -1,
         'requestType': requestTypes,
         'loginId': userId,
-        'languagePreferences': '',
-
+        'fav_search': favSearchValue,
+        // 'languagePreferences': '',
       };
-
 
       final response = await _dio.get(
         "${AppEnvironment.baseApiUrl}$_donationRequest",
