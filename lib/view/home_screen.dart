@@ -324,107 +324,109 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void openBottomSheet(BuildContext context) {
     Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Invite ', style: TextStyle(fontSize: 20)),
-                    InkWell(
-                      child: const Icon(
-                        Icons.close,
-                        size: 24,
+      SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Invite ', style: TextStyle(fontSize: 20)),
+                      InkWell(
+                        child: const Icon(
+                          Icons.close,
+                          size: 24,
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                color: ColorUtils.colorGray,
-                height: 1,
-                width: double.maxFinite,
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Obx(() {
-                      return TextField(
-                        controller: controller.firstNameController,
-                        decoration: InputDecoration(
-                          labelText: 'First Name',
-                         // border: OutlineInputBorder(),
-                          errorText: controller.firstNameError.value,
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 20),
-                    Obx(() {
-                      return TextField(
-                        controller: controller.lastNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Last Name',
-                          //border: OutlineInputBorder(),
-                          errorText: controller.lastNameError.value,
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 20),
-                    Obx(() {
-                      return TextField(
-                        controller: controller.emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                         // border: const OutlineInputBorder(),
-                          errorText: controller.emailError.value,
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 20),
-                    Obx(() {
-                      return ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : () {
-                                controller.inviteMember(context);
-                              },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 45),
-                          // Full-width button
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(5), // Set the radius to 5
+                const SizedBox(height: 20),
+                Container(
+                  color: ColorUtils.colorGray,
+                  height: 1,
+                  width: double.maxFinite,
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Obx(() {
+                        return TextField(
+                          controller: controller.firstNameController,
+                          decoration: InputDecoration(
+                            labelText: 'First Name',
+                           // border: OutlineInputBorder(),
+                            errorText: controller.firstNameError.value,
                           ),
-                        ),
-                        child: controller.isLoading.value
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                'Invite',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                      );
-                    })
-                  ],
-                ),
-              )
-            ],
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      Obx(() {
+                        return TextField(
+                          controller: controller.lastNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Last Name',
+                            //border: OutlineInputBorder(),
+                            errorText: controller.lastNameError.value,
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      Obx(() {
+                        return TextField(
+                          controller: controller.emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                           // border: const OutlineInputBorder(),
+                            errorText: controller.emailError.value,
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      Obx(() {
+                        return ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () {
+                                  controller.inviteMember(context);
+                                },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 45),
+                            // Full-width button
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(5), // Set the radius to 5
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  'Invite',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        );
+                      })
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

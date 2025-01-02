@@ -4,7 +4,7 @@ import '../model/LoginModel.dart';
 import '../utilites/constants_Utils.dart';
 
 class BottomNavController extends GetxController {
-  var loginResponse = Rxn<LoginModel?>();
+  var loginResponse = Rxn<LoginModel?>(null);
 
   var selectedIndex = 0.obs;
 

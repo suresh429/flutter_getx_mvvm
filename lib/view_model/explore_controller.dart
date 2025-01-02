@@ -82,6 +82,12 @@ class ExploreController extends GetxController
   }
 
   @override
+  void onReady() {
+    super.onReady();
+    resetTab();
+  }
+
+  @override
   void onClose() {
     tabController.dispose();
     super.onClose();

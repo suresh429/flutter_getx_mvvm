@@ -12,9 +12,11 @@ class ExploreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-   controller.resetTab();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Safe to call after the build phase is complete
+      controller.resetTab();
+    });
 
-   // controller.resetPaginationForTab(0);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
