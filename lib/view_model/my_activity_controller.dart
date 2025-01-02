@@ -94,7 +94,7 @@ class MyActivityController extends GetxController {
         offset += limit;
       }
     } catch (e) {
-      errorMessage.value = 'Failed to load requests. Please check your internet connection and try again.';
+      errorMessage.value = e.toString();
       print('Error fetching requests: $e');
       Get.snackbar('Error', errorMessage.value);
     } finally {

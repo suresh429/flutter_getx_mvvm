@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_getx_mvvm/utilites/constants_Utils.dart';
 import 'package:get/get.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
@@ -11,9 +12,11 @@ class MyActivityScreen extends StatefulWidget {
   State<MyActivityScreen> createState() => _MyActivityScreenState();
 }
 
-class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBindingObserver {
+class _MyActivityScreenState extends State<MyActivityScreen>
+    with WidgetsBindingObserver {
   final MyActivityController controller = Get.put(MyActivityController());
-  final ConnectivityService connectivityService = Get.find<ConnectivityService>();
+  final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
 
   @override
   void initState() {
@@ -69,10 +72,12 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                         print('Retry button pressed');
                         await connectivityService.checkInitialConnection();
                         if (connectivityService.isConnected.value) {
-                          print('Internet is connected, retrying fetch requests');
+                          print(
+                              'Internet is connected, retrying fetch requests');
                           controller.fetchRequests();
                         } else {
-                          print('Internet is not connected, cannot retry fetch requests');
+                          print(
+                              'Internet is not connected, cannot retry fetch requests');
                         }
                       },
                       child: const Text('Retry'),
@@ -86,8 +91,10 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
           }),
           Expanded(
             child: Obx(() {
-              if (!connectivityService.isConnected.value && controller.requests.isEmpty) {
-                return Center(child: Text("Please check your internet connection"));
+              if (!connectivityService.isConnected.value &&
+                  controller.requests.isEmpty) {
+                return const Center(
+                    child: Text("Please check your internet connection"));
               }
 
               if (controller.isLoading.value && controller.requests.isEmpty) {
@@ -191,7 +198,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
           child: Card(
             color: Colors.white,
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +217,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(15),
@@ -226,22 +235,119 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        donationData.donationRequestInfo?.title ?? 'No Title Available',
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            donationData.donationRequestInfo?.title ??
+                                'No Title Available',
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10,),
+                       Row(
+                        children: [
+                           Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Interest sent on',
+                                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  ConstantsUtils().formatDate(donationData.donationRequestInfo!.createdAt)  ?? 'wewe',
+                                  style: const TextStyle(color: Colors.black, fontWeight:FontWeight.bold,fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 25,),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Request Status',
+                                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                   donationData.donationRequestInfo!.status == 1
+                                      ? 'Approved'
+                                      : donationData.donationRequestInfo!.status == -4
+                                      ? 'Expired'
+                                      : 'Unknown',
+                                  style: const TextStyle(color: Colors.black,fontWeight:FontWeight.bold, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.grey),
+                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                minimumSize: const Size(double.infinity, 35),
+                              ),
+                              icon: const Icon(Icons.notifications_outlined,color: Colors.grey,),
+                              label: const Text(
+                                'Remind',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 25),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              iconAlignment: IconAlignment.start,
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.grey),
+                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                minimumSize: const Size(double.infinity, 35),
+                              ),
+
+                              icon: const Icon(Icons.close,color: Colors.grey,),
+                              label: const Text(
+                                'Withdraw',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -288,7 +394,9 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Filter ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Text('Filter ',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                       InkWell(
                         child: const Icon(
                           Icons.close,
@@ -312,9 +420,12 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Status', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      const Text('Status',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                       Padding(
-                        padding: const EdgeInsets.only(left: 0, right: 8, bottom: 0, top: 8),
+                        padding: const EdgeInsets.only(
+                            left: 0, right: 8, bottom: 0, top: 8),
                         child: Obx(() {
                           return Wrap(
                             spacing: 8.0,
@@ -322,10 +433,12 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                             children: controller.statusList.map((status) {
                               return FilterChip(
                                 label: Text(status),
-                                selected: controller.selectedStatusList.value == status,
+                                selected: controller.selectedStatusList.value ==
+                                    status,
                                 onSelected: (bool selected) {
                                   if (selected) {
-                                    controller.selectedStatusList.value = status;
+                                    controller.selectedStatusList.value =
+                                        status;
                                   } else {
                                     controller.selectedStatusList.value = '';
                                   }
@@ -334,7 +447,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                                 backgroundColor: Colors.grey[200],
                                 checkmarkColor: Colors.white,
                                 labelStyle: TextStyle(
-                                  color: controller.selectedStatusList.value == status
+                                  color: controller.selectedStatusList.value ==
+                                          status
                                       ? Colors.white
                                       : Colors.black,
                                 ),
@@ -344,9 +458,12 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                         }),
                       ),
                       const SizedBox(height: 20),
-                      const Text('Type', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      const Text('Type',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                       Padding(
-                        padding: const EdgeInsets.only(left: 0, right: 8, bottom: 0, top: 8),
+                        padding: const EdgeInsets.only(
+                            left: 0, right: 8, bottom: 0, top: 8),
                         child: Obx(() {
                           return Wrap(
                             spacing: 8.0,
@@ -354,7 +471,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                             children: controller.typeList.map((type) {
                               return FilterChip(
                                 label: Text(type),
-                                selected: controller.selectedTypeList.value == type,
+                                selected:
+                                    controller.selectedTypeList.value == type,
                                 onSelected: (bool selected) {
                                   if (selected) {
                                     controller.selectedTypeList.value = type;
@@ -366,9 +484,10 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                                 backgroundColor: Colors.grey[200],
                                 checkmarkColor: Colors.white,
                                 labelStyle: TextStyle(
-                                  color: controller.selectedTypeList.value == type
-                                      ? Colors.white
-                                      : Colors.black,
+                                  color:
+                                      controller.selectedTypeList.value == type
+                                          ? Colors.white
+                                          : Colors.black,
                                 ),
                               );
                             }).toList(),
@@ -391,7 +510,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                               },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.red),
-                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                                 backgroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
@@ -415,7 +535,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                                 minimumSize: const Size(double.infinity, 40),
                               ),
                               child: const Text('Apply'),

@@ -119,6 +119,8 @@ class DonationRequestInfo {
   final int? shareCount;
   final List<String>? favourites;
   final String? region;
+  final int? status;
+  final String? createdAt;
 
   DonationRequestInfo({
     this.id,
@@ -137,6 +139,8 @@ class DonationRequestInfo {
     this.shareCount,
     this.favourites,
     this.region,
+    this.status,
+    this.createdAt,
   });
 
   factory DonationRequestInfo.fromJson(Map<String, dynamic> json) {
@@ -159,6 +163,8 @@ class DonationRequestInfo {
       shareCount: json['shareCount'] as int?,
       favourites: (json['favourites'] as List?)?.map((e) => e as String).toList(),
       region: json['region'] as String?,
+      status: json['status'] as int?,
+      createdAt: json['createdAt'] as String?,
     );
   }
 }
