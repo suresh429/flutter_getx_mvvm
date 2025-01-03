@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/model/CommonModel.dart';
+import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
@@ -20,6 +21,7 @@ class ApiService {
   final Dio _dio = Dio();
   static const String _login = "login";
   static const String _donationRequest = "donationRequest";
+  static const String _donationRequestResponse = "donationRequestResponses";
   static const String _addToFav = "donation/request/favourite";
   static const String _inviteTalLeaders = "user/inviteTalLeaders";
   static const String _likeUnlike = "donation/request/like";
@@ -278,8 +280,50 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         final responseData = data['data'] as List<dynamic>;
-
         return responseData.map((item) => ExploreModel.fromJson(item)).toList();
+      } else {
+        throw Exception(
+            'Failed to fetch explore requests: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load Requests: $e');
+    }
+  }
+
+  Future<List<DonationRequestResponse>> fetchActivityRequests(
+      {required String requestTypes,
+        required int limit,
+        required int offset,
+        required String? userId,
+        required String requestStatus}) async {
+    try {
+      final queryParameters = {
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+        'userId': userId ?? '',
+        'requestType': requestTypes,
+        'requestStatus': requestStatus,
+      };
+
+      final response = await _dio.get(
+        "${AppEnvironment.baseApiUrl}$_donationRequestResponse",
+        queryParameters: queryParameters,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        ),
+      );
+
+      // print("Response Body: ${response.data}");
+      debugPrint(response.data.toString(), wrapWidth: 1024);
+      print(response.realUri.toString());
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final responseData = data['data'] as List<dynamic>;
+        return responseData.map((item) => DonationRequestResponse.fromJson(item)).toList();
       } else {
         throw Exception(
             'Failed to fetch explore requests: ${response.statusCode}');

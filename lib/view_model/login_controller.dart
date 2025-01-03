@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import '../payload/login_payload.dart';
 import '../service/api_service.dart';
 import '../utilites/constants_Utils.dart';
+import '../utilites/error_handler.dart';
 
 
 class LoginController extends GetxController {
@@ -58,14 +59,8 @@ class LoginController extends GetxController {
         throw Exception("Login data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is DioException) {
-        errorMessage = 'Network error occurred. Please try again later.';
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
-
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {
       isLoading(false);
     }

@@ -192,13 +192,8 @@ class ManagePreferencesController extends GetxController {
         throw Exception("data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is ErrorHandler) {
-        errorMessage = e.toString();
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {
       isLoading(false);
     }

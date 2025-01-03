@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_getx_mvvm/service/ConnectivityService.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
@@ -14,6 +15,7 @@ void commonMain() async {
     statusBarIconBrightness: Brightness.dark, // Change icon brightness
   ));
 
+  Get.put(ConnectivityService()); // Initialize the ConnectivityService
   // local storage
   await GetStorage.init();
 

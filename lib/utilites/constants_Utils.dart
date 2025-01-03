@@ -7,6 +7,7 @@ import 'package:flutter_getx_mvvm/model/UserModel.dart';
 import 'package:flutter_getx_mvvm/utilites/colors.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 
 
 class ConstantsUtils{
@@ -155,6 +156,13 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     return address?.line1?.isNotEmpty == true ||
         address?.city?.isNotEmpty == true ||
         address?.state?.isNotEmpty == true;
+  }
+
+
+  String formatDate(String? dateString) {
+    DateTime parsedDate = DateTime.parse(dateString!); // Parse the ISO 8601 date
+    String formattedDate = DateFormat("dd-MMM-yyyy").format(parsedDate); // Format it
+    return formattedDate;
   }
 
 }
