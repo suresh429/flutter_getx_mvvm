@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
 import '../view_model/my_activity_controller.dart';
+import '../widget/check_internet_widget.dart';
 
 class MyActivityScreen extends StatefulWidget {
   const MyActivityScreen({super.key});
@@ -12,11 +13,9 @@ class MyActivityScreen extends StatefulWidget {
   State<MyActivityScreen> createState() => _MyActivityScreenState();
 }
 
-class _MyActivityScreenState extends State<MyActivityScreen>
-    with WidgetsBindingObserver {
+class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBindingObserver {
   final MyActivityController controller = Get.put(MyActivityController());
-  final ConnectivityService connectivityService =
-      Get.find<ConnectivityService>();
+  final ConnectivityService connectivityService = Get.find<ConnectivityService>();
 
   @override
   void initState() {
@@ -51,78 +50,50 @@ class _MyActivityScreenState extends State<MyActivityScreen>
     return Scaffold(
       backgroundColor: ColorUtils.colorSurface,
       appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          Obx(() {
-            if (!connectivityService.isConnected.value) {
-              return Container(
+      body: Obx(() {
+        if (!connectivityService.isConnected.value) {
+          return Center(
+            child: CheckInternetWidget(
+              onRetry: () {
+                controller.fetchRequests();
+              },
+            ),
+          );
+        }
+
+        if (controller.isLoading.value && controller.requests.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!connectivityService.isConnected.value && controller.requests.isEmpty) {
+          return Center(
+            child: CheckInternetWidget(
+              onRetry: () {
+                controller.fetchRequests();
+              },
+            ),
+          );
+        }
+
+        if (controller.errorMessage.value.isNotEmpty) {
+          return Center(
+            child: Text(
+              controller.errorMessage.value,
+              style: const TextStyle(
                 color: Colors.red,
-                width: double.infinity,
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'No Internet Connection',
-                      style: TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        print('Retry button pressed');
-                        await connectivityService.checkInitialConnection();
-                        if (connectivityService.isConnected.value) {
-                          print(
-                              'Internet is connected, retrying fetch requests');
-                          controller.fetchRequests();
-                        } else {
-                          print(
-                              'Internet is not connected, cannot retry fetch requests');
-                        }
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return SizedBox.shrink();
-            }
-          }),
-          Expanded(
-            child: Obx(() {
-              if (!connectivityService.isConnected.value &&
-                  controller.requests.isEmpty) {
-                return const Center(
-                    child: Text("Please check your internet connection"));
-              }
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
 
-              if (controller.isLoading.value && controller.requests.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
+        if (controller.requests.isEmpty) {
+          return const Center(child: Text("No Activities found."));
+        }
 
-              if (controller.errorMessage.value.isNotEmpty) {
-                return Center(
-                  child: Text(
-                    controller.errorMessage.value,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              }
-
-              if (controller.requests.isEmpty) {
-                return const Center(child: Text("No Activities found."));
-              }
-
-              return _buildActivityList();
-            }),
-          ),
-        ],
-      ),
+        return _buildActivityList();
+      }),
     );
   }
 
@@ -186,9 +157,9 @@ class _MyActivityScreenState extends State<MyActivityScreen>
             WidgetsBinding.instance.addPostFrameCallback((_) {
               controller.fetchRequests();
             });
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         }
 
@@ -198,8 +169,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
           child: Card(
             color: Colors.white,
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,8 +187,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(15),
@@ -226,9 +195,10 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                         child: Text(
                           donationData.request_type ?? '',
                           style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12),
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
@@ -242,21 +212,21 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            donationData.donationRequestInfo?.title ??
-                                'No Title Available',
+                            donationData.donationRequestInfo?.title ?? 'No Title Available',
                             style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10,),
-                       Row(
+                      const SizedBox(height: 10),
+                      Row(
                         children: [
-                           Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -268,13 +238,13 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                   height: 5,
                                 ),
                                 Text(
-                                  ConstantsUtils().formatDate(donationData.donationRequestInfo!.createdAt)  ?? 'wewe',
-                                  style: const TextStyle(color: Colors.black, fontWeight:FontWeight.bold,fontSize: 12),
+                                  ConstantsUtils().formatDate(donationData.donationRequestInfo!.createdAt) ?? 'N/A',
+                                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 25,),
+                          const SizedBox(width: 25),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,19 +257,19 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                   height: 5,
                                 ),
                                 Text(
-                                   donationData.donationRequestInfo!.status == 1
+                                  donationData.donationRequestInfo!.status == 1
                                       ? 'Approved'
                                       : donationData.donationRequestInfo!.status == -4
                                       ? 'Expired'
                                       : 'Unknown',
-                                  style: const TextStyle(color: Colors.black,fontWeight:FontWeight.bold, fontSize: 12),
+                                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
@@ -314,7 +284,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 ),
                                 minimumSize: const Size(double.infinity, 35),
                               ),
-                              icon: const Icon(Icons.notifications_outlined,color: Colors.grey,),
+                              icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
                               label: const Text(
                                 'Remind',
                                 style: TextStyle(color: Colors.grey),
@@ -335,8 +305,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 ),
                                 minimumSize: const Size(double.infinity, 35),
                               ),
-
-                              icon: const Icon(Icons.close,color: Colors.grey,),
+                              icon: const Icon(Icons.close, color: Colors.grey),
                               label: const Text(
                                 'Withdraw',
                                 style: TextStyle(color: Colors.grey),
@@ -347,7 +316,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -394,9 +363,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Filter ',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Text('Filter ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       InkWell(
                         child: const Icon(
                           Icons.close,
@@ -420,12 +387,9 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Status',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
+                      const Text('Status', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       Padding(
-                        padding: const EdgeInsets.only(
-                            left: 0, right: 8, bottom: 0, top: 8),
+                        padding: const EdgeInsets.only(left: 0, right: 8, bottom: 0, top: 8),
                         child: Obx(() {
                           return Wrap(
                             spacing: 8.0,
@@ -433,12 +397,10 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                             children: controller.statusList.map((status) {
                               return FilterChip(
                                 label: Text(status),
-                                selected: controller.selectedStatusList.value ==
-                                    status,
+                                selected: controller.selectedStatusList.value == status,
                                 onSelected: (bool selected) {
                                   if (selected) {
-                                    controller.selectedStatusList.value =
-                                        status;
+                                    controller.selectedStatusList.value = status;
                                   } else {
                                     controller.selectedStatusList.value = '';
                                   }
@@ -447,10 +409,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 backgroundColor: Colors.grey[200],
                                 checkmarkColor: Colors.white,
                                 labelStyle: TextStyle(
-                                  color: controller.selectedStatusList.value ==
-                                          status
-                                      ? Colors.white
-                                      : Colors.black,
+                                  color: controller.selectedStatusList.value == status ? Colors.white : Colors.black,
                                 ),
                               );
                             }).toList(),
@@ -458,12 +417,9 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                         }),
                       ),
                       const SizedBox(height: 20),
-                      const Text('Type',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
+                      const Text('Type', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       Padding(
-                        padding: const EdgeInsets.only(
-                            left: 0, right: 8, bottom: 0, top: 8),
+                        padding: const EdgeInsets.only(left: 0, right: 8, bottom: 0, top: 8),
                         child: Obx(() {
                           return Wrap(
                             spacing: 8.0,
@@ -471,8 +427,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                             children: controller.typeList.map((type) {
                               return FilterChip(
                                 label: Text(type),
-                                selected:
-                                    controller.selectedTypeList.value == type,
+                                selected: controller.selectedTypeList.value == type,
                                 onSelected: (bool selected) {
                                   if (selected) {
                                     controller.selectedTypeList.value = type;
@@ -484,10 +439,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 backgroundColor: Colors.grey[200],
                                 checkmarkColor: Colors.white,
                                 labelStyle: TextStyle(
-                                  color:
-                                      controller.selectedTypeList.value == type
-                                          ? Colors.white
-                                          : Colors.black,
+                                  color: controller.selectedTypeList.value == type ? Colors.white : Colors.black,
                                 ),
                               );
                             }).toList(),
@@ -510,8 +462,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                               },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.red),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 0),
+                                padding: const EdgeInsets.symmetric(vertical: 0),
                                 backgroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
@@ -535,8 +486,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 0),
+                                padding: const EdgeInsets.symmetric(vertical: 0),
                                 minimumSize: const Size(double.infinity, 40),
                               ),
                               child: const Text('Apply'),

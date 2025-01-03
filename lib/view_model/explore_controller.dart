@@ -7,6 +7,7 @@ import '../model/ExploreModel.dart';
 import '../model/LoginModel.dart';
 import '../payload/fav_payload.dart';
 import '../payload/like_unlike_payload.dart';
+import '../service/ConnectivityService.dart';
 import '../service/api_service.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
@@ -30,7 +31,7 @@ class ExploreController extends GetxController
       <int, ScrollController>{}.obs; // Scroll controllers for each tab
 
   final ApiService apiService = ApiService(); // API service instance
-  final Connectivity _connectivity = Connectivity(); // Connectivity instance
+  final ConnectivityService connectivityService = Get.find<ConnectivityService>(); // Connectivity service instance
 
   final List<String> tabTitles = [
     "All",
@@ -67,13 +68,13 @@ class ExploreController extends GetxController
     await fetchDataForTab(0);
 
     // Tab selection listener
-    tabController.addListener(() {
+    tabController.addListener(() async {
       if (tabController.indexIsChanging) return;
       final newIndex = tabController.index;
       if (newIndex != selectedIndex.value) {
         resetPaginationForTab(newIndex);
         selectedIndex.value = newIndex;
-        fetchDataForTab(newIndex); // Fetch data when tab changes
+        await checkAndFetchData(newIndex); // Fetch data when tab changes
       }
     });
 
@@ -93,37 +94,27 @@ class ExploreController extends GetxController
     super.onClose();
   }
 
-  Future<void> checkAndFetchData(int newIndex) async {
-    // Listen to connectivity changes
-    _connectivity.onConnectivityChanged
-        .listen((ConnectivityResult result) async {
-      if (result != ConnectivityResult.none) {
-        errorMessage.value = ''; // Clear the error when internet is back
-        // Reset pagination and fetch data for the given tab
-        resetPaginationForTab(newIndex);
-        await fetchDataForTab(
-            newIndex); // Attempt to fetch data if connection is restored
-      } else {
-        errorMessage.value =
-            'No internet connection. Please check your network settings.';
-      }
-    });
-
-    // Optionally, check immediately if needed
-    var connectivityResult = await _connectivity.checkConnectivity();
-    if (connectivityResult != ConnectivityResult.none) {
-      resetPaginationForTab(newIndex);
-      await fetchDataForTab(newIndex);
+  Future<void> checkAndFetchData(int tabIndex) async {
+    // Check connectivity before making API call
+    var connectivityResult = connectivityService.isConnected.value;
+    if (!connectivityResult) {
+      errorMessage.value =
+      'No internet connection. Please check your network settings.';
+      print(errorMessage.value); // Debugging log
+      return; // Skip API call if no internet
     }
+
+    // Fetch data for the given tab if connection is restored
+    await fetchDataForTab(tabIndex);
   }
 
   Future<void> fetchDataForTab(int tabIndex) async {
     print('Fetching data for tab index: $tabIndex'); // Debugging log
     // Check connectivity before making API call
-    var connectivityResult = await _connectivity.checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
+    var connectivityResult = connectivityService.isConnected.value;
+    if (!connectivityResult) {
       errorMessage.value =
-          'No internet connection. Please check your network settings.';
+      'No internet connection. Please check your network settings.';
       print(errorMessage.value); // Debugging log
       return; // Skip API call if no internet
     }
@@ -146,7 +137,7 @@ class ExploreController extends GetxController
           limit: 5,
           offset: offset,
           page: tabPage[tabIndex]!,
-          userId: loginResponse?.data?.uniqueId,title: title.value);
+          userId: loginResponse?.data?.uniqueId, title: title.value);
 
       print(
           'Fetched data length for tab index $tabIndex: ${fetchedData.length}'); // Debugging log
@@ -174,6 +165,8 @@ class ExploreController extends GetxController
             'Unique data added for tab index $tabIndex: ${uniqueData.length}'); // Debugging log
       }
 
+      // Clear error message on successful fetch
+      errorMessage.value = '';
       // Update the UI to reflect the changes in data
       update(); // Or tabData.refresh() if you're observing the tabData
       print('UI updated for tab index: $tabIndex'); // Debugging log
@@ -260,13 +253,8 @@ class ExploreController extends GetxController
         throw Exception("data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is DioException) {
-        errorMessage = e.toString();
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {}
   }
 
@@ -281,13 +269,8 @@ class ExploreController extends GetxController
         throw Exception("data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is DioException) {
-        errorMessage = 'Network error occurred. Please try again later.';
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {}
   }
 }

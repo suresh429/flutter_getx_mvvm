@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_getx_mvvm/widget/explore_card.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../env/app_env.dart';
+import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
 import '../utilites/constants_Utils.dart';
 import '../view_model/bottom_nav_controller.dart';
 import '../view_model/explore_controller.dart';
 import '../view_model/recommendation_controller.dart';
+import '../widget/check_internet_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -23,9 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
 
   final RecommendationController controller =
-      Get.put(RecommendationController());
+  Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
+
+  final ConnectivityService connectivityService = Get.put(ConnectivityService());
 
   final List<String> bannerImages = [
     'assets/banner_image.png', // Example image paths
@@ -36,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     controller.initializeController();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Spacer(),
             GestureDetector(
               onTap: () {
-                Scaffold.of(context)
-                    .openDrawer(); // Opens the navigation drawer
+                Scaffold.of(context).openDrawer(); // Opens the navigation drawer
               },
               child: Obx(() {
                 final loginResponse = bottomNavController.loginResponse.value!;
@@ -69,26 +69,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     radius: 18.0,
                   ),
                   Positioned(
-                      left: 0.0, // Adjust the horizontal position
-                      bottom: 0.0, // Adjust the vertical position
+                      left: 0.0,
+                      bottom: 0.0,
                       child: Container(
-                        width: 18, // Adjust the width of the circle
-                        height: 18, // Adjust the height of the circle
+                        width: 18,
+                        height: 18,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          // Background color of the circle
                           shape: BoxShape.circle,
-                          // Ensures the container is circular
                           border: Border.all(
-                            color: Colors.black, // Outline color
-                            width: 0.5, // Width of the outline
+                            color: Colors.black,
+                            width: 0.5,
                           ),
                         ),
                         child: const Center(
                           child: Icon(
                             Icons.menu,
                             size: 12,
-                            color: Colors.black, // Icon color
+                            color: Colors.black,
                           ),
                         ),
                       )),
@@ -134,6 +132,14 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 325,
                 child: Obx(() {
+                  if (!connectivityService.isConnected.value) {
+                    return CheckInternetWidget(
+                      onRetry: () {
+                        controller.fetchData(controller.loginResponse?.data?.uniqueId);
+                      },
+                    );
+                  }
+
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -180,11 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
-                  // margin: const EdgeInsets.symmetric(horizontal: 10.0),
                   decoration: BoxDecoration(
                     image: const DecorationImage(
                       image: AssetImage('assets/send_email_image.png'),
-                      // Adjust the image path
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(12.0),
@@ -195,57 +199,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Text(
                         'Know an Inspiring Leader? Invite Them to Join TALLeaders',
-                        // Replace with localized string if needed
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          // Replace with your `textLarge1` dimension
                           fontFamily: 'RobotoBold',
-                          // Replace with your Roboto bold font family
                           color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      // Replace with `layout_side_small` dimension
                       const Text(
                         'Invite change makers and leaders who you think can make a difference and add value to the TALLeaders community.',
-                        // Replace with localized string if needed
                         style: TextStyle(
                           fontSize: 12,
-                          // Replace with your `textMedium` dimension
                           fontFamily: 'RobotoRegular',
-                          // Replace with your Roboto regular font family
                           color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 16.0),
-                      // Space between text and buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton.icon(
                             onPressed: () {
-                              // Action for Send Email Invite button
                               openBottomSheet(context);
                             },
                             icon: const Icon(
                               Icons.email_outlined,
-                              // Replace with `ic_send_email_person` if you have custom icon
                               size: 16,
                             ),
                             label: const Text(
                               'Send Email Invite',
-                              // Replace with localized string if needed
                               style: TextStyle(
                                 fontSize: 12,
-                                // Replace with your `textSmall` dimension
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.all(12),
-                              // Adjust padding as needed
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
@@ -253,7 +244,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           OutlinedButton.icon(
                             onPressed: () {
-                              // Action for Copy Link button
                               String link =
                                   '${AppEnvironment.baseWebUrl}becomeTalLeaderHome';
                               Clipboard.setData(ClipboardData(text: link));
@@ -261,16 +251,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             icon: const Icon(
                               Icons.link,
-                              // Replace with `ic_link` if you have custom icon
                               size: 16,
                               color: Colors.black,
                             ),
                             label: const Text(
                               'Copy Link',
-                              // Replace with localized string if needed
                               style: TextStyle(
                                 fontSize: 12,
-                                // Replace with your Roboto regular font family
                                 color: Colors.black,
                               ),
                             ),
@@ -299,6 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 
   // Banner Slider Widget
   Widget _buildBannerSlider() {
@@ -369,7 +357,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           controller: controller.firstNameController,
                           decoration: InputDecoration(
                             labelText: 'First Name',
-                           // border: OutlineInputBorder(),
                             errorText: controller.firstNameError.value,
                           ),
                         );
@@ -380,7 +367,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           controller: controller.lastNameController,
                           decoration: InputDecoration(
                             labelText: 'Last Name',
-                            //border: OutlineInputBorder(),
                             errorText: controller.lastNameError.value,
                           ),
                         );
@@ -391,7 +377,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           controller: controller.emailController,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                           // border: const OutlineInputBorder(),
                             errorText: controller.emailError.value,
                           ),
                         );
@@ -402,24 +387,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: controller.isLoading.value
                               ? null
                               : () {
-                                  controller.inviteMember(context);
-                                },
+                            controller.inviteMember(context);
+                          },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 45),
-                            // Full-width button
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(5), // Set the radius to 5
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
                           child: controller.isLoading.value
                               ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
+                            color: Colors.white,
+                          )
                               : const Text(
-                                  'Invite',
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                            'Invite',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         );
                       })
                     ],

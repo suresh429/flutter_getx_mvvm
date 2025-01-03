@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../model/LoginModel.dart';
 import '../service/api_service.dart';
 import '../utilites/constants_Utils.dart';
+import '../utilites/error_handler.dart';
 
 class MyActivityController extends GetxController {
   RxList<DonationRequestResponse> requests = <DonationRequestResponse>[].obs;
@@ -94,9 +95,8 @@ class MyActivityController extends GetxController {
         offset += limit;
       }
     } catch (e) {
-      errorMessage.value = e.toString();
-      print('Error fetching requests: $e');
-      Get.snackbar('Error', errorMessage.value);
+      String errorMsg = await ErrorHandler.handleError(e);
+      errorMessage.value = errorMsg;
     } finally {
       isLoading.value = false;
     }

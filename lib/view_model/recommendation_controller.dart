@@ -1,15 +1,12 @@
-import 'dart:convert';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_getx_mvvm/payload/like_unlike_payload.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import '../model/ExploreModel.dart';
 import '../model/LoginModel.dart';
 import '../payload/invite_payload.dart';
+import '../service/ConnectivityService.dart';
 import '../service/api_service.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
@@ -18,11 +15,11 @@ class RecommendationController extends GetxController {
   final recommendations = <ExploreModel>[].obs;
   final isLoading = false.obs;
   var errorMessage = ''.obs;
-  late String requestType='';
-  late String requestLanguage='';
+  late String requestType = '';
+  late String requestLanguage = '';
 
   final ApiService _apiService = ApiService();
-  final Connectivity _connectivity = Connectivity();
+  final ConnectivityService connectivityService = Get.put(ConnectivityService());
   final storage = GetStorage();
   late LoginModel? loginResponse;
 
@@ -39,7 +36,6 @@ class RecommendationController extends GetxController {
     super.onInit();
 
     initializeController();
-
   }
 
   // initialize
@@ -50,31 +46,27 @@ class RecommendationController extends GetxController {
       await getProfileData(loginResponse?.data?.uniqueId);
     }
 
-
-    // Fetch data initially
-    fetchData(loginResponse?.data?.uniqueId);
+    // Fetch data initially if connected
+    if (connectivityService.isConnected.value) {
+      fetchData(loginResponse?.data?.uniqueId);
+    }
 
     // Listen to connectivity changes
-    _connectivity.onConnectivityChanged
-        .listen((ConnectivityResult result) async {
-      if (result != ConnectivityResult.none) {
-        await fetchData(loginResponse?.data
-            ?.uniqueId); // Attempt to fetch data if connection is restored
+    connectivityService.isConnected.listen((isConnected) async {
+      if (isConnected) {
+        // Attempt to fetch data if connection is restored
+        await fetchData(loginResponse?.data?.uniqueId);
       } else {
         errorMessage.value =
         'No internet connection. Please check your network settings.';
       }
     });
-
-
   }
-
 
   // get profile
   Future<void> getProfileData(String? uniqueId) async {
     // Check connectivity before making API request
-    var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
+    if (!connectivityService.isConnected.value) {
       errorMessage.value =
       'No internet connection. Please check your network settings.';
       return; // Skip API call if no internet
@@ -87,9 +79,8 @@ class RecommendationController extends GetxController {
       // Fetch profile data from the API
       final getProfile = await _apiService.getProfile(uniqueId);
 
-      requestType =  ConstantsUtils.buildRequestTypeData(getProfile.data.talLeaderPreferences);
+      requestType = ConstantsUtils.buildRequestTypeData(getProfile.data.talLeaderPreferences);
       requestLanguage = getProfile.data.languagePreferences.join(',') ?? '';
-
     } catch (e) {
       // Use the updated error handler
       String errorMsg = await ErrorHandler.handleError(e);
@@ -99,14 +90,12 @@ class RecommendationController extends GetxController {
     }
   }
 
-
   // validation
   void setErrorMessages(String firstName, String lastName, String email) {
     firstNameError.value = firstName.isEmpty ? 'First Name is required' : null;
     lastNameError.value = lastName.isEmpty ? 'Last Name is required' : null;
     emailError.value = email.isEmpty ? 'Email is required' : null;
   }
-
 
   // invite member
   Future<void> inviteMember(BuildContext context) async {
@@ -140,26 +129,19 @@ class RecommendationController extends GetxController {
         throw Exception("data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is DioException) {
-        errorMessage = 'Network error occurred. Please try again later.';
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {
       isLoading(false);
     }
   }
 
-
   // Method to fetch data from API
   Future<void> fetchData(String? uniqueId) async {
     // Check connectivity before making API request
-    var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
+    if (!connectivityService.isConnected.value) {
       errorMessage.value =
-          'No internet connection. Please check your network settings.';
+      'No internet connection. Please check your network settings.';
       return; // Skip API call if no internet
     }
 
@@ -169,7 +151,7 @@ class RecommendationController extends GetxController {
 
       // Fetch recommendations from the API
       final fetchedRecommendations =
-          await _apiService.fetchRecommendations(uniqueId,requestType,requestLanguage);
+      await _apiService.fetchRecommendations(uniqueId, requestType, requestLanguage);
       recommendations.assignAll(fetchedRecommendations);
     } catch (e) {
       // Use the updated error handler
