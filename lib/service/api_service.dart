@@ -337,7 +337,7 @@ class ApiService {
 
 
 
-  Future<CommonModel> reminder(String requestId, String? token) async {
+  Future<CommonModel> reminderPost(String requestId, String? token) async {
     var payload = {"requestId": requestId};
     try {
       final response = await _dio.post(
@@ -353,6 +353,32 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return CommonModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
+    }
+  }
+
+  Future<DonationRequestResponseData> reminderPut(String requestId, String? token) async {
+    var payload = {"reminderSent": true};
+    try {
+      final response = await _dio.put(
+        '${AppEnvironment.baseApiUrl}$_donationRequestResponse/$requestId',
+        data: payload,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return DonationRequestResponseData.fromJson(data);
       } else {
         throw Exception('Failed to log in: ${response.data['message']}');
       }

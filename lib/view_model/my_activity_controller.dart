@@ -117,13 +117,13 @@ class MyActivityController extends GetxController {
     fetchRequests();
   }
 
-  Future<void> reminder(String requestId) async {
+  Future<void> reminderPost(String requestId) async {
     try {
       if (isLoading.value || loginResponse.value == null) return;
 
       isLoading(true);
 
-      final dataResponse = await apiService.reminder(requestId, loginResponse.value?.data?.tokenDetail?.token);
+      final dataResponse = await apiService.reminderPost(requestId, loginResponse.value?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
         // Update the reminderSent field for the corresponding request
@@ -131,7 +131,7 @@ class MyActivityController extends GetxController {
         if (index != -1) {
           requests[index].reminderSent.value = true;
         }
-        ConstantsUtils.showSuccessSnackbar(dataResponse.message);
+       // ConstantsUtils.showSuccessSnackbar('post ${dataResponse.message}');
       } else {
         throw Exception("data is missing or invalid");
       }
@@ -142,4 +142,26 @@ class MyActivityController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<void> reminderPut(String requestId) async {
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await apiService.reminderPut(requestId, loginResponse.value?.data?.tokenDetail?.token);
+
+      if (dataResponse.status == 'success' && dataResponse.data != null) {
+        ConstantsUtils.showSuccessSnackbar('put ${dataResponse.message}');
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
 }

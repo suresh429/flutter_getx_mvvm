@@ -241,9 +241,10 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                               return OutlinedButton.icon(
                                 onPressed: isReminderSent
                                     ? null // Disable the button when reminderSent is true
-                                    : () {
+                                    : () async {
                                   donationData.reminderSent.value = true; // Update the RxBool value
-                                  controller.reminder(donationData.donationRequestInfo!.id.toString());
+                                  await controller.reminderPost(donationData.donationRequestInfo!.id.toString());
+                                  await controller.reminderPut(donationData.id.toString());
                                 },
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(color: Colors.grey),
