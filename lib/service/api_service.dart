@@ -27,6 +27,7 @@ class ApiService {
   static const String _likeUnlike = "donation/request/like";
   static const String _share = "donationRequest/analytics";
   static const String _user = "user";
+  static const String _reminder = "donationRequest/reminder/donee";
 
   Future<LoginModel> login(LoginPayload payload) async {
     try {
@@ -333,4 +334,32 @@ class ApiService {
       throw Exception('Failed to load Requests: $e');
     }
   }
+
+
+
+  Future<CommonModel> reminder(String requestId, String? token) async {
+    var payload = {"requestId": requestId};
+    try {
+      final response = await _dio.post(
+        '${AppEnvironment.baseApiUrl}$_reminder',
+        data: payload,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return CommonModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to log in: ${response.data['message']}');
+      }
+    } catch (e) {
+      print("Error occurred during login: $e");
+      rethrow;
+    }
+  }
+
 }

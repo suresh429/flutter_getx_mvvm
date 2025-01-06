@@ -37,20 +37,31 @@ class MyActivityController extends GetxController {
   Rx<String> selectedStatusList = 'All'.obs;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    loginResponse = Rx<LoginModel?>(await ConstantsUtils.getStoredLoginResponse());
-    Future.delayed(Duration.zero, fetchRequests);
+    initializeController();
   }
 
   @override
   void onReady() {
     super.onReady();
+    resetSelection();
+  }
+
+  // initialize
+  Future<void> initializeController() async {
+    loginResponse = Rx<LoginModel?>(await ConstantsUtils.getStoredLoginResponse());
+    if (loginResponse.value != null) {
+      resetSelection();
+      await fetchRequests();
+    } else {
+      errorMessage.value = 'Failed to load login response';
+    }
   }
 
   // Method to fetch the requests
   Future<void> fetchRequests() async {
-    if (isLoading.value || !hasMoreData.value) return;
+    if (isLoading.value || !hasMoreData.value || loginResponse.value == null) return;
 
     isLoading.value = true;
     errorMessage.value = ''; // Reset error message
@@ -74,11 +85,7 @@ class MyActivityController extends GetxController {
         break;
     }
 
-    print("Request Status: $requestStatusData");
-    print("Request Type: $requestTypeData");
-
     try {
-      print('Fetching requests...');
       final List<DonationRequestResponse> newRequests = await apiService.fetchActivityRequests(
         requestTypes: requestTypeData,
         limit: limit,
@@ -87,7 +94,6 @@ class MyActivityController extends GetxController {
         requestStatus: requestStatusData,
       );
 
-      print('Requests fetched successfully');
       if (newRequests.isEmpty) {
         hasMoreData.value = false;
       } else {
@@ -109,5 +115,31 @@ class MyActivityController extends GetxController {
     offset = 0;
     hasMoreData.value = true;
     fetchRequests();
+  }
+
+  Future<void> reminder(String requestId) async {
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await apiService.reminder(requestId, loginResponse.value?.data?.tokenDetail?.token);
+
+      if (dataResponse.status == 'success' && dataResponse.data != null) {
+        // Update the reminderSent field for the corresponding request
+        final index = requests.indexWhere((request) => request.id == requestId);
+        if (index != -1) {
+          requests[index].reminderSent.value = true;
+        }
+        ConstantsUtils.showSuccessSnackbar(dataResponse.message);
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
+    } finally {
+      isLoading(false);
+    }
   }
 }

@@ -22,8 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
 
-  final RecommendationController controller =
-  Get.put(RecommendationController());
+  final RecommendationController controller = Get.put(RecommendationController());
 
   final ExploreController exploreController = Get.put(ExploreController());
 
@@ -41,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.initializeController();
     return Scaffold(
       backgroundColor: ColorUtils.colorSurface,
       appBar: AppBar(
