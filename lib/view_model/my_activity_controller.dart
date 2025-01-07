@@ -164,4 +164,33 @@ class MyActivityController extends GetxController {
     }
   }
 
+
+  Future<void> withdraw(String requestId) async {
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await repository.withdraw(requestId, loginResponse.value?.data?.tokenDetail?.token);
+
+      if (dataResponse['status'] == 'success' && dataResponse['data'] != null) {
+        ConstantsUtils.showSuccessSnackbar('withdraw ${dataResponse['message']}');
+
+        removeRequest(requestId);
+
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Method to remove a request by its ID
+  void removeRequest(String requestId) {
+    requests.removeWhere((request) => request.id == requestId);
+  }
 }

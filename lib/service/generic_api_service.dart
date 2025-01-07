@@ -103,7 +103,7 @@ class GenericApiService {
   }
 
   // Delete
-  Future<T> delete<T>(String endpoint, T Function(Map<String, dynamic>) fromJson, {String? token}) async {
+  Future<Map<String, dynamic>> delete(String endpoint, {String? token}) async {
     try {
       final response = await _dio.delete(
         '${AppEnvironment.baseApiUrl}$endpoint',
@@ -116,7 +116,7 @@ class GenericApiService {
       );
 
       if (response.statusCode == 200) {
-        return fromJson(response.data);
+        return response.data as Map<String, dynamic>;
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -129,5 +129,4 @@ class GenericApiService {
       print("Error occurred during DELETE request: $e");
       rethrow;
     }
-  }
-}
+  }}

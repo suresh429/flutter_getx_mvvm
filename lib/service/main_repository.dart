@@ -180,5 +180,12 @@ class MainRepository {
     );
   }
 
+  Future<Map<String, dynamic>> withdraw(String requestId, String? token) async {
+    return await service.delete(
+      '$_donationRequestResponse/$requestId',
+      token: token,
+    );
+  }
+
 
 }

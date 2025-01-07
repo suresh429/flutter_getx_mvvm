@@ -271,22 +271,24 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                           const SizedBox(width: 25),
                           Expanded(
                             child: OutlinedButton.icon(
-                              iconAlignment: IconAlignment.start,
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.grey),
-                                padding: const EdgeInsets.symmetric(vertical: 0),
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                minimumSize: const Size(double.infinity, 35),
-                              ),
-                              icon: const Icon(Icons.close, color: Colors.grey),
-                              label: const Text(
-                                'Withdraw',
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                                  iconAlignment: IconAlignment.start,
+                                  onPressed: () {
+                                    showConfirmationDialog(context,donationData.id.toString(),donationData.donationRequestInfo!.title.toString());
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.grey),
+                                    padding: const EdgeInsets.symmetric(vertical: 0),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    minimumSize: const Size(double.infinity, 35),
+                                  ),
+                                  icon: const Icon(Icons.close, color: Colors.grey),
+                                  label: const Text(
+                                    'Withdraw',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
                             ),
                           ),
                         ],
@@ -321,6 +323,50 @@ class _MyActivityScreenState extends State<MyActivityScreen>
       );
     }
   }
+
+  void showConfirmationDialog(BuildContext context, String reqId, String title) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Confirmation'),
+        content: Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(text: 'Are you sure you want to withdraw your interest from '),
+              TextSpan(
+                text: title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' ?'),
+            ],
+          ),
+        ),        actions: [
+          TextButton(
+            onPressed: () {
+              // Cancel action
+              Get.back(); // Close the dialog
+            },
+            child: const Text('Cancel',style: TextStyle(color: Colors.black)),
+          ),
+          TextButton(
+            onPressed: () async{
+              // Add the action you want to take when the OK button is clicked
+              await controller.withdraw(reqId);
+              Get.back();
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.black, // Set your desired background color here
+            ),
+            child: const Padding(
+              padding: EdgeInsets.only(left: 16.0, right: 16.0),
+              child: Text('Withdraw', style: TextStyle(color: Colors.white)),
+            ),          ),
+        ],
+      ),
+      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+    );
+  }
+
+
   void filterDialog(BuildContext context) {
     Get.bottomSheet(
       SafeArea(
