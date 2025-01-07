@@ -1,4 +1,6 @@
 // Address model
+import 'package:get/get.dart';
+
 class Address {
   final String? line1;
   final String? line2;
@@ -122,6 +124,7 @@ class DonationRequestInfo {
   final int? status;
   final String? createdAt;
 
+
   DonationRequestInfo({
     this.id,
     this.shippingAddress,
@@ -141,6 +144,7 @@ class DonationRequestInfo {
     this.region,
     this.status,
     this.createdAt,
+
   });
 
   factory DonationRequestInfo.fromJson(Map<String, dynamic> json) {
@@ -177,6 +181,7 @@ class DonationRequestResponse {
   final UserInfo? participantName;
   final DonationRequestInfo? donationRequestInfo;
   final UserInfo? userInfo;
+  final RxBool reminderSent; // Change to non-nullable RxBool
 
   DonationRequestResponse({
     this.id,
@@ -185,6 +190,7 @@ class DonationRequestResponse {
     this.participantName,
     this.donationRequestInfo,
     this.userInfo,
+    required this.reminderSent, // Mark as required
   });
 
   factory DonationRequestResponse.fromJson(Map<String, dynamic> json) {
@@ -201,9 +207,11 @@ class DonationRequestResponse {
       userInfo: json['user_info'] != null
           ? UserInfo.fromJson(json['user_info'])
           : null,
+      reminderSent: RxBool(json['reminderSent'] ?? false), // Explicitly initialize RxBool
     );
   }
 }
+
 
 // Complete Response model
 class DonationRequestResponseData {

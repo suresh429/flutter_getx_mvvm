@@ -13,40 +13,17 @@ class MyActivityScreen extends StatefulWidget {
   State<MyActivityScreen> createState() => _MyActivityScreenState();
 }
 
-class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBindingObserver {
+class _MyActivityScreenState extends State<MyActivityScreen>
+    with WidgetsBindingObserver {
   final MyActivityController controller = Get.put(MyActivityController());
   final ConnectivityService connectivityService = Get.find<ConnectivityService>();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    connectivityService.checkInitialConnection().then((_) {
-      if (connectivityService.isConnected.value) {
-        controller.fetchRequests();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      connectivityService.checkInitialConnection().then((_) {
-        if (connectivityService.isConnected.value) {
-          controller.fetchRequests();
-        }
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Safe to call after the build phase is complete
+      controller.resetSelection();
+    });
     return Scaffold(
       backgroundColor: ColorUtils.colorSurface,
       appBar: _buildAppBar(context),
@@ -63,16 +40,6 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
 
         if (controller.isLoading.value && controller.requests.isEmpty) {
           return const Center(child: CircularProgressIndicator());
-        }
-
-        if (!connectivityService.isConnected.value && controller.requests.isEmpty) {
-          return Center(
-            child: CheckInternetWidget(
-              onRetry: () {
-                controller.fetchRequests();
-              },
-            ),
-          );
         }
 
         if (controller.errorMessage.value.isNotEmpty) {
@@ -234,9 +201,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                                   'Interest sent on',
                                   style: TextStyle(color: Colors.grey, fontSize: 12),
                                 ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                const SizedBox(height: 5),
                                 Text(
                                   ConstantsUtils().formatDate(donationData.donationRequestInfo!.createdAt) ?? 'N/A',
                                   style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
@@ -253,9 +218,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                                   'Request Status',
                                   style: TextStyle(color: Colors.grey, fontSize: 12),
                                 ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                const SizedBox(height: 5),
                                 Text(
                                   donationData.donationRequestInfo!.status == 1
                                       ? 'Approved'
@@ -273,23 +236,37 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
                       Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.grey),
-                                padding: const EdgeInsets.symmetric(vertical: 0),
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
+                            child: Obx(() {
+                              final isReminderSent = donationData.reminderSent.value; // Access RxBool using .value
+                              return OutlinedButton.icon(
+                                onPressed: isReminderSent
+                                    ? null // Disable the button when reminderSent is true
+                                    : () async {
+                                  donationData.reminderSent.value = true; // Update the RxBool value
+                                  await controller.reminderPost(donationData.donationRequestInfo!.id.toString());
+                                  await controller.reminderPut(donationData.id.toString());
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Colors.grey),
+                                  padding: const EdgeInsets.symmetric(vertical: 0),
+                                  backgroundColor: isReminderSent
+                                      ? Colors.grey.withOpacity(0.3) // Greyed out for disabled state
+                                      : Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  minimumSize: const Size(double.infinity, 35),
                                 ),
-                                minimumSize: const Size(double.infinity, 35),
-                              ),
-                              icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
-                              label: const Text(
-                                'Remind',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
+                                icon: Icon(
+                                  isReminderSent ? Icons.check : Icons.notifications_outlined,
+                                  color: Colors.grey,
+                                ),
+                                label: Text(
+                                  isReminderSent ? 'Reminder Sent' : 'Remind',
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              );
+                            }),
                           ),
                           const SizedBox(width: 25),
                           Expanded(
@@ -344,7 +321,6 @@ class _MyActivityScreenState extends State<MyActivityScreen> with WidgetsBinding
       );
     }
   }
-
   void filterDialog(BuildContext context) {
     Get.bottomSheet(
       SafeArea(

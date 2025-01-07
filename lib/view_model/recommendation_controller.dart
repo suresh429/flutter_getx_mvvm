@@ -7,7 +7,7 @@ import '../model/ExploreModel.dart';
 import '../model/LoginModel.dart';
 import '../payload/invite_payload.dart';
 import '../service/ConnectivityService.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
@@ -18,7 +18,7 @@ class RecommendationController extends GetxController {
   late String requestType = '';
   late String requestLanguage = '';
 
-  final ApiService _apiService = ApiService();
+  final MainRepository repository = MainRepository();
   final ConnectivityService connectivityService = Get.put(ConnectivityService());
   final storage = GetStorage();
   late LoginModel? loginResponse;
@@ -77,7 +77,7 @@ class RecommendationController extends GetxController {
       errorMessage.value = ''; // Reset previous errors
 
       // Fetch profile data from the API
-      final getProfile = await _apiService.getProfile(uniqueId);
+      final getProfile = await repository.getProfile(uniqueId);
 
       requestType = ConstantsUtils.buildRequestTypeData(getProfile.data.talLeaderPreferences);
       requestLanguage = getProfile.data.languagePreferences.join(',') ?? '';
@@ -119,7 +119,7 @@ class RecommendationController extends GetxController {
 
       isLoading(true);
 
-      final dataResponse = await _apiService.inviteMember(
+      final dataResponse = await repository.inviteMember(
           payload, loginResponse?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
@@ -151,7 +151,7 @@ class RecommendationController extends GetxController {
 
       // Fetch recommendations from the API
       final fetchedRecommendations =
-      await _apiService.fetchRecommendations(uniqueId, requestType, requestLanguage);
+      await repository.fetchRecommendations(uniqueId, requestType, requestLanguage);
       recommendations.assignAll(fetchedRecommendations);
     } catch (e) {
       // Use the updated error handler

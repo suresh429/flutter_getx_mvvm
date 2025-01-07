@@ -8,7 +8,7 @@ import '../model/LoginModel.dart';
 import '../payload/fav_payload.dart';
 import '../payload/like_unlike_payload.dart';
 import '../service/ConnectivityService.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
@@ -30,7 +30,7 @@ class ExploreController extends GetxController
   final scrollControllers =
       <int, ScrollController>{}.obs; // Scroll controllers for each tab
 
-  final ApiService apiService = ApiService(); // API service instance
+  final MainRepository repository = MainRepository(); // API service instance
   final ConnectivityService connectivityService = Get.find<ConnectivityService>(); // Connectivity service instance
 
   final List<String> tabTitles = [
@@ -132,7 +132,7 @@ class ExploreController extends GetxController
     int offset = (tabPage[tabIndex]! - 1) * 5;
 
     try {
-      List<ExploreModel> fetchedData = await apiService.fetchExploreRequests(
+      List<ExploreModel> fetchedData = await repository.fetchExploreRequests(
           requestTypes: requestTypeData,
           limit: 5,
           offset: offset,
@@ -191,7 +191,7 @@ class ExploreController extends GetxController
       print("payload  :   $payload");
     }
     try {
-      await apiService.addToFavorite(
+      await repository.addToFavorite(
           payload, loginResponse?.data?.tokenDetail?.token);
     } catch (e) {
       String errorMessage = await ErrorHandler.handleError(e);
@@ -244,7 +244,7 @@ class ExploreController extends GetxController
     );
     print("likeUnlikeRequest :  $payload");
     try {
-      final dataResponse = await apiService.likeUnlikeRequest(
+      final dataResponse = await repository.likeUnlikeRequest(
           payload, loginResponse?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
@@ -260,17 +260,23 @@ class ExploreController extends GetxController
 
   Future<void> shareRequest(String reqId) async {
     try {
-      final dataResponse = await apiService.shareRequest(
-          loginResponse?.data?.tokenDetail?.token, reqId);
+      if (loginResponse?.data?.tokenDetail?.token == null) {
+        throw Exception("Authorization token is missing.");
+      }
+
+      final dataResponse = await repository.shareRequest(
+        loginResponse!.data!.tokenDetail!.token!,
+        reqId,
+      );
 
       if (dataResponse.statusCode == 200) {
         ConstantsUtils.showSuccessSnackbar(dataResponse.message);
       } else {
-        throw Exception("data is missing or invalid");
+        throw Exception("Failed to share request: ${dataResponse.message}");
       }
     } catch (e) {
       String errorMsg = await ErrorHandler.handleError(e);
       ConstantsUtils.showErrorSnackbar(errorMsg);
-    } finally {}
+    }
   }
 }

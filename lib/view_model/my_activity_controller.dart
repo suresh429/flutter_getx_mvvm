@@ -1,7 +1,7 @@
 import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:get/get.dart';
 import '../model/LoginModel.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
@@ -15,9 +15,9 @@ class MyActivityController extends GetxController {
   RxString title = ''.obs;
   var subtitle = ''.obs;
   final errorMessage = ''.obs;
-  late Rx<LoginModel?> loginResponse;
+  Rx<LoginModel?> loginResponse = Rx<LoginModel?>(null); // Initialize with a default value
 
-  final ApiService apiService = ApiService();
+  final MainRepository repository = MainRepository();
 
   final List<String> typeList = [
     "All",
@@ -37,20 +37,31 @@ class MyActivityController extends GetxController {
   Rx<String> selectedStatusList = 'All'.obs;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    loginResponse = Rx<LoginModel?>(await ConstantsUtils.getStoredLoginResponse());
-    Future.delayed(Duration.zero, fetchRequests);
+    initializeController();
   }
 
   @override
   void onReady() {
     super.onReady();
+    resetSelection();
+  }
+
+  // initialize
+  Future<void> initializeController() async {
+    loginResponse = Rx<LoginModel?>(await ConstantsUtils.getStoredLoginResponse());
+    if (loginResponse.value != null) {
+      resetSelection();
+      await fetchRequests();
+    } else {
+      errorMessage.value = 'Failed to load login response';
+    }
   }
 
   // Method to fetch the requests
   Future<void> fetchRequests() async {
-    if (isLoading.value || !hasMoreData.value) return;
+    if (isLoading.value || !hasMoreData.value || loginResponse.value == null) return;
 
     isLoading.value = true;
     errorMessage.value = ''; // Reset error message
@@ -74,12 +85,8 @@ class MyActivityController extends GetxController {
         break;
     }
 
-    print("Request Status: $requestStatusData");
-    print("Request Type: $requestTypeData");
-
     try {
-      print('Fetching requests...');
-      final List<DonationRequestResponse> newRequests = await apiService.fetchActivityRequests(
+      final List<DonationRequestResponse> newRequests = await repository.fetchActivityRequests(
         requestTypes: requestTypeData,
         limit: limit,
         offset: offset,
@@ -87,7 +94,6 @@ class MyActivityController extends GetxController {
         requestStatus: requestStatusData,
       );
 
-      print('Requests fetched successfully');
       if (newRequests.isEmpty) {
         hasMoreData.value = false;
       } else {
@@ -110,4 +116,52 @@ class MyActivityController extends GetxController {
     hasMoreData.value = true;
     fetchRequests();
   }
+
+  Future<void> reminderPost(String requestId) async {
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await repository.reminderPost(requestId, loginResponse.value?.data?.tokenDetail?.token);
+
+      if (dataResponse.status == 'success' && dataResponse.data != null) {
+        // Update the reminderSent field for the corresponding request
+        final index = requests.indexWhere((request) => request.id == requestId);
+        if (index != -1) {
+          requests[index].reminderSent.value = true;
+        }
+       // ConstantsUtils.showSuccessSnackbar('post ${dataResponse.message}');
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> reminderPut(String requestId) async {
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await repository.reminderPut(requestId, loginResponse.value?.data?.tokenDetail?.token);
+
+      if (dataResponse.status == 'success' && dataResponse.data != null) {
+        ConstantsUtils.showSuccessSnackbar('put ${dataResponse.message}');
+      } else {
+        throw Exception("data is missing or invalid");
+      }
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
 }
