@@ -1,7 +1,7 @@
 import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:get/get.dart';
 import '../model/LoginModel.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
@@ -15,9 +15,9 @@ class MyActivityController extends GetxController {
   RxString title = ''.obs;
   var subtitle = ''.obs;
   final errorMessage = ''.obs;
-  late Rx<LoginModel?> loginResponse;
+  Rx<LoginModel?> loginResponse = Rx<LoginModel?>(null); // Initialize with a default value
 
-  final ApiService apiService = ApiService();
+  final MainRepository repository = MainRepository();
 
   final List<String> typeList = [
     "All",
@@ -86,7 +86,7 @@ class MyActivityController extends GetxController {
     }
 
     try {
-      final List<DonationRequestResponse> newRequests = await apiService.fetchActivityRequests(
+      final List<DonationRequestResponse> newRequests = await repository.fetchActivityRequests(
         requestTypes: requestTypeData,
         limit: limit,
         offset: offset,
@@ -123,7 +123,7 @@ class MyActivityController extends GetxController {
 
       isLoading(true);
 
-      final dataResponse = await apiService.reminderPost(requestId, loginResponse.value?.data?.tokenDetail?.token);
+      final dataResponse = await repository.reminderPost(requestId, loginResponse.value?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
         // Update the reminderSent field for the corresponding request
@@ -149,7 +149,7 @@ class MyActivityController extends GetxController {
 
       isLoading(true);
 
-      final dataResponse = await apiService.reminderPut(requestId, loginResponse.value?.data?.tokenDetail?.token);
+      final dataResponse = await repository.reminderPut(requestId, loginResponse.value?.data?.tokenDetail?.token);
 
       if (dataResponse.status == 'success' && dataResponse.data != null) {
         ConstantsUtils.showSuccessSnackbar('put ${dataResponse.message}');

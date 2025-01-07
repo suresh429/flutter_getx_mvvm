@@ -8,7 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import '../model/AreaOption.dart';
 import '../model/CategoryModel.dart';
 import '../model/LoginModel.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
@@ -19,7 +19,7 @@ class ManagePreferencesController extends GetxController {
   final isLoading = false.obs;
   var errorMessage = ''.obs;
 
-  final ApiService _apiService = ApiService();
+  final MainRepository repository = MainRepository();
 
   final categories = <Category>[
     Category(
@@ -178,7 +178,7 @@ class ManagePreferencesController extends GetxController {
 
       isLoading(true);
 
-      final dataResponse = await _apiService.managePreferencesRequest(
+      final dataResponse = await repository.managePreferencesRequest(
           loginResponse?.data?.tokenDetail?.token,
           loginResponse?.data?.uniqueId,
           payload);
@@ -214,7 +214,7 @@ class ManagePreferencesController extends GetxController {
       errorMessage.value = ''; // Reset previous errors
 
       // Fetch profile data from the API
-      final getProfile = await _apiService.getProfile(uniqueId);
+      final getProfile = await repository.getProfile(uniqueId);
 
       setInitialAppCategories(getProfile.data.talLeaderPreferences);
       setInitialLanguages(getProfile.data.languagePreferences);
