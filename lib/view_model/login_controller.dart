@@ -8,7 +8,7 @@ import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
-
+//login screen 2
 class LoginController extends GetxController {
   final storage = GetStorage();
 
