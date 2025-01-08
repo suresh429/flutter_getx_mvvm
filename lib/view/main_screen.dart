@@ -3,10 +3,10 @@ import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
 import 'package:flutter_getx_mvvm/view/settings_screen.dart';
 import 'package:flutter_getx_mvvm/view/user_profile_screen.dart';
+import 'package:flutter_getx_mvvm/view/profile_progressbar.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import '../env/app_env.dart';
 import '../utilites/constants_Utils.dart';
 import '../view_model/bottom_nav_controller.dart';
@@ -30,13 +30,11 @@ class _MainScreenState extends State<MainScreen> {
         drawer: Drawer(
           child: ListView(
             children: [
-              SizedBox(
-                height: 120,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => UserProfileScreen());
-                    },
+ SafeArea(
+                child: SizedBox(
+                  height: 120,
+                  child: Center(
+
                     child: DrawerHeader(
                       decoration: const BoxDecoration(
                         image: DecorationImage(
@@ -46,6 +44,7 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       child: Obx(() {
                         final loginResponse = bottomNavController.loginResponse.value!;
+
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -96,6 +95,55 @@ class _MainScreenState extends State<MainScreen> {
                           ],
                         );
                       }),
+
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 60,
+                                  height: 60,
+                                  child: ProfileWithProgressBar(data: loginResponse,)
+                              ),
+                              // CircleAvatar(
+                              //   backgroundColor: Colors.red,
+                              //   backgroundImage: NetworkImage(
+                              //       loginResponse.data?.profileImageUrl ??
+                              //           'https://via.placeholder.com/150'),
+                              //   radius:
+                              //       20.0, // Adjust the size of the avatar if needed
+                              // ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      loginResponse.data?.username ?? 'User Name',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      loginResponse.data?.email ?? 'User@email.com',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 15,))
+                            ],
+                          );
+                        }
+                      ),
+
                     ),
                   ),
                 ),
@@ -120,6 +168,7 @@ class _MainScreenState extends State<MainScreen> {
                 title: const Text("Favorites"),
                 onTap: () {
                   Navigator.pop(context);
+                  Get.toNamed('/explore',arguments: {'title': 'My Favorites','subtitle':'Opportunities you marked as your favorites.'});
                 },
               ),
               ListTile(
@@ -209,7 +258,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 title: const Text("Logout"),
                 onTap: () {
-                  logout();
+                  showGetXDialog(context);
+                  //logout();
                 },
               ),
             ],
@@ -268,5 +318,32 @@ class _MainScreenState extends State<MainScreen> {
   void logout() {
     storage.remove('isLoggedIn');
     Get.offAllNamed('/login');
+  }
+
+  void showGetXDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Do you want to proceed to Logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Cancel action
+              Get.back(); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // OK action
+              // Add the action you want to take when the OK button is clicked
+              logout();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+    );
   }
 }

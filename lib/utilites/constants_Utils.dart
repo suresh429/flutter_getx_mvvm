@@ -3,8 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
+import 'package:flutter_getx_mvvm/model/UserModel.dart';
+import 'package:flutter_getx_mvvm/utilites/colors.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
+
 
 class ConstantsUtils{
 
@@ -48,7 +52,7 @@ static void launchURL(String url,BuildContext context) async {
       Uri.parse(url),
       options: LaunchOptions(
         barColor: theme.colorScheme.surface,
-        onBarColor: theme.colorScheme.onSurface,
+        onBarColor: Colors.black,
         barFixingEnabled: false,
       ),
     );
@@ -119,4 +123,46 @@ static Future<LoginModel?> getStoredLoginResponse() async {
 // Return null if no data found
   return null;
 }
+
+
+// calculate profile progress
+  int calculateProfileCompletion(data) {
+    if (data == null) return 0;
+
+    int percentage = 0;
+
+    bool nameRoleCompanyAddressPresent =
+         data.currentRole?.isNotEmpty == true &&
+            isNameComplete(data.name) &&
+            isAddressComplete(data.address);
+
+    if (nameRoleCompanyAddressPresent) percentage += 10;
+    if (data.aboutMe?.isNotEmpty == true) percentage += 10;
+    if (data.experience.isNotEmpty) percentage += 20;
+    if (data.functionalExpertise.isNotEmpty) percentage += 20;
+    if (data.areasOfInterest.isNotEmpty) percentage += 20;
+    if (data.achievements.isNotEmpty) percentage += 20;
+
+    return percentage;
+  }
+
+  bool isNameComplete(name) {
+    return name?.firstName?.isNotEmpty == true ||
+        name?.middleName?.isNotEmpty == true ||
+        name?.lastName?.isNotEmpty == true;
+  }
+
+  bool isAddressComplete(address) {
+    return address?.line1?.isNotEmpty == true ||
+        address?.city?.isNotEmpty == true ||
+        address?.state?.isNotEmpty == true;
+  }
+
+
+  String formatDate(String? dateString) {
+    DateTime parsedDate = DateTime.parse(dateString!); // Parse the ISO 8601 date
+    String formattedDate = DateFormat("dd-MMM-yyyy").format(parsedDate); // Format it
+    return formattedDate;
+  }
+
 }

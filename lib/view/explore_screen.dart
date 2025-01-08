@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
 import 'package:get/get.dart';
+import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
+import '../widget/check_internet_widget.dart';
 import '../widget/explore_card.dart';
 
 class ExploreScreen extends StatelessWidget {
   final ExploreController controller = Get.put(ExploreController());
+  final ConnectivityService connectivityService = Get.put(ConnectivityService());
 
   ExploreScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    controller.resetTab();
-   // controller.resetPaginationForTab(0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Safe to call after the build phase is complete
+      controller.resetTab();
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -26,24 +32,28 @@ class ExploreScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  const Text(
-                    "Explore Requests",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Obx(() {
+                    return Text(
+                      controller.title.value,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 5),
-                  Text(
-                    "Unleash your expertise on epic missions! Spark lasting change!",
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 12,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Obx(() {
+                    return Text(
+                      controller.subtitle.value,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }),
                   const SizedBox(height: 12),
                 ],
               ),
@@ -103,67 +113,80 @@ class ExploreScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: Container(
-              color: Colors.grey[200],
-              child: TabBarView(
-                controller: controller.tabController,
-                children: controller.tabTitles.map((title) {
-                  final int tabIndex = controller.tabTitles.indexOf(title);
-                  return Obx(() {
-                    final isLoading = controller.isLoading[tabIndex] ?? false;
-                    final data = controller.tabData[tabIndex] ?? [];
+            child: Obx(() {
+              if (!connectivityService.isConnected.value) {
+                return CheckInternetWidget(
+                  onRetry: () {
+                    controller.checkAndFetchData(controller.selectedIndex.value);
+                  },
+                );
+              }
 
-                    // Show error message
-                    if (controller.errorMessage.value.isNotEmpty) {
-                      return Center(
-                        child: Text(
-                          controller.errorMessage.value,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 16,
+              return Container(
+                color: Colors.grey[200],
+                child: TabBarView(
+                  controller: controller.tabController,
+                  children: controller.tabTitles.map((title) {
+                    final int tabIndex = controller.tabTitles.indexOf(title);
+                    return Obx(() {
+                      final isLoading = controller.isLoading[tabIndex] ?? false;
+                      final data = controller.tabData[tabIndex] ?? [];
+
+                      // Show error message
+                      if (controller.errorMessage.value.isNotEmpty) {
+                        return Center(
+                          child: Text(
+                            controller.errorMessage.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    if (data.isEmpty && !isLoading) {
-                      return const Center(
-                          child: Text("No Explore Data found."));
-                    }
+                      if (data.isEmpty && !isLoading) {
+                        return const Center(
+                            child: Text("No Explore Data found."));
+                      }
 
-                    return CustomScrollView(
-                      controller: controller.scrollControllers[tabIndex],
-                      slivers: [
-                        // List of items
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                              if (index < data.length) {
-                                final exploreModel = data[index];
-                                return ExploreCard(exploreModel: exploreModel,controller: controller,);
-                              }
+                      return CustomScrollView(
+                        controller: controller.scrollControllers[tabIndex],
+                        slivers: [
+                          // List of items
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                if (index < data.length) {
+                                  final exploreModel = data[index];
+                                  return ExploreCard(
+                                    exploreModel: exploreModel,
+                                    controller: controller,
+                                  );
+                                }
 
-                              // The extra space for loading indicator at the bottom
-                              return const SizedBox.shrink();
-                            },
-                            childCount: data.length,
-                          ),
-                        ),
-                        // Loading indicator at the bottom
-                        if (isLoading)
-                          const SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              child: Center(child: CircularProgressIndicator()),
+                                // The extra space for loading indicator at the bottom
+                                return const SizedBox.shrink();
+                              },
+                              childCount: data.length,
                             ),
                           ),
-                      ],
-                    );
-                  });
-                }).toList(),
-              ),
-            ),
+                          // Loading indicator at the bottom
+                          if (isLoading)
+                            const SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(child: CircularProgressIndicator()),
+                              ),
+                            ),
+                        ],
+                      );
+                    });
+                  }).toList(),
+                ),
+              );
+            }),
           ),
         ],
       ),

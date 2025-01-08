@@ -4,8 +4,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:dio/dio.dart';
 import '../payload/login_payload.dart';
-import '../service/api_service.dart';
+import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
+import '../utilites/error_handler.dart';
 
 //login screen 2
 class LoginController extends GetxController {
@@ -15,7 +16,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
 
   var isLoading = false.obs;
-  final ApiService _apiService = ApiService();
+  final MainRepository repository = MainRepository();
 
   @override
   void onInit() {
@@ -45,7 +46,7 @@ class LoginController extends GetxController {
 
       isLoading(true);
 
-      final loginResponse = await _apiService.login(payload);
+      final loginResponse = await repository.login(payload);
 
       if (loginResponse.status == 'success' && loginResponse.data != null) {
 
@@ -58,14 +59,8 @@ class LoginController extends GetxController {
         throw Exception("Login data is missing or invalid");
       }
     } catch (e) {
-      String errorMessage;
-      if (e is DioException) {
-        errorMessage = 'Network error occurred. Please try again later.';
-      } else {
-        errorMessage = e.toString();
-      }
-      ConstantsUtils.showErrorSnackbar(errorMessage);
-
+      String errorMsg = await ErrorHandler.handleError(e);
+      ConstantsUtils.showErrorSnackbar(errorMsg);
     } finally {
       isLoading(false);
     }
