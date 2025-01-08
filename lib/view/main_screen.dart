@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
-import 'package:flutter_getx_mvvm/view/settings_screen.dart';
-import 'package:flutter_getx_mvvm/view/user_profile_screen.dart';
 import 'package:flutter_getx_mvvm/view/profile_progressbar.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import '../env/app_env.dart';
 import '../utilites/constants_Utils.dart';
 import '../view_model/bottom_nav_controller.dart';
@@ -19,7 +18,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final BottomNavController bottomNavController =
-      Get.put(BottomNavController());
+  Get.put(BottomNavController());
   final storage = GetStorage();
 
   // Access GetStorage
@@ -30,78 +29,30 @@ class _MainScreenState extends State<MainScreen> {
         drawer: Drawer(
           child: ListView(
             children: [
- SafeArea(
+              SafeArea(
                 child: SizedBox(
                   height: 120,
                   child: Center(
-
-                    child: DrawerHeader(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/ic_header.webp'),
-                          fit: BoxFit.cover,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed('/userProfile');
+                      },
+                      child: DrawerHeader(
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/ic_header.webp'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      child: Obx(() {
-                        final loginResponse = bottomNavController.loginResponse.value!;
-
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.red,
-                              backgroundImage: NetworkImage(
-                                loginResponse.data?.profileImageUrl ??
-                                    'https://via.placeholder.com/150',
-                              ),
-                              radius: 25.0, // Adjusted size of the avatar if needed
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded( // Ensures the column content doesn't overflow
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    loginResponse.data?.username ?? 'User Name',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis, // Prevents text overflow
-                                  ),
-                                  Text(
-                                    loginResponse.data?.email ?? 'User@email.com',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
-                                    ),
-                                    overflow: TextOverflow.ellipsis, // Prevents text overflow
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-
+                        child: Obx(() {
+                          final loginResponse = bottomNavController.loginResponse.value!;
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width: 60,
+                                  width: 60,
                                   height: 60,
                                   child: ProfileWithProgressBar(data: loginResponse,)
                               ),
@@ -142,13 +93,12 @@ class _MainScreenState extends State<MainScreen> {
                             ],
                           );
                         }
+                        ),
                       ),
-
                     ),
                   ),
                 ),
               ),
-
               ListTile(
                 leading: const Icon(
                   Icons.person_2_outlined,
@@ -156,8 +106,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 title: const Text("Public Profile"),
                 onTap: () {
-                  Get.to(() => UserProfileScreen());
-                  // Navigator.pop(context);
+                  Navigator.pop(context);
                 },
               ),
               ListTile(
@@ -189,8 +138,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 title: const Text("Settings"),
                 onTap: () {
-                  Get.to(() => SettingsScreen());
-                  // Navigator.pop(context);
+                  Navigator.pop(context);
+                  Get.toNamed('/settings');
                 },
               ),
               const Divider(),
