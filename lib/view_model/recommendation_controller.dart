@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -76,12 +75,24 @@ class RecommendationController extends GetxController {
       isLoading(true);
       errorMessage.value = ''; // Reset previous errors
 
+      // Debugging: Print statement before the API call
+      print('Calling getProfile with uniqueId: $uniqueId');
+
       // Fetch profile data from the API
       final getProfile = await repository.getProfile(uniqueId);
 
+      // Debugging: Print statement after the API call
+      print('Profile Data: ${getProfile.data}');
+
+      // Check if the data is not null
+      // Extract and set requestType and requestLanguage
       requestType = ConstantsUtils.buildRequestTypeData(getProfile.data.talLeaderPreferences);
       requestLanguage = getProfile.data.languagePreferences.join(',') ?? '';
-    } catch (e) {
+
+      // Debugging: Print the parsed values
+      print('requestType: $requestType');
+      print('requestLanguage: $requestLanguage');
+        } catch (e) {
       // Use the updated error handler
       String errorMsg = await ErrorHandler.handleError(e);
       errorMessage.value = errorMsg;

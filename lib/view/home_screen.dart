@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_getx_mvvm/widget/explore_card.dart';
 import 'package:get/get.dart';
-
 import '../env/app_env.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
@@ -11,6 +9,7 @@ import '../view_model/bottom_nav_controller.dart';
 import '../view_model/explore_controller.dart';
 import '../view_model/recommendation_controller.dart';
 import '../widget/check_internet_widget.dart';
+import '../widget/explore_card.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -21,11 +20,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final BottomNavController bottomNavController = Get.find();
-
   final RecommendationController controller = Get.put(RecommendationController());
-
   final ExploreController exploreController = Get.put(ExploreController());
-
   final ConnectivityService connectivityService = Get.put(ConnectivityService());
 
   final List<String> bannerImages = [
@@ -58,38 +54,45 @@ class _HomeScreenState extends State<HomeScreen> {
                 Scaffold.of(context).openDrawer(); // Opens the navigation drawer
               },
               child: Obx(() {
-                final loginResponse = bottomNavController.loginResponse.value!;
+                final loginResponse = bottomNavController.loginResponse.value;
+                if (loginResponse == null) {
+                  return CircleAvatar(
+                    backgroundColor: Colors.red,
+                    backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                    radius: 18.0,
+                  );
+                }
                 return Stack(children: [
                   CircleAvatar(
                     backgroundColor: Colors.red,
                     backgroundImage: NetworkImage(
-                      loginResponse.data?.profileImageUrl ??
-                          'https://via.placeholder.com/150',
+                      loginResponse.data?.profileImageUrl ?? 'https://via.placeholder.com/150',
                     ),
                     radius: 18.0,
                   ),
                   Positioned(
-                      left: 0.0,
-                      bottom: 0.0,
-                      child: Container(
-                        width: 18,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 0.5,
-                          ),
+                    left: 0.0,
+                    bottom: 0.0,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 0.5,
                         ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.menu,
-                            size: 12,
-                            color: Colors.black,
-                          ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.menu,
+                          size: 12,
+                          color: Colors.black,
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
                 ]);
               }),
             ),
@@ -286,7 +289,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 
   // Banner Slider Widget
   Widget _buildBannerSlider() {

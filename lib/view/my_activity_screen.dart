@@ -5,6 +5,7 @@ import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
 import '../view_model/my_activity_controller.dart';
 import '../widget/check_internet_widget.dart';
+import '../widget/custom_app_bar.dart';
 
 class MyActivityScreen extends StatefulWidget {
   const MyActivityScreen({super.key});
@@ -26,7 +27,15 @@ class _MyActivityScreenState extends State<MyActivityScreen>
     });
     return Scaffold(
       backgroundColor: ColorUtils.colorSurface,
-      appBar: _buildAppBar(context),
+      appBar: CustomAppBar(
+        title: 'My Activities',
+        subTitle: 'Impactful opportunities you expressed interest in.',
+        showFilterButton: true,
+        onFilterPressed: () {
+          // Your filter logic here
+          filterDialog(context);
+        },
+      ),
       body: Obx(() {
         if (!connectivityService.isConnected.value) {
           return Center(
@@ -64,56 +73,6 @@ class _MyActivityScreenState extends State<MyActivityScreen>
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(80),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: AppBar(
-          titleSpacing: 20,
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'My Activities',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      filterDialog(context);
-                    },
-                    icon: const Icon(Icons.filter_alt),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 0),
-              Text(
-                'Impactful opportunities you expressed interest in.',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 12,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
-    );
-  }
 
   Widget _buildActivityList() {
     return ListView.builder(
