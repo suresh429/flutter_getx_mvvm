@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';
 import '../widget/check_internet_widget.dart';
+import '../widget/custom_app_bar.dart';
 import '../widget/explore_card.dart';
+import '../widget/observable_app_bar.dart';
 
 class ExploreScreen extends StatelessWidget {
   final ExploreController controller = Get.put(ExploreController());
@@ -22,45 +24,14 @@ class ExploreScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: AppBar(
-              titleSpacing: 20,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Obx(() {
-                    return Text(
-                      controller.title.value,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 5),
-                  Obx(() {
-                    return Text(
-                      controller.subtitle.value,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 12,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    );
-                  }),
-                  const SizedBox(height: 12),
-                ],
-              ),
-              backgroundColor: Colors.white,
-              elevation: 0,
-            ),
-          ),
+        preferredSize: const Size.fromHeight(60),
+        child: ObservableAppBar(
+          title: controller.title,
+          subTitle: controller.subtitle,
+          showFilterButton: false,
+          onFilterPressed: () {
+            // Filter button logic
+          },
         ),
       ),
       body: Column(

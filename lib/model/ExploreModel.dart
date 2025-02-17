@@ -8,9 +8,9 @@ class ExploreModel {
   final String defaultImageUrl;
   final int? startDate; // Nullable for optional dates
   final int? dueDate; // Nullable for optional dates
-  RxInt likesCount; // Changed from late final RxInt to final RxInt
+  RxInt likesCount; // Reactive integer for likes count
   final int commentsCount;
-  RxInt sharesCount;
+  RxInt sharesCount; // Reactive integer for shares count
   final String city;
   final String state;
   final String country;
@@ -18,8 +18,8 @@ class ExploreModel {
   final String podcastName;
   final String format;
   final List<String> languages;
-  final RxBool isFavorite;
-  final RxBool isLike;
+  RxBool isFavorite; // Reactive boolean for favorite status
+  RxBool isLike; // Reactive boolean for like status
 
   ExploreModel({
     required this.id,
@@ -31,7 +31,7 @@ class ExploreModel {
     this.dueDate,
     required int likesCount, // Pass an int and convert to RxInt
     required this.commentsCount,
-    required int sharesCount,
+    required int sharesCount, // Pass an int and convert to RxInt
     required this.city,
     required this.state,
     required this.country,
@@ -39,11 +39,10 @@ class ExploreModel {
     required this.podcastName,
     required this.format,
     required this.languages,
-    required bool isFavorite,
-    required bool isLike,
+    required bool isFavorite, // Pass a bool and convert to RxBool
+    required bool isLike, // Pass a bool and convert to RxBool
   })  : likesCount = likesCount.obs,
         sharesCount = sharesCount.obs,
-        // Convert to RxInt
         isFavorite = isFavorite.obs,
         isLike = isLike.obs;
 
@@ -55,14 +54,11 @@ class ExploreModel {
       requestType: json['request_type'] ?? '',
       requestedFor: json['requested_for'] ?? '',
       defaultImageUrl: json['defaultImageUrl'] ?? '',
-      startDate: json['start_date'] as int?,
-      // Ensure startDate is nullable
-      dueDate: json['due_date'] as int?,
-      // Ensure dueDate is nullable
-      likesCount: json['likesCount'] ?? 0,
-      // Pass int
-      commentsCount: json['commentsCount'] ?? 0,
-      sharesCount: json['sharesCount'] ?? 0,
+      startDate: json['start_date'] as int?, // Ensure startDate is nullable
+      dueDate: json['due_date'] as int?, // Ensure dueDate is nullable
+      likesCount: json['likesCount'] ?? 0, // Pass int and handle null
+      commentsCount: json['commentsCount'] ?? 0, // Pass int and handle null
+      sharesCount: json['sharesCount'] ?? 0, // Pass int and handle null
       city: (json['user_info']?['address']?['city'] ?? '') as String,
       state: (json['user_info']?['address']?['state'] ?? '') as String,
       country: (json['user_info']?['address']?['country'] ?? '') as String,
@@ -70,8 +66,8 @@ class ExploreModel {
       podcastName: (json['additionalInfo']?['podcastName'] ?? '') as String,
       format: (json['additionalInfo']?['format'] ?? '') as String,
       languages: List<String>.from(json['additionalInfo']?['languages'] ?? []),
-      isFavorite: (json['isFavourite'] ?? false) as bool,
-      isLike: (json['isLike'] ?? false) as bool,
+      isFavorite: (json['isFavourite'] ?? false) as bool, // Handle null
+      isLike: (json['isLike'] ?? false) as bool, // Handle null
     );
   }
 }

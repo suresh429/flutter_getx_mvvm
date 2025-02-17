@@ -1047,7 +1047,7 @@ class ProfileStatus {
     id: json["_id"],
     type: json["type"],
     reason: json["reason"],
-    endDate: json["endDate"],
+    endDate: json["endDate"] ?? 0,
     hideStatus: json["hideStatus"],
     updatedAt: DateTime.parse(json["updatedAt"]),
     createdAt: DateTime.parse(json["createdAt"]),
