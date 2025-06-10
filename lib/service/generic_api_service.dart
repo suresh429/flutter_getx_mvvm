@@ -8,7 +8,12 @@ class GenericApiService {
 
   // Generic methods for API requests
   // Post
-  Future<T> post<T>(String endpoint, dynamic data, T Function(Map<String, dynamic>) fromJson, {String? token}) async {
+  Future<T> post<T>(
+      String endpoint,
+      dynamic data,
+      T Function(Map<String, dynamic>) fromJson, {
+        String? token,
+      }) async {
     try {
       final response = await _dio.post(
         '${AppEnvironment.baseApiUrl}$endpoint',
@@ -31,12 +36,17 @@ class GenericApiService {
           error: 'Failed request: ${response.data['message']}',
         );
       }
+    } on DioException catch (dioError) {
+      print("DioException caught in POST:");
+      print("Status code: ${dioError.response?.statusCode}");
+      print("Response data: ${dioError.response?.data}");
+      print("Request data: $data");
+      rethrow;
     } catch (e) {
-      print("Error occurred during POST request: $e");
+      print("Unexpected error in POST: $e");
       rethrow;
     }
   }
-
   // Get
   Future<T> get<T>(String endpoint, T Function(Map<String, dynamic>) fromJson, {Map<String, dynamic>? params, String? token}) async {
     try {

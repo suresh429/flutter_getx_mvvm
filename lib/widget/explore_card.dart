@@ -26,18 +26,23 @@ class _ExploreCardState extends State<ExploreCard> {
   Widget build(BuildContext context) {
     final ExploreController controller = Get.find<ExploreController>();
     print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
     final timeLeft = ConstantsUtils.calculateTimeLeft(
       widget.exploreModel.startDate ?? 0,
       widget.exploreModel.dueDate ?? 0,
     );
 
+
+
     return SizedBox(
-      width: 320,
+      width: 300,
       child: Card(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
+        elevation: 1,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -152,23 +157,23 @@ class _ExploreCardState extends State<ExploreCard> {
                                   fontSize: 12, color: Colors.grey)),
                         ],
                       ),
-                      ElevatedButton(
+                      OutlinedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: ColorUtils.colorPrimary,
-                          backgroundColor: ColorUtils.colorButtonCard,
+                         // foregroundColor: Colors.white, // Text and icon color
+                          backgroundColor: const Color(0xFFFFEFEF),   // Red background
                           side: const BorderSide(color: Colors.transparent),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Details"),
-                            SizedBox(width: 5),
-                            Icon(Icons.arrow_forward, size: 16),
+                            Text("Details",style: TextStyle(color: ColorUtils.colorPrimary)),
+                            const SizedBox(width: 5),
+                            Icon(Icons.arrow_forward,color: ColorUtils.colorPrimary, size: 16),
                           ],
                         ),
                       ),

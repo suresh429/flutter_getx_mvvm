@@ -1,95 +1,116 @@
 import 'package:flutter/material.dart';
-
 import '../model/LoginModel.dart';
 
 class ProfileWithProgressBar extends StatelessWidget {
   final LoginModel data;
 
-  ProfileWithProgressBar({required this.data});
+  const ProfileWithProgressBar({required this.data, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("object data : ${data.data?.areasOfInterest}data");
+    int progressPercentage = calculateProfileCompletion(data.data);
+    Color progressColor = _getProgressColor(progressPercentage);
 
-    // Calculate the profile completion percentage
-     int progressPercentage = calculateProfileCompletion(data.data);
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Progress background circle
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.grey.shade200.withOpacity(0.5),
+          ),
+        ),
 
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Circular Progress Indicator
-          SizedBox(
-            width: 50,
-            height: 50,
-            child: CircularProgressIndicator(
-              value: progressPercentage / 100, // Convert percentage to 0-1 range
-              strokeWidth: 1.5, // Width of the progress bar
-              backgroundColor: Colors.grey.shade300, // Background color of the circle
-              valueColor: AlwaysStoppedAnimation<Color>(
-                progressPercentage < 40
-                    ? Colors.red // For progress less than 40%
-                    : progressPercentage < 75
-                    ? Colors.orange // For progress between 40% and 74%
-                    : Colors.green, // For progress greater than or equal to 75%
-              ), // Progress color
+        // Progress indicator
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: CircularProgressIndicator(
+            value: progressPercentage / 100,
+            strokeWidth: 3,
+            backgroundColor: Colors.transparent,
+            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+          ),
+        ),
+
+        // Profile image
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white,
+              width: 2,
+            ),
+            image: DecorationImage(
+              image: NetworkImage(
+                data.data?.profileImageUrl ?? 'https://via.placeholder.com/150',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
-          // Circle Avatar with Profile Image
-          CircleAvatar(
-            backgroundColor: Colors.red,
-            backgroundImage: NetworkImage(data.data?.profileImageUrl ?? 'https://via.placeholder.com/150'),
-            radius: 22, // Size of the avatar
-          ),
-          // Percentage Text at the bottom
-          Positioned(
-            bottom: -2,
+        ),
+
+        // Percentage badge
+        Positioned(
+          bottom: 0, // Slightly above the very bottom
+          left: 0,
+          right: 0, // This centers the child horizontally
+          child: Center( // Double centering for precision
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6), // Adjust padding for better fit
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.white, // Background color
-                borderRadius: BorderRadius.circular(12), // Increased corner radius for rounded effect
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 2,
+                  ),
+                ],
               ),
               child: Text(
-                '${progressPercentage.toInt()}%', // Display percentage
-                style: const TextStyle(
+                '$progressPercentage%',
+                style: TextStyle(
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  fontSize: 7,
-                  color: Colors.green,
+                  color: progressColor,
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
-
   }
 
-  // Method to calculate profile completion
+  Color _getProgressColor(int percentage) {
+    if (percentage < 40) return Colors.red;
+    if (percentage < 75) return Colors.orange;
+    return Colors.green;
+  }
+
   int calculateProfileCompletion(data) {
-    if (data == null) return 0;  // Check if data is null
+    if (data == null) return 0;
 
     int percentage = 0;
+    bool basicInfoComplete = data.currentRole?.isNotEmpty == true &&
+        isNameComplete(data.name) &&
+        isAddressComplete(data.address);
 
-    // Check if currentRole, name, address are non-null and not empty
-    bool nameRoleCompanyAddressPresent =
-        data.currentRole?.isNotEmpty == true &&
-            isNameComplete(data.name) &&
-            isAddressComplete(data.address);
-
-    if (nameRoleCompanyAddressPresent) percentage += 10;
-
-    // Check if other fields are non-null and not empty
+    if (basicInfoComplete) percentage += 30;
     if (data.aboutMe?.isNotEmpty == true) percentage += 10;
     if (data.experience?.isNotEmpty == true) percentage += 20;
     if (data.functionalExpertise?.isNotEmpty == true) percentage += 20;
-    if (data.areasOfInterest?.isNotEmpty == true) percentage += 20;
-    if (data.achievements?.isNotEmpty == true) percentage += 20;
+    if (data.areasOfInterest?.isNotEmpty == true) percentage += 10;
+    if (data.achievements?.isNotEmpty == true) percentage += 10;
 
-    return percentage;
+    return percentage.clamp(0, 100);
   }
-
 
   bool isNameComplete(name) {
     return name?.firstName?.isNotEmpty == true ||
@@ -102,5 +123,4 @@ class ProfileWithProgressBar extends StatelessWidget {
         address?.city?.isNotEmpty == true ||
         address?.state?.isNotEmpty == true;
   }
-
 }
