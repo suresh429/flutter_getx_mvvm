@@ -8,7 +8,6 @@ import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
-//login screen 2
 class LoginController extends GetxController {
   final storage = GetStorage();
 
@@ -22,12 +21,12 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     emailController.text = "chandralekha@touchalife.org";
-    passwordController.text = "Youknowbts@7";
+    passwordController.text = "Saybts@7";
   }
 
   Future<void> login() async {
-    final email = emailController.text;
-    final password = passwordController.text;
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       ConstantsUtils.showErrorSnackbar('Email and password are required.');
@@ -49,14 +48,29 @@ class LoginController extends GetxController {
       final loginResponse = await repository.login(payload);
 
       if (loginResponse.status == 'success' && loginResponse.data != null) {
-
-        await storage.write('isLoggedIn', true ?? false);
-        // Save the entire login response to storage
+        await storage.write('isLoggedIn', true);
         await storage.write('userData', jsonEncode(loginResponse.toJson()));
         ConstantsUtils.showSuccessSnackbar('Login successful!');
         Get.offNamed('/home');
       } else {
-        throw Exception("Login data is missing or invalid");
+        ConstantsUtils.showErrorSnackbar("Login failed: Invalid response.");
+      }
+    } on DioException catch (dioError) {
+      final statusCode = dioError.response?.statusCode;
+      final responseData = dioError.response?.data;
+
+      print('Login failed with status $statusCode');
+      print('Response data: $responseData');
+
+      if (statusCode == 500) {
+        ConstantsUtils.showErrorSnackbar("Server error. Please try again later.");
+      } else if (statusCode != null) {
+        final message = (responseData != null && responseData['message'] != null)
+            ? responseData['message']
+            : "An error occurred";
+        ConstantsUtils.showErrorSnackbar(message);
+      } else {
+        ConstantsUtils.showErrorSnackbar("Unexpected network error");
       }
     } catch (e) {
       String errorMsg = await ErrorHandler.handleError(e);

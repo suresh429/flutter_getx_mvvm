@@ -3,6 +3,7 @@ import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
 import 'package:flutter_getx_mvvm/view/profile_progressbar.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
+import 'package:flutter_getx_mvvm/widget/custom_header.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -29,75 +30,8 @@ class _MainScreenState extends State<MainScreen> {
         drawer: Drawer(
           child: ListView(
             children: [
-              SafeArea(
-                child: SizedBox(
-                  height: 120,
-                  child: Center(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        Get.toNamed('/userProfile');
-                      },
-                      child: DrawerHeader(
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/ic_header.webp'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Obx(() {
-                          final loginResponse = bottomNavController.loginResponse.value!;
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                  width: 60,
-                                  height: 60,
-                                  child: ProfileWithProgressBar(data: loginResponse,)
-                              ),
-                              // CircleAvatar(
-                              //   backgroundColor: Colors.red,
-                              //   backgroundImage: NetworkImage(
-                              //       loginResponse.data?.profileImageUrl ??
-                              //           'https://via.placeholder.com/150'),
-                              //   radius:
-                              //       20.0, // Adjust the size of the avatar if needed
-                              // ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      loginResponse.data?.username ?? 'User Name',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      loginResponse.data?.email ?? 'User@email.com',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 2),
-                              IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 15,))
-                            ],
-                          );
-                        }
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              const SafeArea(
+                child: CustomHeader(),
               ),
               ListTile(
                 leading: const Icon(

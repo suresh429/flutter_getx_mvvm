@@ -96,7 +96,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
             color: Colors.white,
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 3,
+            elevation: 1,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Obx(() {
                 final loginResponse = bottomNavController.loginResponse.value;
                 if (loginResponse == null) {
-                  return CircleAvatar(
+                  return const CircleAvatar(
                     backgroundColor: Colors.red,
                     backgroundImage: NetworkImage('https://via.placeholder.com/150'),
                     radius: 18.0,
@@ -180,14 +180,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 }),
               ),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               Card(
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),
-                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                margin: const EdgeInsets.symmetric(horizontal:4),
                 child: Container(
                   decoration: BoxDecoration(
                     image: const DecorationImage(
@@ -196,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
