@@ -26,6 +26,9 @@ class _ExploreCardState extends State<ExploreCard> {
   Widget build(BuildContext context) {
     final ExploreController controller = Get.find<ExploreController>();
     print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
+    print("object ${widget.exploreModel.isFavorite}");
     final timeLeft = ConstantsUtils.calculateTimeLeft(
       widget.exploreModel.startDate ?? 0,
       widget.exploreModel.dueDate ?? 0,
