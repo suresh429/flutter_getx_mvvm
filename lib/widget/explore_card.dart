@@ -31,6 +31,8 @@ class _ExploreCardState extends State<ExploreCard> {
       widget.exploreModel.dueDate ?? 0,
     );
 
+
+
     return SizedBox(
       width: 300,
       child: Card(
