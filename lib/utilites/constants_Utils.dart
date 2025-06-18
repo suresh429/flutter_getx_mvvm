@@ -5,12 +5,29 @@ import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/model/UserModel.dart';
 import 'package:flutter_getx_mvvm/utilites/colors.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 
 
 class ConstantsUtils{
+
+  static String extractCity(String fullAddress) {
+    return fullAddress.split(',').first.trim();
+  }
+
+  static String extractState(String fullAddress) {
+    List<String> parts = fullAddress.split(',');
+    return parts.length > 1 ? parts[1].trim() : '';
+  }
+
+  static String extractCountry(String fullAddress) {
+    List<String> parts = fullAddress.split(',');
+    return parts.length > 2 ? parts[2].trim() : '';
+  }
+
+
 
 static void showSuccessSnackbar(String? message) {
   Get.snackbar(
@@ -42,6 +59,17 @@ static void showInfoSnackbar(String message) {
     backgroundColor: Colors.black,
     colorText: Colors.white,
       margin: const EdgeInsets.all(15)
+  );
+}
+
+static void showToast(String message) {
+  Fluttertoast.showToast(
+    msg: message,
+    toastLength: Toast.LENGTH_SHORT, // or Toast.LENGTH_LONG
+    gravity: ToastGravity.BOTTOM, // TOP, CENTER, or BOTTOM
+    backgroundColor: Colors.black87,
+    textColor: Colors.white,
+    fontSize: 16.0,
   );
 }
 
@@ -163,6 +191,31 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     DateTime parsedDate = DateTime.parse(dateString!); // Parse the ISO 8601 date
     String formattedDate = DateFormat("dd-MMM-yyyy").format(parsedDate); // Format it
     return formattedDate;
+  }
+
+
+  static int convertDobToTimestamp(String dobString) {
+    try {
+      final parsedDate = DateFormat('dd-MMM-yyyy').parse(dobString);
+      return parsedDate.millisecondsSinceEpoch;
+    } catch (e) {
+      print('Invalid DOB format: $e');
+      return 0; // Or throw
+    }
+  }
+
+
+  static String mapGenderToCode(String genderText) {
+    switch (genderText.toLowerCase()) {
+      case 'female':
+        return 'f';
+      case 'male':
+        return 'm';
+      case 'other':
+        return 'o';
+      default:
+        return 'f'; // Default fallback
+    }
   }
 
 }

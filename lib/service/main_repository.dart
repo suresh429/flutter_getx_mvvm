@@ -1,16 +1,18 @@
 // services/main_repository.dart
-import 'package:flutter_getx_mvvm/model/CommonModel.dart';
+import 'package:flutter_getx_mvvm/model/CommonModel.dart' hide Data;
 import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
-import 'package:flutter_getx_mvvm/model/ShareModel.dart';
-import 'package:flutter_getx_mvvm/model/UserModel.dart';
+import 'package:flutter_getx_mvvm/model/ShareModel.dart' hide Data;
+import 'package:flutter_getx_mvvm/model/UserModel.dart' hide Data;
+import 'package:flutter_getx_mvvm/model/location_model.dart' hide Datum;
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
 import 'package:flutter_getx_mvvm/payload/like_unlike_payload.dart';
 import 'package:flutter_getx_mvvm/payload/login_payload.dart';
 import 'package:flutter_getx_mvvm/payload/user_update_payload.dart';
 
+import '../model/vote_leader_model.dart';
 import 'generic_api_service.dart';
 
 class MainRepository {
@@ -26,8 +28,10 @@ class MainRepository {
   static const String _share = "donationRequest/analytics";
   static const String _user = "user";
   static const String _reminder = "donationRequest/reminder/donee";
-
-
+  // Add new endpoint constants
+  static const String _voteLeadersAction = "voteLeaders/action";
+  static const String _voteLeaders = "users";
+  static const String _cities = "cities";
 
 
   // Specific API methods using the generic methods
@@ -76,12 +80,46 @@ class MainRepository {
     );
   }
 
-  Future<UserModel> getProfile(String? uniqueId) async {
-    return await service.get<UserModel>(
-      '$_user/$uniqueId',
-          (data) => UserModel.fromJson(data),
+  Future<LoginModel> updateProfileRequest(String? token, String? userId, Map<String, dynamic> payload) async {
+    return await service.put<LoginModel>(
+      '$_user/$userId',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
     );
   }
+
+
+  // In your repository
+  Future<UserModel> getProfile(String uniqueId) async {
+    try {
+      print('Making API call to user endpoint with ID: $uniqueId');
+      return await service.get<UserModel>(
+        '$_user/$uniqueId',
+            (data) => UserModel.fromJson(data),
+      );
+    } catch (e) {
+      print('Repository error: $e');
+      rethrow;
+    }
+  }
+
+
+
+  // get cities
+  Future<List<LocationModel>> fetchCities(String? keyword) async {
+    final params = {
+    'limit': 10,
+    'keyword': keyword,
+    };
+    final data = await service.get<Map<String, dynamic>>(
+      _cities,
+          (data) => data,
+      params: params,
+    );
+    return (data['data'] as List).map((explore) => LocationModel.fromJson(explore)).toList();
+  }
+
 
   Future<List<ExploreModel>> fetchRecommendations(String? uniqueId, String requestType, String language) async {
     final params = {
@@ -140,6 +178,9 @@ class MainRepository {
     return (data['data'] as List).map((item) => ExploreModel.fromJson(item)).toList();
   }
 
+
+
+  // Fetch donation requests
   Future<List<DonationRequestResponse>> fetchActivityRequests({
     required String requestTypes,
     required int limit,
@@ -161,6 +202,7 @@ class MainRepository {
     );
     return (data['data'] as List).map((item) => DonationRequestResponse.fromJson(item)).toList();
   }
+
 
   Future<CommonModel> reminderPost(String requestId, String? token) async {
     return await service.post<CommonModel>(
@@ -188,4 +230,72 @@ class MainRepository {
   }
 
 
+
+
+
+
+  // Fetch vote leaders
+  Future<List<Datum>> fetchVoteLeaders({
+    required String profileVerificationStatus,
+    required int limit,
+    required int offset,
+    required String userId,
+    required String sortBy,
+    required String sortOrder,
+  }) async {
+    final params = {
+      'sourceOfSignup': 'talleaders',
+      'isTALLeader': 'true',
+      'limit': limit,
+      'offset': offset,
+      'profileVerificationStatus': profileVerificationStatus,
+      'inactiveUsers': 'yes',
+      'sortBy': sortBy,
+      'sortOrder': sortOrder,
+
+    };
+
+    final data = await service.get<Map<String, dynamic>>(
+      _voteLeaders,
+          (data) => data,
+      params: params,
+    );
+    return (data['data'] as List).map((item) => Datum.fromJson(item)).toList();
+  }
+
+
+
+
+
+
+
+// Like a leader
+  Future<CommonModel> likeLeader(String? token, String id) async {
+    return await service.put<CommonModel>(
+      'user/$id/like',
+      null, // No payload
+          (data) => CommonModel.fromJson(data),
+      token: token,
+    );
+  }
+
+
+
+  // unLike a leader
+  Future<CommonModel> unLikeLeader(String? id, String token) async {
+    final data = await service.delete('user/$id/unlike', token: token);
+    return CommonModel.fromJson(data);
+  }
+
+
+
+// Approve or reject a leader
+  Future<CommonModel> approveRejectLeader(String leaderId, Map<String, dynamic> payload, String? token) async {
+    return await service.post<CommonModel>(
+      '$_voteLeadersAction/$leaderId/approve-reject',
+      payload,
+          (data) => CommonModel.fromJson(data),
+      token: token,
+    );
+  }
 }

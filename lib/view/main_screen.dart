@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
-import 'package:flutter_getx_mvvm/view/profile_progressbar.dart';
+import 'package:flutter_getx_mvvm/widget/profile_progressbar.dart';
 import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
 import 'package:flutter_getx_mvvm/widget/custom_header.dart';
 import 'package:get/get.dart';
@@ -160,7 +160,7 @@ class _MainScreenState extends State<MainScreen> {
               case 2:
                 return const MyActivityScreen(); // Refresh MyActivityScreen
               case 3:
-                return const VoteLeadersScreen(); // Refresh VoteLeadersScreen
+                return  VoteLeadersScreen(); // Refresh VoteLeadersScreen
               default:
                 return Container();
             }

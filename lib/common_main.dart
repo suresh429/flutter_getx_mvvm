@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_getx_mvvm/service/ConnectivityService.dart';
+import 'package:flutter_getx_mvvm/view/comments_screen.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
@@ -12,6 +13,8 @@ import 'package:get_storage/get_storage.dart';
 import 'utilites/colors.dart';
 
 void commonMain() async {
+ /// await Firebase.initializeApp();
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.white, // Change this to your desired color
     statusBarIconBrightness: Brightness.dark, // Change icon brightness
@@ -98,6 +101,7 @@ class MyApp extends StatelessWidget {
           hintStyle: TextStyle(color: ColorUtils.colorGray),
           // Hint text style
           labelStyle: const TextStyle(color: Colors.grey), // Label text style
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         ),
       ),
       home: isLoggedIn ? MainScreen() : const LoginView(),
@@ -106,9 +110,10 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => MainScreen()),
         // Define your home screen
         GetPage(name: '/explore', page: () => ExploreScreen()),
-        GetPage(name: '/managePref', page: () => ManagePreferences()),
+        GetPage(name: '/managePref', page: () => const ManagePreferences()),
         GetPage(name: '/settings', page: () => SettingsScreen()),
-        GetPage(name: '/userProfile', page: () => UserProfileScreen()),
+        GetPage(name: '/userProfile', page: () => ProfileScreen()),
+        GetPage(name: '/comments', page: () => const CommentsScreen()),
       ],
     );
   }

@@ -13,7 +13,8 @@ class GenericApiService {
       dynamic data,
       T Function(Map<String, dynamic>) fromJson, {
         String? token,
-      }) async {
+      })
+  async {
     try {
       final response = await _dio.post(
         '${AppEnvironment.baseApiUrl}$endpoint',
@@ -47,11 +48,21 @@ class GenericApiService {
       rethrow;
     }
   }
+
+
+
+
+
   // Get
-  Future<T> get<T>(String endpoint, T Function(Map<String, dynamic>) fromJson, {Map<String, dynamic>? params, String? token}) async {
+// In your service
+  Future<T> get<T>(String endpoint, T Function(Map<String, dynamic>) fromJson,
+      {Map<String, dynamic>? params, String? token}) async {
     try {
+      final url = '${AppEnvironment.baseApiUrl}$endpoint';
+      print('Making GET request to: $url');
+
       final response = await _dio.get(
-        '${AppEnvironment.baseApiUrl}$endpoint',
+        url,
         queryParameters: params,
         options: Options(
           headers: {
@@ -61,32 +72,40 @@ class GenericApiService {
         ),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
       if (response.statusCode == 200) {
         return fromJson(response.data);
       } else {
+        final errorMsg = response.data['message'] ?? 'Unknown error';
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
           type: DioExceptionType.badResponse,
-          error: 'Failed request: ${response.data['message']}',
+          error: 'Request failed: $errorMsg (${response.statusCode})',
         );
       }
+    } on DioException catch (e) {
+      print('Dio error: ${e.message}');
+      print('Error response: ${e.response?.data}');
+      rethrow;
     } catch (e) {
-      print("Error occurred during GET request: $e");
+      print('Unexpected error: $e');
       rethrow;
     }
   }
-
   // Put
-  Future<T> put<T>(String endpoint, dynamic data, T Function(Map<String, dynamic>) fromJson, {String? token}) async {
+  Future<T> put<T>(
+      String endpoint,
+      dynamic data,
+      T Function(Map<String, dynamic>) fromJson, {
+        String? token,
+      }) async {
     try {
-      if (data == null) {
-        throw Exception("Request data is null");
-      }
-
       final response = await _dio.put(
         '${AppEnvironment.baseApiUrl}$endpoint',
-        data: jsonEncode(data),
+        data: data != null ? jsonEncode(data) : null,
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -107,7 +126,7 @@ class GenericApiService {
       }
     } catch (e) {
       print("Error occurred during PUT request: $e");
-      print("Request data: ${jsonEncode(data)}");
+      print("Request data: ${data != null ? jsonEncode(data) : 'No data'}");
       rethrow;
     }
   }

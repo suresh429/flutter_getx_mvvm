@@ -214,7 +214,7 @@ class ManagePreferencesController extends GetxController {
       errorMessage.value = ''; // Reset previous errors
 
       // Fetch profile data from the API
-      final getProfile = await repository.getProfile(uniqueId);
+      final getProfile = await repository.getProfile(uniqueId!);
 
       setInitialAppCategories(getProfile.data.talLeaderPreferences);
       setInitialLanguages(getProfile.data.languagePreferences);
