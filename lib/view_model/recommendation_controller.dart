@@ -79,7 +79,7 @@ class RecommendationController extends GetxController {
       print('Calling getProfile with uniqueId: $uniqueId');
 
       // Fetch profile data from the API
-      final getProfile = await repository.getProfile(uniqueId);
+      final getProfile = await repository.getProfile(uniqueId!);
 
       // Debugging: Print statement after the API call
       print('Profile Data: ${getProfile.data}');
