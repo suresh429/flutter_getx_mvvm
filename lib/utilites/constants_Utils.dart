@@ -218,4 +218,64 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     }
   }
 
+
+  static String convertMilliToDateInEducation(int timestamp) {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final formatter = DateFormat('dd MMM yyyy'); // Example: Jun 2025
+    return formatter.format(date);
+  }
+
+  static String getFormattedExperienceRange(int? start, int? end) {
+    if (start == null || start == 0) return '';
+    final formattedStart = convertMilliToDateInEducation(start);
+    final formattedEnd = (end == null || end == 0)
+        ? 'Present'
+        : convertMilliToDateInEducation(end);
+    final durationText = getDuration(start, end ?? DateTime.now().millisecondsSinceEpoch);
+    return '$formattedStart - $formattedEnd · $durationText';
+  }
+
+  static String getDuration(int startMillis, int endMillis) {
+    final start = DateTime.fromMillisecondsSinceEpoch(startMillis);
+    final end = DateTime.fromMillisecondsSinceEpoch(endMillis);
+
+    int years = end.year - start.year;
+    int months = end.month - start.month;
+    int days = end.day - start.day;
+
+    if (days < 0) {
+      months -= 1;
+      final previousMonth = DateTime(end.year, end.month, 0);
+      days += previousMonth.day; // Days in the previous month
+    }
+
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    final y = years > 0 ? "$years yr${years > 1 ? 's' : ''}" : "";
+    final m = months > 0 ? "$months mo${months > 1 ? 's' : ''}" : "";
+    final d = days > 0 ? "$days day${days > 1 ? 's' : ''}" : "";
+
+    return [y, m, d].where((e) => e.isNotEmpty).join(" ");
+  }
+
+  static bool isValidUrl(String url) {
+    final urlPattern = RegExp(
+        r'^(https?:\/\/)' // http or https
+        r'(([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})' // domain name
+        r'(:\d+)?' // optional port
+        r'(\/[^\s\/]+)+\/?$' // path
+    );
+    return urlPattern.hasMatch(url);
+  }
+
+  static bool checkString(String location) {
+    final parts = location.split(',');
+    print('checkSize: ${parts.length}');
+    return parts.length != 3;
+  }
+
+
 }

@@ -32,6 +32,8 @@ class MainRepository {
   static const String _voteLeadersAction = "voteLeaders/action";
   static const String _voteLeaders = "users";
   static const String _cities = "cities";
+  static const String changeUserName = "change/username";
+
 
 
   // Specific API methods using the generic methods
@@ -80,14 +82,7 @@ class MainRepository {
     );
   }
 
-  Future<LoginModel> updateProfileRequest(String? token, String? userId, Map<String, dynamic> payload) async {
-    return await service.put<LoginModel>(
-      '$_user/$userId',
-      payload,
-          (data) => LoginModel.fromJson(data),
-      token: token,
-    );
-  }
+
 
 
   // In your repository
@@ -298,4 +293,93 @@ class MainRepository {
       token: token,
     );
   }
+
+
+
+// update profile
+  Future<LoginModel> updateProfileRequest(String? token, String? userId, Map<String, dynamic> payload) async {
+    return await service.put<LoginModel>(
+      '$_user/$userId',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+
+// update profile URL
+  Future<LoginModel> updateProfileUrlRequest(String? token, Map<String, dynamic> payload) async {
+    return await service.post<LoginModel>(
+      changeUserName,
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+  // update public profile
+  Future<LoginModel> updatePublicProfileRequest(String? token, Map<String, dynamic> payload,String? userId) async {
+    return await service.put<LoginModel>(
+      '$_user/$userId',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+
+  // update Honors and Awards
+  Future<LoginModel> updateHonorsAndAwards(String? token, Map<String, dynamic> payload,String? userId) async {
+    return await service.put<LoginModel>(
+      '$_user/$userId/achievements',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+  // delete Honors and Awards
+  Future<Map<String, dynamic>> deleteHonorsAndAwards(String? userId,String? requestId, String? token) async {
+    return await service.delete(
+      '$_user/$userId/achievements/$requestId',
+      token: token,
+    );
+  }
+
+  // update Experience
+  Future<LoginModel> updateExperience(String? token, Map<String, dynamic> payload,String? userId) async {
+    return await service.put<LoginModel>(
+      '$_user/$userId/experience',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+  // delete Experience
+  Future<Map<String, dynamic>> deleteExperience(String? userId,String? requestId, String? token) async {
+    return await service.delete(
+      '$_user/$userId/experience/$requestId',
+      token: token,
+    );
+  }
+
+// get public profile
+  Future<LoginModel> getPublicProfile(String uniqueId) async {
+    try {
+      print('Making API call to user endpoint with ID: $uniqueId');
+      return await service.get<LoginModel>(
+        '$_user/$uniqueId',
+            (data) {
+          // ✅ extract `data` field before parsing
+          return LoginModel.fromJson(data['data']);
+        },
+      );
+    } catch (e) {
+      print('Repository error: $e');
+      rethrow;
+    }
+  }
+
+
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,8 @@ class ProfileController extends GetxController {
   final MainRepository repository = MainRepository();
 
   final cityTextController = TextEditingController();
+
+
 
   @override
   void onInit() {
@@ -102,7 +105,7 @@ class ProfileController extends GetxController {
       dob.value = DateFormat('dd-MMM-yyyy').format(
           DateTime.fromMillisecondsSinceEpoch(profile.data.dob)
       );
-          setGenderFromApi(profile.data.gender);
+      setGenderFromApi(profile.data.gender);
       username.value = profile.data.username ?? '';
       email.value = profile.data.email ?? '';
       mobile.value = profile.data.phone ?? '';
@@ -241,6 +244,7 @@ class ProfileController extends GetxController {
       final response = await repository.updateProfileRequest(token.value,userId.value, userProfileBody);
       if (response.statusCode == 200) {
         print('Profile updated successfully');
+        await storage.write('userData', jsonEncode(response.toJson()));
         ConstantsUtils.showToast('Profile updated successfully');
       } else {
         print('Update failed: ${response.message}');

@@ -6,6 +6,7 @@ import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
 import 'package:flutter_getx_mvvm/view/manage_preferences.dart';
+import 'package:flutter_getx_mvvm/view/public_profile_screen.dart';
 import 'package:flutter_getx_mvvm/view/settings_screen.dart';
 import 'package:flutter_getx_mvvm/view/user_profile_screen.dart';
 import 'package:get/get.dart';
@@ -114,6 +115,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/settings', page: () => SettingsScreen()),
         GetPage(name: '/userProfile', page: () => ProfileScreen()),
         GetPage(name: '/comments', page: () => const CommentsScreen()),
+        GetPage(name: '/publicProfile', page: () =>  PublicProfileScreen()),
+
       ],
     );
   }

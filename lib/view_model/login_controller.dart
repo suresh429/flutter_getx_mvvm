@@ -46,7 +46,6 @@ class LoginController extends GetxController {
       isLoading(true);
 
       final loginResponse = await repository.login(payload);
-
       if (loginResponse.status == 'success' && loginResponse.data != null) {
         await storage.write('isLoggedIn', true);
         await storage.write('userData', jsonEncode(loginResponse.toJson()));
