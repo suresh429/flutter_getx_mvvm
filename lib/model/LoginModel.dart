@@ -614,6 +614,7 @@ class Achievement {
     "updatedAt": updatedAt?.toIso8601String(),
     "createdAt": createdAt?.toIso8601String(),
   };
+
 }
 
 class Address {

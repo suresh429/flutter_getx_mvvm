@@ -4,7 +4,8 @@ import '../model/LoginModel.dart';
 import '../utilites/constants_Utils.dart';
 
 class BottomNavController extends GetxController {
-  var loginResponse = Rxn<LoginModel?>(null);
+  Rx<LoginModel?> loginResponse = Rx<LoginModel?>(null);
+
 
   var selectedIndex = 0.obs;
 
@@ -21,6 +22,7 @@ class BottomNavController extends GetxController {
 
   Future<void> fetchUserData() async {
     loginResponse.value = await ConstantsUtils.getStoredLoginResponse();
+
   }
 
 }

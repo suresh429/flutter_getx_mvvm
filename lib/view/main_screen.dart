@@ -41,6 +41,7 @@ class _MainScreenState extends State<MainScreen> {
                 title: const Text("Public Profile"),
                 onTap: () {
                   Navigator.pop(context);
+                  Get.toNamed('/publicProfile');
                 },
               ),
               ListTile(

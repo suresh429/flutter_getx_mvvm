@@ -3,87 +3,86 @@ import '../model/LoginModel.dart';
 
 class ProfileWithProgressBar extends StatelessWidget {
   final LoginModel data;
+  final double size;
 
-  const ProfileWithProgressBar({required this.data, Key? key}) : super(key: key);
+  const ProfileWithProgressBar({
+    required this.data,
+    this.size = 60.0,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     int progressPercentage = calculateProfileCompletion(data.data);
     Color progressColor = _getProgressColor(progressPercentage);
 
-    return Stack(
-      alignment: Alignment.center,
+    double avatarSize = size * 0.78;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Progress background circle
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.shade200.withOpacity(0.5),
-          ),
-        ),
-
-        // Progress indicator
-        SizedBox(
-          width: 56,
-          height: 56,
-          child: CircularProgressIndicator(
-            value: progressPercentage / 100,
-            strokeWidth: 3,
-            backgroundColor: Colors.transparent,
-            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-          ),
-        ),
-
-        // Profile image
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white,
-              width: 2,
-            ),
-            image: DecorationImage(
-              image: NetworkImage(
-                data.data?.profileImageUrl ?? 'https://via.placeholder.com/150',
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-
-        // Percentage badge
-        Positioned(
-          bottom: 0, // Slightly above the very bottom
-          left: 0,
-          right: 0, // This centers the child horizontally
-          child: Center( // Double centering for precision
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-              child: Text(
-                '$progressPercentage%',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: size,
+              height: size,
+              child: CustomPaint(
+                painter: _RoundedArcPainter(
+                  progress: progressPercentage / 100,
                   color: progressColor,
+                  strokeWidth: size * 0.05,
                 ),
               ),
             ),
-          ),
+            Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: NetworkImage(
+                    data.data?.profileImageUrl ?? 'https://via.placeholder.com/150',
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+            // Percentage badge overlapping the bottom of the progress arc
+            Positioned(
+              bottom: size * 0.08, // was 0.02 before — lift it more
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: size * 0.12,
+                  vertical: size * 0.04,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(size * 0.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '$progressPercentage%',
+                  style: TextStyle(
+                    fontSize: size * 0.15,
+                    fontWeight: FontWeight.bold,
+                    color: progressColor,
+                  ),
+                ),
+              ),
+            ),
+
+
+          ],
         ),
+        const SizedBox(height: 8),
+
       ],
     );
   }
@@ -123,4 +122,46 @@ class ProfileWithProgressBar extends StatelessWidget {
         address?.city?.isNotEmpty == true ||
         address?.state?.isNotEmpty == true;
   }
+}
+class _RoundedArcPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final double strokeWidth;
+
+  _RoundedArcPainter({
+    required this.progress,
+    required this.color,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final startAngle = 5 * 3.14 / 6;  // ~150°
+    final sweepAngle = 4 * 3.14 / 3;  // ~240°
+
+    final backgroundPaint = Paint()
+      ..color = Colors.grey.shade300
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final progressPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = strokeWidth;
+
+    final arcRect = Rect.fromLTWH(
+      strokeWidth / 2,
+      strokeWidth / 2,
+      size.width - strokeWidth,
+      size.height - strokeWidth,
+    );
+
+    canvas.drawArc(arcRect, startAngle, sweepAngle, false, backgroundPaint);
+    canvas.drawArc(arcRect, startAngle, sweepAngle * progress, false, progressPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
