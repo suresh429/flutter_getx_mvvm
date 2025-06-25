@@ -144,7 +144,7 @@ class ProfileController extends GetxController {
         mobile.value = '';
       }
 
-      print('Profile data loaded successfully');
+      print('Profile data loaded successfully ${profile.data.experience?.length}');
     } catch (e) {
       print('Profile fetch error: $e');
       errorMessage.value = await ErrorHandler.handleError(e);

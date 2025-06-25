@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart';
+import '../model/experience_model.dart';
 
 class PublicProfileExperienceBottomSheet extends StatefulWidget {
   final PublicProfileController controller;
@@ -32,19 +33,24 @@ class _PublicProfileExperienceBottomSheetState
     if (item != null) {
       widget.controller.roleController.text = item.role ?? '';
       widget.controller.companyController.text = item.company ?? '';
+      isCurrentlyWorking = item.status == 1 || item.status == 2;
+
       if (item.experienceStartDate != null) {
-        widget.controller.startDateController.text =
-            DateFormat('dd-MMM-yyyy').format(
-                DateTime.fromMillisecondsSinceEpoch(item.experienceStartDate!));
+        widget.controller.startDateController.text = DateFormat(
+          'dd-MMM-yyyy',
+        ).format(
+          DateTime.fromMillisecondsSinceEpoch(item.experienceStartDate!),
+        );
       }
-      if (item.experienceEndDate != null) {
-        widget.controller.endDateController.text =
-            DateFormat('dd-MMM-yyyy').format(
-                DateTime.fromMillisecondsSinceEpoch(item.experienceEndDate!));
+
+      if (!isCurrentlyWorking && item.experienceEndDate != null) {
+        widget.controller.endDateController.text = DateFormat(
+          'dd-MMM-yyyy',
+        ).format(DateTime.fromMillisecondsSinceEpoch(item.experienceEndDate!));
       }
-      isCurrentlyWorking = item.status == 1;
     } else {
       widget.controller.clearExperienceControllers();
+      isCurrentlyWorking = false;
     }
   }
 
@@ -59,17 +65,22 @@ class _PublicProfileExperienceBottomSheetState
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Form(
-            key: widget.controller.experienceFormKey, // ✅ Use controller key
+            key: widget.controller.experienceFormKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.editItem != null ? 'Edit Experience' : 'Add Experience',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      widget.editItem != null
+                          ? 'Edit Experience'
+                          : 'Add Experience',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -78,12 +89,10 @@ class _PublicProfileExperienceBottomSheetState
                   ],
                 ),
                 const SizedBox(height: 16),
-
                 _buildTextField(widget.controller.roleController, 'Role'),
                 const SizedBox(height: 12),
                 _buildTextField(widget.controller.companyController, 'Company'),
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Checkbox(
@@ -95,26 +104,89 @@ class _PublicProfileExperienceBottomSheetState
                         });
                       },
                     ),
-                    const Expanded(child: Text("I am currently working in this role.")),
+                    const Expanded(
+                      child: Text("I am currently working in this role."),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Expanded(
                       child: _buildDateField(
-                          widget.controller.startDateController, 'Start Date', context),
+                        widget.controller.startDateController,
+                        'Start Date',
+                        context,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildDateField(
-                          widget.controller.endDateController, 'End Date', context),
+                        widget.controller.endDateController,
+                        'End Date',
+                        context,
+                        isDisabled: isCurrentlyWorking,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                const Text(
+                  'Company Logo (optional)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
 
+                Stack(
+                  alignment: Alignment.topLeft,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        'https://via.placeholder.com/300x150',
+                        // 🔁 Replace with your actual image URL
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 80,
+                            height: 80,
+                            color: Colors.grey[300],
+                            child: Image.asset(
+                              'assets/profile_placeholder.png',
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: InkWell(
+                        onTap: () {
+                          // TODO: Add image picker or edit logic
+                          print('Edit image tapped');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -127,13 +199,14 @@ class _PublicProfileExperienceBottomSheetState
                       ),
                     ),
                     onPressed: () {
-                      if (widget.controller.experienceFormKey.currentState!.validate()) {
+                      if (widget.controller.experienceFormKey.currentState!
+                          .validate()) {
                         widget.controller.addOrUpdateExperince(
                           expId: widget.editItem?.id,
                           bottomSheetContext: widget.bottomSheetContext,
-                          status: isCurrentlyWorking ? 1 : 2,
+                          status: isCurrentlyWorking ? 1 : 0,
+                          editItem: widget.editItem,
                         );
-                        Navigator.pop(widget.bottomSheetContext);
                       }
                     },
                     child: Text(
@@ -142,14 +215,16 @@ class _PublicProfileExperienceBottomSheetState
                     ),
                   ),
                 ),
-
                 if (widget.editItem != null) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      label: const Text("Delete", style: TextStyle(color: Colors.red)),
+                      label: const Text(
+                        "Delete",
+                        style: TextStyle(color: Colors.red),
+                      ),
                       onPressed: () {
                         widget.controller.deleteExperince(widget.editItem!.id!);
                         Navigator.pop(widget.bottomSheetContext);
@@ -162,7 +237,7 @@ class _PublicProfileExperienceBottomSheetState
                       ),
                     ),
                   ),
-                ]
+                ],
               ],
             ),
           ),
@@ -177,35 +252,55 @@ class _PublicProfileExperienceBottomSheetState
       decoration: InputDecoration(
         hintText: hint,
         border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 12,
+        ),
       ),
-      validator: (value) =>
-      (value == null || value.trim().isEmpty) ? '$hint is required' : null,
+      validator:
+          (value) =>
+              (value == null || value.trim().isEmpty)
+                  ? '$hint is required'
+                  : null,
     );
   }
 
   Widget _buildDateField(
-      TextEditingController controller, String hint, BuildContext context) {
+    TextEditingController controller,
+    String hint,
+    BuildContext context, {
+    bool isDisabled = false,
+  }) {
     return TextFormField(
       controller: controller,
       readOnly: true,
+      enabled: !isDisabled,
       decoration: InputDecoration(
         hintText: hint,
         suffixIcon: const Icon(Icons.calendar_today),
         border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 12,
+        ),
       ),
-      validator: (value) =>
-      (value == null || value.trim().isEmpty) ? '$hint is required' : null,
+      validator: (value) {
+        if (!isDisabled && (value == null || value.trim().isEmpty)) {
+          return '$hint is required';
+        }
+        return null;
+      },
       onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1950),
-          lastDate: DateTime(2100),
-        );
-        if (picked != null) {
-          controller.text = DateFormat('dd-MMM-yyyy').format(picked);
+        if (!isDisabled) {
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(1950),
+            lastDate: DateTime(2100),
+          );
+          if (picked != null) {
+            controller.text = DateFormat('dd-MMM-yyyy').format(picked);
+          }
         }
       },
     );

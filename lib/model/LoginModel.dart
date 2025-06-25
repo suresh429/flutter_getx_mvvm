@@ -4,6 +4,9 @@
 
 import 'dart:convert';
 
+import 'achievement.dart';
+import 'experience_model.dart';
+
 LoginModel loginModelFromJson(String str) => LoginModel.fromJson(json.decode(str));
 
 String loginModelToJson(LoginModel data) => json.encode(data.toJson());
@@ -580,42 +583,6 @@ class Data {
   };
 }
 
-class Achievement {
-  String? id;
-  String? awardTitle;
-  String? awardIssuedBy;
-  String? awardDescription;
-  DateTime? updatedAt;
-  DateTime? createdAt;
-
-  Achievement({
-    this.id,
-    this.awardTitle,
-    this.awardIssuedBy,
-    this.awardDescription,
-    this.updatedAt,
-    this.createdAt,
-  });
-
-  factory Achievement.fromJson(Map<String, dynamic> json) => Achievement(
-    id: json["_id"],
-    awardTitle: json["awardTitle"],
-    awardIssuedBy: json["awardIssuedBy"],
-    awardDescription: json["awardDescription"],
-    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
-    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "_id": id,
-    "awardTitle": awardTitle,
-    "awardIssuedBy": awardIssuedBy,
-    "awardDescription": awardDescription,
-    "updatedAt": updatedAt?.toIso8601String(),
-    "createdAt": createdAt?.toIso8601String(),
-  };
-
-}
 
 class Address {
   String? line1;
@@ -817,61 +784,6 @@ class EstablishmentInformation {
   };
 }
 
-class Experience {
-  String? id;
-  String? role;
-  String? company;
-  int? experienceStartDate;
-  int? experienceEndDate;
-  String? logoUrl;
-  int? status;
-  DateTime? updatedAt;
-  DateTime? createdAt;
-  dynamic description;
-  dynamic designation;
-
-  Experience({
-    this.id,
-    this.role,
-    this.company,
-    this.experienceStartDate,
-    this.experienceEndDate,
-    this.logoUrl,
-    this.status,
-    this.updatedAt,
-    this.createdAt,
-    this.description,
-    this.designation,
-  });
-
-  factory Experience.fromJson(Map<String, dynamic> json) => Experience(
-    id: json["_id"],
-    role: json["role"],
-    company: json["company"],
-    experienceStartDate: json["experienceStartDate"],
-    experienceEndDate: json["experienceEndDate"],
-    logoUrl: json["logoUrl"],
-    status: json["status"],
-    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
-    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-    description: json["description"],
-    designation: json["designation"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "_id": id,
-    "role": role,
-    "company": company,
-    "experienceStartDate": experienceStartDate,
-    "experienceEndDate": experienceEndDate,
-    "logoUrl": logoUrl,
-    "status": status,
-    "updatedAt": updatedAt?.toIso8601String(),
-    "createdAt": createdAt?.toIso8601String(),
-    "description": description,
-    "designation": designation,
-  };
-}
 
 class Location {
   String? type;

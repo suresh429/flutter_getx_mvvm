@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/LoginModel.dart';
+import '../model/achievement.dart';
 import '../view_model/public_profile_controller.dart';
 
 class PublicProfileHonorBottom extends StatelessWidget {
@@ -33,7 +34,7 @@ class PublicProfileHonorBottom extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
         ),
         child: Form(
-          key: controller.honorFormKey, // 💡 Add the form key
+          key: controller.honorFormKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -102,9 +103,9 @@ class PublicProfileHonorBottom extends StatelessWidget {
                         onPressed: () {
                           if (controller.honorFormKey.currentState?.validate() ?? false) {
                             controller.addOrUpdateHonorsAndAwards(
-                              awardId: editItem?.id, bottomSheetContext: bottomSheetContext,
+                              awardId: editItem?.id,
+                              bottomSheetContext: bottomSheetContext,
                             );
-                           // Navigator.pop(bottomSheetContext);
                           }
                         },
                         child: Text(
@@ -113,6 +114,28 @@ class PublicProfileHonorBottom extends StatelessWidget {
                         ),
                       ),
                     ),
+
+                    // 🗑️ Delete Button when editing
+                    if (editItem != null) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text("Delete", style: TextStyle(color: Colors.red)),
+                          onPressed: () {
+                            controller.deleteHonorsAndAwards(editItem!.id);
+                            Navigator.pop(bottomSheetContext);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

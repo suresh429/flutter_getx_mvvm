@@ -130,13 +130,10 @@ class PublicProfileUserBottom extends StatelessWidget {
                   _buildTextField('Last Name', controller.lastNameController),
                   const SizedBox(height: 16),
                   Obx(
-                    () => DropdownButtonFormField<String>(
-                      value:
-                          controller.companyRoleOptions.contains(
-                                controller.companyRoleController.text,
-                              )
-                              ? controller.companyRoleController.text
-                              : null,
+                        () => DropdownButtonFormField<String>(
+                      value: controller.companyRoleOptions.contains(controller.companyRoleController.text)
+                          ? controller.companyRoleController.text
+                          : null,
                       decoration: const InputDecoration(
                         labelText: 'Current Company, Current Role',
                         floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -146,16 +143,21 @@ class PublicProfileUserBottom extends StatelessWidget {
                           horizontal: 12,
                         ),
                       ),
-                      items:
-                          controller.companyRoleOptions.map((item) {
-                            return DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
-                            );
-                          }).toList(),
+                      items: controller.companyRoleOptions.map((item) {
+                        return DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item),
+                        );
+                      }).toList(),
                       onChanged: (selected) {
                         if (selected != null) {
                           controller.companyRoleController.text = selected;
+
+                          /// ✅ Here you get the experience ID:
+                          final selectedExp = controller.experienceOptionMap[selected];
+                          controller.selectedExperienceId.value = selectedExp?.id ?? '';
+                          debugPrint('Selected experienceId: ${controller.selectedExperienceId.value}');
+
                         }
                       },
                       style: const TextStyle(fontSize: 14, color: Colors.black),
