@@ -381,7 +381,7 @@ class MainRepository {
 
   // change password
   Future<LoginModel> changePassword(String? token, Map<String, dynamic> payload) async {
-    return await service.put<LoginModel>(
+    return await service.post<LoginModel>(
       'change/user/password',
       payload,
           (data) => LoginModel.fromJson(data),
@@ -391,7 +391,7 @@ class MainRepository {
 
   // change password
   Future<LoginModel> disbandUser(String? token, Map<String, dynamic> payload) async {
-    return await service.put<LoginModel>(
+    return await service.post<LoginModel>(
       'disband/user',
       payload,
           (data) => LoginModel.fromJson(data),

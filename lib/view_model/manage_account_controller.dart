@@ -29,9 +29,11 @@ class ManageAccountController extends GetxController {
   final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
 
   final GlobalKey<FormState> passwordFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> disbandFormKey = GlobalKey<FormState>();
 
 
   // Initialize with some mock data
@@ -78,7 +80,7 @@ class ManageAccountController extends GetxController {
         ConstantsUtils.showToast('Password Changed successfully');
         // ✅ Clear local storage (logout user)
         await storage.erase();
-        loginResponse.value = null;
+       // loginResponse.value = null;
 
         // ✅ Clear password fields
         currentPasswordController.clear();
@@ -99,6 +101,50 @@ class ManageAccountController extends GetxController {
     }
   }
 
+  Future<void> disbandUser(String type) async {
+
+    try {
+      isLoading(true);
+      errorMessage.value = '';
+
+
+      // Build the request body
+      final Map<String, dynamic> requestBody = {
+        "password": currentPasswordController.text.trim(),
+        "type": type,
+        "userId": loginResponse.value?.data?.uniqueId,
+      };
+
+
+      final response = await repository.disbandUser(
+        loginResponse.value?.data?.tokenDetail?.token,
+        requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        ConstantsUtils.showToast('Account has been $type  successfully');
+        // ✅ Clear local storage (logout user)
+        await storage.erase();
+        // loginResponse.value = null;
+
+        // ✅ Clear password fields
+        passwordController.clear();
+
+        // ✅ Navigate to login screen (replace with your route name or LoginScreen)
+        Get.offAllNamed('/login');
+
+
+      } else {
+        errorMessage.value = response.message ?? 'Update failed';
+      }
+    } catch (e) {
+      errorMessage.value = await ErrorHandler.handleError(e);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+
 
 
   @override
@@ -107,5 +153,6 @@ class ManageAccountController extends GetxController {
     currentPasswordController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
+    passwordController.dispose();
   }
 }
