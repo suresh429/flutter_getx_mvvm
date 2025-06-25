@@ -12,12 +12,18 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
   late final dynamic exploreModel;
+  int _currentTabIndex = 0; // Track current tab
 
   @override
   void initState() {
     super.initState();
     exploreModel = Get.arguments;
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _currentTabIndex = _tabController.index;
+      });
+    });
   }
 
   @override
@@ -36,92 +42,75 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                expandedHeight: 280,
+                expandedHeight: 400,
                 floating: false,
                 pinned: true,
                 elevation: 0,
-                toolbarHeight: 0, // Set to 0 to hide app bar when collapsed
+                toolbarHeight: kToolbarHeight,
                 backgroundColor: Colors.white,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(kToolbarHeight),
-                  child: Container(
-                    color: Colors.white,
-                    child: TabBar(
-                      controller: _tabController,
-                      padding: EdgeInsets.zero,
-                      indicatorPadding: EdgeInsets.zero,
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 16),
-                      tabs: const [
-                        Tab(text: 'Request Info'),
-                        Tab(text: 'Uploads (1)'),
-                        Tab(text: 'Comments'),
-                      ],
-                      labelColor: Colors.black,
-                      indicatorColor: Colors.red,
-                    ),
-                  ),
+                title: Text(
+                  exploreModel?.title ?? "Request Details",
+                  style: const TextStyle(color: Colors.black),
+                ),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () => Get.back(),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.parallax,
                   background: Stack(
                     children: [
                       // Banner Image
-                      Image.asset(
-                        'assets/banner_image.png',
-                        width: double.infinity,
+                      Container(
                         height: 280,
-                        fit: BoxFit.cover,
-                      ),
-                      // Add a gradient overlay for better text visibility at top
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 100,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.7),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: kToolbarHeight + 16),
+                        child: Image.asset(
+                          'assets/banner_image.png',
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      // Back button and title
+                      // Header Card
                       Positioned(
-                        top: MediaQuery.of(context).padding.top,
-                        left: 0,
-                        right: 0,
-                        child: AppBar(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          leading: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Get.back(),
-                          ),
-                          title: Text(
-                            exploreModel?.title ?? "Request Details",
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      // Header Card Overlay
-                      Positioned(
-                        bottom: 0,
+                        top: 140,
                         left: 16,
                         right: 16,
                         child: Card(
                           elevation: 4,
-                          margin: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: const BorderSide(color: Colors.grey, width: 1),
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: _buildHeaderCard(),
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(kToolbarHeight + 32),
+                  child: Column(
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        child: TabBar(
+                          controller: _tabController,
+                          padding: EdgeInsets.zero,
+                          indicatorPadding: EdgeInsets.zero,
+                          labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          tabs: const [
+                            Tab(text: 'Request Info'),
+                            Tab(text: 'Uploads (1)'),
+                            Tab(text: 'Comments'),
+                          ],
+                          labelColor: Colors.black,
+                          indicatorColor: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -141,14 +130,13 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
               SingleChildScrollView(
                 child: _buildUploads(),
               ),
-              SingleChildScrollView(
-                child: _buildComments(),
-              ),
+              _buildComments(),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: _currentTabIndex != 2 // Hide for Comments tab
+          ? Container(
         color: Colors.white,
         padding: const EdgeInsets.all(10),
         child: Row(
@@ -169,7 +157,8 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
             ),
           ],
         ),
-      ),
+      )
+          : null,
     );
   }
 
@@ -186,10 +175,10 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
         const Text("179 days left", style: TextStyle(color: Colors.black87)),
         const SizedBox(height: 8),
         const Text("Preferred Industry: Management, Fundraising, Operations",
-          style: TextStyle(color: Colors.black87)),
+            style: TextStyle(color: Colors.black87)),
         const SizedBox(height: 4),
         const Text("Preferred Language: Hindi, English",
-          style: TextStyle(color: Colors.black87)),
+            style: TextStyle(color: Colors.black87)),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -302,56 +291,125 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
   }
 
   Widget _buildComments() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              CircleAvatar(backgroundImage: AssetImage('assets/avatar.png')),
-              SizedBox(width: 8),
-              Text("LaLisa Manoban", style: TextStyle(fontWeight: FontWeight.bold)),
-              Spacer(),
-              Text("20-Jun-2025 02:35 PM", style: TextStyle(fontSize: 12))
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text("hi"),
-          const SizedBox(height: 8),
-          Row(
-            children: const [
-              Text("Reply", style: TextStyle(color: Colors.blue)),
-              Spacer(),
-              Icon(Icons.edit),
-              SizedBox(width: 10),
-              Icon(Icons.delete),
-            ],
-          ),
-          const Divider(),
-          Row(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(16).copyWith(bottom: 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(backgroundImage: AssetImage('assets/avatar.png'), radius: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Add a comment...",
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.red),
-                      onPressed: () {},
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(backgroundImage: AssetImage('assets/avatar.png')),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("LaLisa Manoban", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text("20-Jun-2025 02:35 PM", style: TextStyle(fontSize: 12)),
+                        const SizedBox(height: 8),
+                        const Text("hi"),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: const [
+                            Text("Reply", style: TextStyle(color: Colors.blue)),
+                          ],
+                        ),
+                      ],
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert, size: 20),
+                    onPressed: () {
+                      _showCommentOptionsDialog(context);
+                    },
+                  ),
+                ],
+              ),
+              const Divider(),
+            ],
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                const CircleAvatar(backgroundImage: AssetImage('assets/avatar.png'), radius: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Add a comment...",
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.send, color: Colors.red),
+                        onPressed: () {},
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                 ),
-              )
-            ],
-          )
-        ],
-      ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showCommentOptionsDialog(BuildContext context) {
+    final RenderBox? button = context.findRenderObject() as RenderBox?;
+    if (button == null) return;
+
+    final position = button.localToGlobal(Offset.zero);
+    final size = button.size;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            Positioned(
+              top: position.dy + size.height,
+              left: position.dx + size.width - 100,
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 100,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: const Text("Edit", style: TextStyle(fontSize: 14)),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Implement edit functionality
+                        },
+                      ),
+                      ListTile(
+                        title: const Text("Delete", style: TextStyle(fontSize: 14)),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Implement delete functionality
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -381,10 +439,10 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 48.0; // Fixed height for the tab bar
+  double get maxExtent => 48.0;
 
   @override
-  double get minExtent => 48.0; // Same as maxExtent for consistent height
+  double get minExtent => 48.0;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => false;
