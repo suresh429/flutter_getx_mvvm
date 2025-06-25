@@ -110,6 +110,7 @@ class VoteLeadersScreen extends StatelessWidget {
     );
   }
 
+
   void viewProfile(BuildContext context, Datum data) {
     showModalBottomSheet(
       context: context,
