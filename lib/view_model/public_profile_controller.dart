@@ -7,8 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../env/app_env.dart';
-import '../model/LoginModel.dart';
+import '../model/LoginModel.dart' hide Experience, Achievement;
 import '../model/achievement.dart';
 import '../model/experience_model.dart';
 import '../service/ConnectivityService.dart';

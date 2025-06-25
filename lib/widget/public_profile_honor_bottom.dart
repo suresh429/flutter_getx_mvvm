@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/LoginModel.dart';
+import '../model/LoginModel.dart' hide Achievement;
 import '../model/achievement.dart';
 import '../view_model/public_profile_controller.dart';
 
