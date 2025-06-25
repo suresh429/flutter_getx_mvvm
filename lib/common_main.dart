@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_getx_mvvm/service/ConnectivityService.dart';
 import 'package:flutter_getx_mvvm/view/comments_screen.dart';
+import 'package:flutter_getx_mvvm/view/details_screen.dart';
 import 'package:flutter_getx_mvvm/view/explore_screen.dart';
 import 'package:flutter_getx_mvvm/view/login_view.dart';
 import 'package:flutter_getx_mvvm/view/main_screen.dart';
@@ -105,11 +106,11 @@ class MyApp extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         ),
       ),
-      home: isLoggedIn ? MainScreen() : const LoginView(),
+      initialRoute: isLoggedIn ? '/main' : '/login',
       getPages: [
-        GetPage(name: '/', page: () => const LoginView()),
-        GetPage(name: '/home', page: () => MainScreen()),
-        // Define your home screen
+        GetPage(name: '/login', page: () => const LoginView()),
+        GetPage(name: '/main', page: () => MainScreen()),  // removed const
+        GetPage(name: '/details', page: () => const DetailsScreen()),
         GetPage(name: '/explore', page: () => ExploreScreen()),
         GetPage(name: '/managePref', page: () => const ManagePreferences()),
         GetPage(name: '/settings', page: () => SettingsScreen()),
