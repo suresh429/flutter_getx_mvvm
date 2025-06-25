@@ -365,15 +365,12 @@ class MainRepository {
   }
 
 // get public profile
-  Future<LoginModel> getPublicProfile(String uniqueId) async {
+  Future<Data> getPublicProfile(String uniqueId) async {
     try {
       print('Making API call to user endpoint with ID: $uniqueId');
-      return await service.get<LoginModel>(
+      return await service.get<Data>(
         '$_user/$uniqueId',
-            (data) {
-          // ✅ extract `data` field before parsing
-          return LoginModel.fromJson(data['data']);
-        },
+            (data) => Data.fromJson(data),
       );
     } catch (e) {
       print('Repository error: $e');
