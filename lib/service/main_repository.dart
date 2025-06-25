@@ -379,4 +379,24 @@ class MainRepository {
   }
 
 
+  // change password
+  Future<LoginModel> changePassword(String? token, Map<String, dynamic> payload) async {
+    return await service.put<LoginModel>(
+      'change/user/password',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
+  // change password
+  Future<LoginModel> disbandUser(String? token, Map<String, dynamic> payload) async {
+    return await service.put<LoginModel>(
+      'disband/user',
+      payload,
+          (data) => LoginModel.fromJson(data),
+      token: token,
+    );
+  }
+
 }
