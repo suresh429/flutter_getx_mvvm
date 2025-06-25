@@ -72,10 +72,14 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
     required int? groupValue,
     required ValueChanged<int?>? onChanged,
   }) {
+    final isSelected = value == groupValue;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 1),
+        border: Border.all(
+          color: isSelected ? Colors.red : Colors.grey,
+          width: isSelected ? 2 : 1,
+        ),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -86,36 +90,45 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
         ],
       ),
       padding: const EdgeInsets.all(16),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Radio<int?>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          Row(
+            children: [
+              Radio<int?>(
+                value: value,
+                groupValue: groupValue,
+                onChanged: onChanged,
+                activeColor: Colors.red,
+                fillColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return Colors.red;
+                    }
+                    return Colors.grey;
+                  },
+                ),
+              ),
+              Expanded(
+                child: Text(
                   label,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    height: 1.5,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 48), // Aligns with radio button
+            child: Text(
+              description,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
             ),
           ),
         ],

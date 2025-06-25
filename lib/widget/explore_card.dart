@@ -43,243 +43,257 @@ class _ExploreCardState extends State<ExploreCard> {
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 1,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: _buildImage(),
-                ),
-                // Positioned label at the bottom left of the image
-                Positioned(
-                  bottom: 8, // Position 8px from the bottom
-                  left: 8, // Position 8px from the left
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(15),
+        child: SingleChildScrollView(  // Added to handle overflow
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,  // Added to prevent expansion
+            children: [
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
                     ),
-                    child: Text(
-                      widget.exploreModel.requestType,
+                    child: _buildImage(),
+                  ),
+                  // Positioned label at the bottom left of the image
+                  Positioned(
+                    bottom: 8, // Position 8px from the bottom
+                    left: 8, // Position 8px from the left
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text(
+                        widget.exploreModel.requestType,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Obx(
+                        // still OK, but rebuilds Column unnecessarily
+                        () => IconButton(
+                          onPressed: () {
+                            widget.exploreModel.isFavorite.value =
+                                !widget.exploreModel.isFavorite.value;
+                            controller.addToFav(
+                                [widget.exploreModel.id],
+                                widget.exploreModel.isFavorite.value
+                                    ? "favourite"
+                                    : 'unfavourite');
+                          },
+                          icon: Icon(
+                            widget.exploreModel.isFavorite.value
+                                ? Icons.favorite
+                                : Icons.favorite_border_outlined,
+                            size: 15,
+                            color: widget.exploreModel.isFavorite.value
+                                ? Colors.red
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.exploreModel.title.isNotEmpty
+                          ? widget.exploreModel.title
+                          : 'No Title Available',
                       style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12),
+                          fontSize: 14),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Obx(
-                      // still OK, but rebuilds Column unnecessarily
-                      () => IconButton(
-                        onPressed: () {
-                          widget.exploreModel.isFavorite.value =
-                              !widget.exploreModel.isFavorite.value;
-                          controller.addToFav(
-                              [widget.exploreModel.id],
-                              widget.exploreModel.isFavorite.value
-                                  ? "favourite"
-                                  : 'unfavourite');
-                        },
-                        icon: Icon(
-                          widget.exploreModel.isFavorite.value
-                              ? Icons.favorite
-                              : Icons.favorite_border_outlined,
-                          size: 15,
-                          color: widget.exploreModel.isFavorite.value
-                              ? Colors.red
-                              : Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.exploreModel.title.isNotEmpty
-                        ? widget.exploreModel.title
-                        : 'No Title Available',
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on,
-                          size: 16, color: Colors.grey),
-                      const SizedBox(width: 1),
-                      Flexible(
-                        child: Text(
-                          "${widget.exploreModel.city.isNotEmpty ? widget.exploreModel.city : 'Unknown City'}, ${widget.exploreModel.country.isNotEmpty ? widget.exploreModel.country : 'Unknown Country'}",
-                          style:
-                              const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.timer_outlined,
-                              size: 16, color: Colors.grey),
-                          const SizedBox(width: 3),
-                          Text(timeLeft,
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey)),
-                        ],
-                      ),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                         // foregroundColor: Colors.white, // Text and icon color
-                          backgroundColor: const Color(0xFFFFEFEF),   // Red background
-                          side: const BorderSide(color: Colors.transparent),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on,
+                            size: 16, color: Colors.grey),
+                        const SizedBox(width: 1),
+                        Flexible(
+                          child: Text(
+                            "${widget.exploreModel.city.isNotEmpty ? widget.exploreModel.city : 'Unknown City'}, ${widget.exploreModel.country.isNotEmpty ? widget.exploreModel.country : 'Unknown Country'}",
+                            style:
+                                const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Text("Details",style: TextStyle(color: ColorUtils.colorPrimary)),
-                            const SizedBox(width: 5),
-                            Icon(Icons.arrow_forward,color: ColorUtils.colorPrimary, size: 16),
+                            const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
+                            const SizedBox(width: 3),
+                            Text(timeLeft, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0x82F1EEF1),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Obx(() {
-                                return IconButton(
-                                  icon: Icon(
-                                    Icons.thumb_up,
-                                    size: 20,
-                                    color: widget.exploreModel.isLike.value
-                                        ? Colors.red
-                                        : Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    widget.exploreModel.isLike.value =
-                                    !widget.exploreModel.isLike.value;
-                                    if (widget.exploreModel.isLike.value) {
-                                      widget.exploreModel.likesCount++;
-                                    } else {
-                                      widget.exploreModel.likesCount--;
-                                    }
-                                    controller.likeUnlikeRequest(
-                                        widget.exploreModel.id,
-                                        widget.exploreModel.isLike.value ? "like" : 'unlike');
-                                  },
-                                );
-                              }),
-                              Flexible(
-                                child: Obx(() {
-                                  return Text(
-                                    widget.exploreModel.likesCount.toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(fontSize: 16),
-                                  );
-                                }),
-                              ),
-                            ],
+                        OutlinedButton(
+                          onPressed: () => Get.toNamed('/details', arguments: widget.exploreModel),  // Fixed navigation
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFEFEF),
+                            side: const BorderSide(color: Colors.transparent),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                           ),
-                        ),
-                        Expanded(
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,  // Added to prevent expansion
                             children: [
-                              IconButton(
-                                icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
-                                onPressed: () {},
-                              ),
-                              Flexible(
-                                child: Text(
-                                  widget.exploreModel.commentsCount.toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.share, size: 20, color: Colors.grey),
-                                onPressed: () {
-                                  // share content
-                                  widget.exploreModel.sharesCount++;
-                                  controller.shareRequest(widget.exploreModel.id);
-                                  var title = widget.exploreModel.title.replaceAll(' ', '-');
-                                  var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
-                                  Share.share(url, subject: 'TALLeaders');
-                                },
-                              ),
-                              Flexible(
-                                child: Obx(() {
-                                  return Text(
-                                    widget.exploreModel.sharesCount.toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(fontSize: 16),
-                                  );
-                                }),
-                              ),
+                              Text("Details", style: TextStyle(color: ColorUtils.colorPrimary)),
+                              const SizedBox(width: 5),
+                              Icon(Icons.arrow_forward, color: ColorUtils.colorPrimary, size: 16),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  )
-
-                ],
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0x82F1EEF1),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Obx(() {
+                                  return IconButton(
+                                    icon: Icon(
+                                      Icons.thumb_up,
+                                      size: 20,
+                                      color: widget.exploreModel.isLike.value
+                                          ? Colors.red
+                                          : Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      widget.exploreModel.isLike.value =
+                                      !widget.exploreModel.isLike.value;
+                                      if (widget.exploreModel.isLike.value) {
+                                        widget.exploreModel.likesCount++;
+                                      } else {
+                                        widget.exploreModel.likesCount--;
+                                      }
+                                      controller.likeUnlikeRequest(
+                                          widget.exploreModel.id,
+                                          widget.exploreModel.isLike.value ? "like" : 'unlike');
+                                    },
+                                  );
+                                }),
+                                Flexible(
+                                  child: Obx(() {
+                                    return Text(
+                                      widget.exploreModel.likesCount.toString(),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(fontSize: 16),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
+                                  onPressed: () {},
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    widget.exploreModel.commentsCount.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.share, size: 20, color: Colors.grey),
+                                  onPressed: () {
+                                    // share content
+                                    widget.exploreModel.sharesCount++;
+                                    controller.shareRequest(widget.exploreModel.id);
+                                    var title = widget.exploreModel.title.replaceAll(' ', '-');
+                                    var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                    Share.share(url, subject: 'TALLeaders');
+                                  },
+                                ),
+                                Flexible(
+                                  child: Obx(() {
+                                    return Text(
+                                      widget.exploreModel.sharesCount.toString(),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(fontSize: 16),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Get.toNamed('/details', arguments: widget.exploreModel);
+                            },
+                            child: const Text('Details'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
