@@ -275,20 +275,6 @@ class _ExploreCardState extends State<ExploreCard> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Get.toNamed('/details', arguments: widget.exploreModel);
-                            },
-                            child: const Text('Details'),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),

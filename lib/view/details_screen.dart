@@ -180,9 +180,9 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
         const Text("Preferred Language: Hindi, English",
             style: TextStyle(color: Colors.black87)),
         const SizedBox(height: 10),
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: const [
+          children: [
             Icon(Icons.thumb_up_off_alt, color: Colors.black54),
             Icon(Icons.comment, color: Colors.black54),
             Icon(Icons.share, color: Colors.black54),

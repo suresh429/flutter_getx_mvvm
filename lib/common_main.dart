@@ -116,7 +116,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/settings', page: () => SettingsScreen()),
         GetPage(name: '/userProfile', page: () => ProfileScreen()),
         GetPage(name: '/comments', page: () => const CommentsScreen()),
-        GetPage(name: '/publicProfile', page: () =>  PublicProfileScreen()),
+        GetPage(name: '/publicProfile', page: () =>  const PublicProfileScreen()),
 
       ],
     );

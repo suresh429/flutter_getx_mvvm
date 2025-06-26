@@ -1,241 +1,176 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
-import 'package:flutter_getx_mvvm/utilites/colors.dart';
-import 'package:flutter_getx_mvvm/utilites/constants_Utils.dart';
-import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_about_bottom.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_area_interest_bottom.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_experience_bottom.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_expertise_bottom.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_honor_bottom.dart';
-import 'package:flutter_getx_mvvm/widget/public_profile_user_bottom.dart';
 import 'package:get/get.dart';
 
 import '../env/app_env.dart';
+import '../utilites/constants_Utils.dart';
+import '../view_model/public_profile_controller.dart';
 import '../widget/profile_progressbar.dart';
+import '../widget/public_profile_about_bottom.dart';
+import '../widget/public_profile_area_interest_bottom.dart';
+import '../widget/public_profile_experience_bottom.dart';
+import '../widget/public_profile_expertise_bottom.dart';
+import '../widget/public_profile_honor_bottom.dart';
 import '../widget/public_profile_url_bottom.dart';
+import '../widget/public_profile_user_bottom.dart';
 
-class PublicProfileScreen extends StatelessWidget {
+class PublicProfileScreen extends StatefulWidget {
+  const PublicProfileScreen({super.key});
+
+  @override
+  _PublicProfileScreenState createState() => _PublicProfileScreenState();
+}
+
+class _PublicProfileScreenState extends State<PublicProfileScreen> {
+  final List<GlobalKey> categoriesSections = List.generate(
+    5,
+    (_) => GlobalKey(),
+  );
   final PublicProfileController controller = Get.put(PublicProfileController());
-  static const double _tabBarHeight = 56.0;
+  late ScrollController scrollController;
+  BuildContext? tabContext;
 
-  // Define isTabSelectedByUser at class level
-  final RxBool isTabSelectedByUser = false.obs;
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController();
+    scrollController.addListener(animateToTab);
+  }
 
-  // Global keys for each section
-  final GlobalKey _aboutKey = GlobalKey();
-  final GlobalKey _experienceKey = GlobalKey();
-  final GlobalKey _expertiseKey = GlobalKey();
-  final GlobalKey _areasOfInterestKey = GlobalKey();
-  final GlobalKey _honorsKey = GlobalKey();
+  void animateToTab() {
+    for (int i = 0; i < categoriesSections.length; i++) {
+      final box = categoriesSections[i].currentContext?.findRenderObject();
+      if (box is RenderBox) {
+        final position = box.localToGlobal(Offset.zero);
+        if (scrollController.offset >= position.dy - 150) {
+          DefaultTabController.of(tabContext!)?.animateTo(i);
+        }
+      }
+    }
+  }
 
-  PublicProfileScreen({super.key});
+  void scrollToIndex(int index) async {
+    scrollController.removeListener(animateToTab);
+    final keyContext = categoriesSections[index].currentContext;
+    if (keyContext != null) {
+      await Scrollable.ensureVisible(
+        keyContext,
+        duration: const Duration(milliseconds: 600),
+      );
+    }
+    scrollController.addListener(animateToTab);
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
-      child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        body: SafeArea(
-          child: Builder(
-            builder: (BuildContext context) {
-              // Access TabController and ScrollController here
-              final TabController tabController = DefaultTabController.of(context);
-              final ScrollController scrollController = ScrollController();
+      child: Builder(
+        builder: (BuildContext context) {
+          tabContext = context;
+          return Scaffold(
+            body: SafeArea(
+              child: Obx(() {
+                return controller.isLoading.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : CustomScrollView(
+                      controller: scrollController,
+                      slivers: [
+                        // Proper height for header
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 490,
+                            // Adjusted height to accommodate entire header content
+                            child: _buildProfileHeader(context),
+                          ),
+                        ),
 
-              // Handle tab selection to scroll to the corresponding section
-              tabController.addListener(() {
-                if (tabController.indexIsChanging && !isTabSelectedByUser.value) {
-                  _scrollToSection(context, tabController.index, scrollController);
-                }
-              });
+                        // Pinned TabBar
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _SliverAppBarDelegate(
+                            TabBar(
+                              labelColor: Theme.of(context).primaryColor,
+                              unselectedLabelColor: Colors.grey,
+                              indicatorColor: Theme.of(context).primaryColor,
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              unselectedLabelStyle: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14,
+                              ),
+                              isScrollable: true,
+                              tabs: const [
+                                Tab(child: Text('About')),
+                                Tab(child: Text('Experience')),
+                                Tab(child: Text('Expertise')),
+                                Tab(child: Text('Areas Of Interest')),
+                                Tab(child: Text('Honors & Awards')),
+                              ],
+                              onTap: scrollToIndex,
+                            ),
+                          ),
+                        ),
 
-              // Handle scroll changes to update tab selection
-              scrollController.addListener(() {
-                if (isTabSelectedByUser.value) {
-                  _updateTabBasedOnScroll(context, tabController, scrollController);
-                }
-              });
-
-              return NestedScrollView(
-                controller: scrollController,
-                physics: const ClampingScrollPhysics(),
-                headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                  SliverAppBar(
-                    expandedHeight: 505.0,
-                    pinned: false,
-                    backgroundColor: Colors.grey[200],
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: _buildProfileHeader(context),
-                    ),
-                  ),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _ProfileTabBarDelegate(
-                      onTabSelected: (index) {
-                        isTabSelectedByUser.value = false;
-                        _scrollToSection(context, index, scrollController);
-                      },
-                    ),
-                  ),
-                ],
-                body: TabBarView(
-                  children: [
-                    _buildScrollableTabContent(_buildAboutTab(context), _aboutKey),
-                    _buildScrollableTabContent(_buildExperienceTab(context), _experienceKey),
-                    _buildScrollableTabContent(_buildExpertiseTab(context), _expertiseKey),
-                    _buildScrollableTabContent(_buildInterestsTab(context), _areasOfInterestKey),
-                    _buildScrollableTabContent(_buildHonorsTab(context), _honorsKey),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
+                        // Tab Content
+                        SliverList(
+                          delegate: SliverChildListDelegate([
+                            //_buildCategoryTitle('About', 0),
+                            _buildAboutTab(context, categoriesSections[0]),
+                            _buildExperienceTab(context, categoriesSections[1]),
+                            _buildExpertiseTab(context, categoriesSections[2]),
+                            _buildInterestsTab(context, categoriesSections[3]),
+                            _buildHonorsTab(context, categoriesSections[4]),
+                            const SizedBox(height: 30),
+                          ]),
+                        ),
+                      ],
+                    );
+              }),
+            ),
+          );
+        },
       ),
-    );
-  }
-
-  void _scrollToSection(
-      BuildContext context,
-      int index,
-      ScrollController scrollController,
-      ) {
-    GlobalKey key;
-    switch (index) {
-      case 0:
-        key = _aboutKey;
-        break;
-      case 1:
-        key = _experienceKey;
-        break;
-      case 2:
-        key = _expertiseKey;
-        break;
-      case 3:
-        key = _areasOfInterestKey;
-        break;
-      case 4:
-        key = _honorsKey;
-        break;
-      default:
-        return;
-    }
-
-    final contextKey = key.currentContext;
-    if (contextKey != null) {
-      final RenderBox renderBox = contextKey.findRenderObject() as RenderBox;
-      final offset = renderBox.localToGlobal(Offset.zero).dy;
-      final appBarHeight = AppBar().preferredSize.height;
-      final tabBarHeight = _tabBarHeight;
-      final statusBarHeight = MediaQuery.of(context).padding.top;
-
-      scrollController.animateTo(
-        offset - appBarHeight - tabBarHeight - statusBarHeight,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _updateTabBasedOnScroll(
-      BuildContext context,
-      TabController tabController,
-      ScrollController scrollController,
-      ) {
-    final scrollPosition = scrollController.offset;
-    final aboutOffset = _getSectionOffset(context, _aboutKey);
-    final experienceOffset = _getSectionOffset(context, _experienceKey);
-    final expertiseOffset = _getSectionOffset(context, _expertiseKey);
-    final areasOfInterestOffset = _getSectionOffset(context, _areasOfInterestKey);
-    final honorsOffset = _getSectionOffset(context, _honorsKey);
-
-    isTabSelectedByUser.value = true;
-    if (scrollPosition >= honorsOffset) {
-      tabController.animateTo(4);
-    } else if (scrollPosition >= areasOfInterestOffset) {
-      tabController.animateTo(3);
-    } else if (scrollPosition >= expertiseOffset) {
-      tabController.animateTo(2);
-    } else if (scrollPosition >= experienceOffset) {
-      tabController.animateTo(1);
-    } else {
-      tabController.animateTo(0);
-    }
-  }
-
-  double _getSectionOffset(BuildContext context, GlobalKey key) {
-    final contextKey = key.currentContext;
-    if (contextKey != null) {
-      final RenderBox renderBox = contextKey.findRenderObject() as RenderBox;
-      final offset = renderBox.localToGlobal(Offset.zero).dy;
-      final appBarHeight = AppBar().preferredSize.height;
-      final tabBarHeight = _tabBarHeight;
-      final statusBarHeight = MediaQuery.of(context).padding.top;
-      return offset - appBarHeight - tabBarHeight - statusBarHeight;
-    }
-    return double.infinity;
-  }
-
-  Widget _buildScrollableTabContent(Widget child, GlobalKey key) {
-    return CustomScrollView(
-      physics: const ClampingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Container(
-            key: key,
-            child: child,
-          ),
-        ),
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 16.0), // Optional padding
-        ),
-      ],
     );
   }
 
   Widget _buildProfileHeader(BuildContext context) {
     return Stack(
+      clipBehavior: Clip.none,
+      // fit: StackFit.expand,
       children: [
-      SizedBox(
-      height: 150.0,
-      child: Obx(() {
-        final url = controller.coverBgImage.value;
-
-        if (url.isNotEmpty) {
-          return Image.network(
-            url,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            errorBuilder: (context, error, stackTrace) {
+        // Cover Image
+        SizedBox(
+          height: 120.0,
+          width: double.infinity,
+          child: Obx(() {
+            final url = controller.coverBgImage.value;
+            if (url.isNotEmpty) {
+              return Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                errorBuilder:
+                    (_, __, ___) => Image.asset(
+                      'assets/card_default_image.webp',
+                      fit: BoxFit.cover,
+                    ),
+              );
+            } else {
               return Image.asset(
                 'assets/card_default_image.webp',
-                fit: BoxFit.fitWidth,
-                width: double.infinity,
+                fit: BoxFit.cover,
               );
-            },
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return const Center(child: CircularProgressIndicator());
-            },
-          );
-        } else {
-          return Image.asset(
-            'assets/card_default_image.webp',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          );
-        }
-      }),
-    ),
+            }
+          }),
+        ),
         Positioned(
           top: 8,
           right: 8,
           child: InkWell(
-            onTap: () => controller.pickImage(),
+            onTap: controller.pickImage,
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
@@ -248,135 +183,162 @@ class PublicProfileScreen extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 140.0,
-          left: 0.0,
-          right: 0.0,
-          child: Transform.translate(
-            offset: const Offset(0.0, -20.0),
+          top: 90,
+          left: 0,
+          right: 0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               children: [
-                Stack(
-                  children: [
-                    Card(
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           children: [
                             Obx(() {
-                              final loginResponse = controller.loginResponse.value;
-                              print("response $loginResponse");
-
+                              final loginResponse =
+                                  controller.loginResponse.value;
                               if (loginResponse == null) {
                                 return const CircleAvatar(
-                                  radius: 50.0,
-                                  backgroundColor: Colors.white,
+                                  radius: 50,
                                   child: CircularProgressIndicator(),
                                 );
                               }
-
-                              return Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  ProfileWithProgressBar(
-                                    data: loginResponse,
-                                    size: 100.0,
-                                  ),
-                                ],
+                              return ProfileWithProgressBar(
+                                data: loginResponse,
+                                size: 100,
                               );
                             }),
-                            Obx(() => Column(
-                              children: [
-                                Text(
-                                  controller.name.value,
-                                  style: const TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                            const SizedBox(height: 10),
+                            Obx(
+                              () => Column(
+                                children: [
+                                  Text(
+                                    controller.name.value,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 5.0),
-                                Text(
-                                  controller.bio.value,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: Colors.grey[500],
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    controller.bio.value,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 5.0),
-                                Text(
-                                  controller.location.value,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: Colors.grey[500],
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    controller.location.value,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            )),
-                            const SizedBox(height: 16.0),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 _buildSocialIcon(
-                                    'assets/facebook.png', controller.loginResponse.value?.data?.facebookProfileUrl ?? '', context),
+                                  'assets/facebook.png',
+                                  controller
+                                          .loginResponse
+                                          .value
+                                          ?.data
+                                          ?.facebookProfileUrl ??
+                                      '',
+                                  context,
+                                ),
                                 const SizedBox(width: 10),
                                 _buildSocialIcon(
-                                    'assets/twitter.png', controller.loginResponse.value?.data?.twitterProfileUrl ?? '', context),
+                                  'assets/twitter.png',
+                                  controller
+                                          .loginResponse
+                                          .value
+                                          ?.data
+                                          ?.twitterProfileUrl ??
+                                      '',
+                                  context,
+                                ),
                                 const SizedBox(width: 10),
                                 _buildSocialIcon(
-                                    'assets/linkedin.png', controller.loginResponse.value?.data?.linkedInProfileUrl ?? '', context),
+                                  'assets/linkedin.png',
+                                  controller
+                                          .loginResponse
+                                          .value
+                                          ?.data
+                                          ?.linkedInProfileUrl ??
+                                      '',
+                                  context,
+                                ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
                               ),
+                              builder:
+                                  (_) => Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom:
+                                          MediaQuery.of(
+                                            context,
+                                          ).viewInsets.bottom,
+                                    ),
+                                    child: PublicProfileUserBottom(
+                                      controller: controller,
+                                    ),
+                                  ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(color: Colors.black12, blurRadius: 2),
+                              ],
                             ),
-                            builder: (context) => Padding(
-                              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                              child: PublicProfileUserBottom(controller: controller),
+                            child: const Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Colors.red,
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(color: Colors.black12, blurRadius: 2),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.edit,
-                            size: 18,
-                            color: Colors.red,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                //const SizedBox(height: 16),
                 _buildProfileUrlSection(context),
               ],
             ),
@@ -386,7 +348,11 @@ class PublicProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(String assetPath, String socialLink, BuildContext context) {
+  Widget _buildSocialIcon(
+    String assetPath,
+    String socialLink,
+    BuildContext context,
+  ) {
     return GestureDetector(
       onTap: () {
         ConstantsUtils.launchURL(socialLink, context);
@@ -448,143 +414,172 @@ class PublicProfileScreen extends StatelessWidget {
                   },
                   child: Container(
                     padding: const EdgeInsets.all(6),
-                    child: const Icon(Icons.edit, size: 18, color: Colors.black),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 5),
-            Obx(() => Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    "${AppEnvironment.baseWebUrl}public-profile/${controller.publicProfileUrl.value}",
-                    style: const TextStyle(fontSize: 10.0, color: Colors.black),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                SizedBox(
-                  height: 30,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Clipboard.setData(
-                        ClipboardData(text: "${AppEnvironment.baseWebUrl}public-profile/${controller.publicProfileUrl.value}"),
-                      );
-                      ScaffoldMessenger.of(Get.context!).showSnackBar(
-                        const SnackBar(
-                          content: Text('URL copied to clipboard'),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 6.0,
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "${AppEnvironment.baseWebUrl}public-profile/${controller.publicProfileUrl.value}",
+                      style: const TextStyle(
+                        fontSize: 10.0,
+                        color: Colors.black,
                       ),
                     ),
-                    child: const Text(
-                      'Copy',
-                      style: TextStyle(color: Colors.black, fontSize: 10.0),
-                    ),
                   ),
-                ),
-              ],
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAboutTab(BuildContext context) {
-    return Card(
-      elevation: 1.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'About',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 18.0),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
-                      ),
-                      builder: (context) {
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                  const SizedBox(width: 20),
+                  SizedBox(
+                    height: 30,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text:
+                                "${AppEnvironment.baseWebUrl}public-profile/${controller.publicProfileUrl.value}",
                           ),
-                          child: PublicProfileAboutBottom(
-                            controller: controller,
-                            bottomSheetContext: context,
+                        );
+                        ScaffoldMessenger.of(Get.context!).showSnackBar(
+                          const SnackBar(
+                            content: Text('URL copied to clipboard'),
                           ),
                         );
                       },
-                    );
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8.0),
-
-            // About text with Read more/less
-            Obx(() {
-              final aboutText = controller.aboutMe.value;
-              final isExpanded = controller.isAboutExpanded.value;
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    aboutText.isEmpty ? "No description provided." : aboutText,
-                    maxLines: isExpanded ? null : 4,
-                    overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey[800]),
-                  ),
-                  if (aboutText.trim().isNotEmpty)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () => controller.isAboutExpanded.toggle(),
-                        child: Text(
-                          isExpanded ? 'Read less' : 'Read more',
-                          style: const TextStyle(fontSize: 14, color: Colors.red),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.grey),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 6.0,
                         ),
                       ),
+                      child: const Text(
+                        'Copy',
+                        style: TextStyle(color: Colors.black, fontSize: 10.0),
+                      ),
                     ),
+                  ),
                 ],
-              );
-            }),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildExperienceTab(BuildContext context) {
+  Widget _buildCategoryTitle(String title, int index) {
+    return Container(
+      key: categoriesSections[index],
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildAboutTab(BuildContext context, Key key) {
     return Card(
+      key: key,
+      // 👈 Important for scroll-to-section to work!
+      elevation: 1.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Obx(() {
+          final aboutText = controller.aboutMe.value;
+          final isExpanded = controller.isAboutExpanded.value;
+          final hasContent = aboutText.trim().isNotEmpty;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'About',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                          ),
+                        ),
+                        builder:
+                            (_) => Padding(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom,
+                              ),
+                              child: PublicProfileAboutBottom(
+                                controller: controller,
+                                bottomSheetContext: context,
+                              ),
+                            ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit, size: 18, color: Colors.red),
+                    label: Text(
+                      hasContent ? 'Edit' : 'Add',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                hasContent ? aboutText : "No description provided.",
+                maxLines: isExpanded ? null : 4,
+                overflow:
+                    isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16.0, color: Colors.grey[800]),
+              ),
+              if (hasContent)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => controller.isAboutExpanded.toggle(),
+                    child: Text(
+                      isExpanded ? 'Read less' : 'Read more',
+                      style: const TextStyle(fontSize: 14, color: Colors.red),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  // Experience Tab (Optimized with ListView.builder)
+  Widget _buildExperienceTab(BuildContext context, Key key) {
+    return Card(
+      key: key,
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -593,74 +588,81 @@ class PublicProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionHeader("Experience", onAdd: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                builder: (context) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: PublicProfileExperienceBottomSheet(
-                    controller: controller,
-                    bottomSheetContext: context,
-                   // index: null,
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 8),
-
-            Obx(() => controller.experiences.isEmpty
-                ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Center(
-                child: Text(
-                  "No experiences available.",
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-            )
-                : Column(
-              children: controller.experiences.asMap().entries.map((entry) {
-                final index = entry.key;
-                final exp = entry.value;
-
-                final date = ConstantsUtils.getFormattedExperienceRange(
-                  exp.experienceStartDate,
-                  exp.experienceEndDate,
-                );
-
-                return Column(
-                  children: [
-                    _experienceItem(
-                      index,
-                      exp.role!,
-                      exp.company!,
-                      date,
-                      context: context,
+            _sectionHeader(
+              "Experience",
+              onAdd: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
-                    if (index < controller.experiences.length - 1)
-                      const Divider(),
-                  ],
+                  ),
+                  builder:
+                      (context) => Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: PublicProfileExperienceBottomSheet(
+                          controller: controller,
+                          bottomSheetContext: context,
+                        ),
+                      ),
                 );
-              }).toList(),
-            )),
+              },
+            ),
+            const SizedBox(height: 8),
+            Obx(
+              () =>
+                  controller.experiences.isEmpty
+                      ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(
+                          child: Text(
+                            "No experiences available.",
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          ),
+                        ),
+                      )
+                      : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.experiences.length,
+                        itemBuilder: (context, index) {
+                          final exp = controller.experiences[index];
+                          final date =
+                              ConstantsUtils.getFormattedExperienceRange(
+                                exp.experienceStartDate,
+                                exp.experienceEndDate,
+                              );
+                          return Column(
+                            children: [
+                              _experienceItem(
+                                index,
+                                exp.role!,
+                                exp.company!,
+                                date,
+                                context: context,
+                              ),
+                              if (index < controller.experiences.length - 1)
+                                const Divider(),
+                            ],
+                          );
+                        },
+                      ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildExpertiseTab(BuildContext context) {
+  Widget _buildExpertiseTab(BuildContext context, Key key) {
     return _buildCardSection(
+      key: key,
       title: "Expertise",
       onEdit: () {
         showModalBottomSheet(
@@ -687,23 +689,29 @@ class PublicProfileScreen extends StatelessWidget {
         );
       },
       children: [
-        Obx(() => controller.expertise.isEmpty
-            ? const Center(child: Text("No expertise added yet."))
-            : Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: controller.expertise
-              .map((chip) => Chip(label: Text(chip)))
-              .toList(),
-        )),
+        Obx(
+          () =>
+              controller.expertise.isEmpty
+                  ? const Center(child: Text("No expertise added yet."))
+                  : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children:
+                        controller.expertise
+                            .map((chip) => Chip(label: Text(chip)))
+                            .toList(),
+                  ),
+        ),
       ],
     );
   }
 
-  Widget _buildInterestsTab(BuildContext context) {
+  Widget _buildInterestsTab(BuildContext context, Key key) {
     return _buildCardSection(
+      key: key,
       title: "Areas of Interest",
-      subtitle: "Sustainable Development Goals (SDGs) that the TALLeader is passionate about.",
+      subtitle:
+          "Sustainable Development Goals (SDGs) that the TALLeader is passionate about.",
       onEdit: () {
         showModalBottomSheet(
           context: context,
@@ -720,27 +728,36 @@ class PublicProfileScreen extends StatelessWidget {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: PublicProfileAreaInterestBottom(controller: controller, bottomSheetContext: context),
+              child: PublicProfileAreaInterestBottom(
+                controller: controller,
+                bottomSheetContext: context,
+              ),
             );
           },
         );
       },
       children: [
-        Obx(() => controller.areaOfInterest.isEmpty
-            ? const Center(child: Text("No Area of Interest added yet."))
-            : Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: controller.areaOfInterest
-              .map((chip) => Chip(label: Text(chip)))
-              .toList(),
-        )),
+        Obx(
+          () =>
+              controller.areaOfInterest.isEmpty
+                  ? const Center(child: Text("No Area of Interest added yet."))
+                  : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children:
+                        controller.areaOfInterest
+                            .map((chip) => Chip(label: Text(chip)))
+                            .toList(),
+                  ),
+        ),
       ],
     );
   }
 
-  Widget _buildHonorsTab(BuildContext context) {
+  // Honors Tab (Optimized with ListView.builder)
+  Widget _buildHonorsTab(BuildContext context, Key key) {
     return _buildCardSection(
+      key: key,
       title: "Honor & Awards",
       onAdd: () {
         showModalBottomSheet(
@@ -779,12 +796,12 @@ class PublicProfileScreen extends StatelessWidget {
               ),
             );
           }
-
-          return Column(
-            children: controller.honorsAwards.asMap().entries.map((entry) {
-              final index = entry.key;
-              final honor = entry.value;
-
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.honorsAwards.length,
+            itemBuilder: (context, index) {
+              final honor = controller.honorsAwards[index];
               return Column(
                 children: [
                   Row(
@@ -800,13 +817,13 @@ class PublicProfileScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   honor.awardTitle ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
                                 GestureDetector(
                                   onTap: () {
-                                    // Show edit bottom sheet
-
                                     showModalBottomSheet(
                                       context: context,
                                       isScrollControlled: true,
@@ -820,30 +837,40 @@ class PublicProfileScreen extends StatelessWidget {
                                       builder: (context) {
                                         return Padding(
                                           padding: EdgeInsets.only(
-                                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                                            bottom:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).viewInsets.bottom,
                                           ),
                                           child: PublicProfileHonorBottom(
                                             controller: controller,
                                             bottomSheetContext: context,
-                                            editItem: honor, // Pass the honor item to edit
-                                            editIndex: index, // Pass the index for editing
+                                            editItem: honor,
+                                            editIndex: index,
                                           ),
                                         );
                                       },
                                     );
                                   },
-                                  child: const Icon(Icons.edit, size: 14, color: Colors.red),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 14,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 5,),
+                            const SizedBox(height: 5),
                             if (honor.awardIssuedBy != null)
                               Text(honor.awardIssuedBy!),
-                            const SizedBox(height: 5,),
+                            const SizedBox(height: 5),
                             if (honor.awardDescription != null)
                               Text(
                                 honor.awardDescription!,
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                           ],
                         ),
@@ -855,17 +882,22 @@ class PublicProfileScreen extends StatelessWidget {
                   const Divider(),
                 ],
               );
-            }).toList(),
+            },
           );
         }),
       ],
     );
   }
 
-  Widget _experienceItem(int index, String role, String company, String date, {
+  Widget _experienceItem(
+    int index,
+    String role,
+    String company,
+    String date, {
     required BuildContext context,
   }) {
-    final experience = controller.experiences[index]; // ✅ Get current experience item
+    final experience =
+        controller.experiences[index]; // ✅ Get current experience item
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -878,7 +910,10 @@ class PublicProfileScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(role, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    role,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(width: 10),
                   InkWell(
                     onTap: () {
@@ -900,23 +935,31 @@ class PublicProfileScreen extends StatelessWidget {
                             child: PublicProfileExperienceBottomSheet(
                               controller: controller,
                               bottomSheetContext: context,
-                              editItem: experience, // ✅ Use actual experience object
+                              editItem:
+                                  experience, // ✅ Use actual experience object
                             ),
                           );
                         },
                       );
                     },
-                    child: const Icon(Icons.edit, size: 18, color: Colors.black),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Text(company),
               const SizedBox(height: 5),
-              Text(date, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              Text(
+                date,
+                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -925,7 +968,10 @@ class PublicProfileScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         if (onAdd != null)
           TextButton(
             onPressed: onAdd,
@@ -936,6 +982,7 @@ class PublicProfileScreen extends StatelessWidget {
   }
 
   Widget _buildCardSection({
+    Key? key,
     required String title,
     String? subtitle,
     VoidCallback? onAdd,
@@ -943,6 +990,8 @@ class PublicProfileScreen extends StatelessWidget {
     required List<Widget> children,
   }) {
     return Card(
+      key: key,
+      // Use key for scroll-to-section functionality
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -954,15 +1003,36 @@ class PublicProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 if (onAdd != null)
-                  TextButton(onPressed: onAdd, child: const Text("Add", style: TextStyle(color: Colors.red))),
+                  TextButton(
+                    onPressed: onAdd,
+                    child: const Text(
+                      "Add",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
                 if (onEdit != null)
-                  TextButton(onPressed: onEdit, child: const Text("Edit", style: TextStyle(color: Colors.red))),
+                  TextButton(
+                    onPressed: onEdit,
+                    child: const Text(
+                      "Edit",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
               ],
             ),
             if (subtitle != null) ...[
-              Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+              Text(
+                subtitle,
+                style: const TextStyle(color: Colors.grey, fontSize: 13),
+              ),
               const SizedBox(height: 8),
             ],
             ...children,
@@ -973,61 +1043,27 @@ class PublicProfileScreen extends StatelessWidget {
   }
 }
 
-class _ProfileTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final Function(int) onTabSelected;
+// Delegate for pinned TabBar
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
 
-  _ProfileTabBarDelegate({required this.onTabSelected});
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
 
   @override
   Widget build(
-      BuildContext context,
-      double shrinkOffset,
-      bool overlapsContent,
-      ) {
-    return Material(
-      color: Colors.transparent,
-      child: Card(
-        elevation: 0.5,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 2),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-            child: TabBar(
-              isScrollable: true,
-              labelColor: ColorUtils.colorPrimary,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: ColorUtils.colorPrimary,
-              labelStyle: const TextStyle(
-                fontSize: 14.0,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: const TextStyle(fontSize: 14.0),
-              onTap: onTabSelected,
-              tabs: const [
-                Tab(text: 'About'),
-                Tab(text: 'Experience'),
-                Tab(text: 'Expertise'),
-                Tab(text: 'Areas of Interest'),
-                Tab(text: 'Honors & Awards'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: Colors.white, child: _tabBar);
   }
 
   @override
-  double get maxExtent => 56.0;
-
-  @override
-  double get minExtent => 56.0;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
