@@ -187,7 +187,7 @@ static Future<LoginModel?> getStoredLoginResponse() async {
   }
 
 
-  String formatDate(String? dateString) {
+  static String formatDate(String? dateString) {
     DateTime parsedDate = DateTime.parse(dateString!); // Parse the ISO 8601 date
     String formattedDate = DateFormat("dd-MMM-yyyy").format(parsedDate); // Format it
     return formattedDate;
@@ -277,5 +277,21 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     return parts.length != 3;
   }
 
+  static String capitalizeFirst(String value) {
+    if (value.isEmpty) return value;
+    return value[0].toUpperCase() + value.substring(1);
+  }
 
+  static String formatDateTime(DateTime date) {
+    final DateFormat formatter = DateFormat('MMMM dd, yyyy, h:mm a');
+    return formatter.format(date);
+  }
+
+
+  static String convertMillisecondsToFormattedDate(int? milliseconds) {
+    if (milliseconds == null || milliseconds == 0) return 'N/A';
+    final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    final formatter = DateFormat('dd-MMM-yyyy');
+    return formatter.format(date);
+  }
 }
