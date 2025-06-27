@@ -10,6 +10,7 @@ class ExploreModel {
   final int? startDate;
   final int? dueDate;
   final int? createdAt;
+  final int? quantity;
 
   RxInt likesCount;
   final int commentsCount;
@@ -26,6 +27,9 @@ class ExploreModel {
   final List<String> functionalExpertise;
 
   OrgId? orgId;
+  AdditionalInfo? additionalInfo;
+  UserInfo? userInfo;
+
 
   RxBool isFavorite;
   RxBool isLike;
@@ -40,6 +44,7 @@ class ExploreModel {
     this.startDate,
     this.dueDate,
     this.createdAt,
+    this.quantity,
     required int likesCount,
     required this.commentsCount,
     required int sharesCount,
@@ -52,6 +57,8 @@ class ExploreModel {
     required this.languages,
     required this.functionalExpertise,
     this.orgId,
+    this.additionalInfo,
+    this.userInfo,
     required bool isFavorite,
     required bool isLike,
     required bool isScholarshipApplied,
@@ -71,6 +78,7 @@ class ExploreModel {
       startDate: json['start_date'] as int?,
       dueDate: json['due_date'] as int?,
       createdAt: json['createdAt'] as int?,
+      quantity: json['quantity'] as int?,
       likesCount: json['likesCount'] ?? 0,
       commentsCount: json['commentsCount'] ?? 0,
       sharesCount: json['sharesCount'] ?? 0,
@@ -86,6 +94,8 @@ class ExploreModel {
       isLike: (json['isLike'] ?? false) as bool,
       isScholarshipApplied: (json['isScholarshipApplied'] ?? false) as bool,
       orgId: json['orgId'] != null ? OrgId.fromJson(json['orgId']) : null,
+      additionalInfo: json['additionalInfo'] != null ? AdditionalInfo.fromJson(json['additionalInfo']) : null,
+      userInfo: json['user_info'] != null ? UserInfo.fromJson(json['user_info']) : null,
     );
   }
 }

@@ -17,7 +17,7 @@ class DetailsPageController extends GetxController {
   RxString errorMessage = ''.obs;
   final MainRepository repository = MainRepository(); // API service instance
   final ConnectivityService connectivityService =
-      Get.find<ConnectivityService>(); // Connectivity service instance
+  Get.find<ConnectivityService>(); // Connectivity service instance
 
   // Add currentRequestType
   RxString currentRequestType = ''.obs;
@@ -113,10 +113,56 @@ class DetailsPageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    initializeController();
+
+
     exploreModel = Get.arguments as ExploreModel;
     print('Received title: ${exploreModel.title}');
     print('Received requestType: ${exploreModel.requestType}');
-    initializeController();
+    title.value = exploreModel.title ?? '';
+    imageUrl.value = exploreModel.defaultImageUrl ?? '';
+    final due = DateTime.fromMillisecondsSinceEpoch(exploreModel.dueDate ?? 0);
+    daysLeft.value = '${due.difference(DateTime.now()).inDays} days left';
+
+    // Handle podcast specific data
+    if (exploreModel.additionalInfo != null) {
+      final additionalInfo = exploreModel.additionalInfo!;
+
+      List<String> formattedDates = [];
+
+      if (additionalInfo.podcastDate != null && additionalInfo.podcastDate! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate!);
+        formattedDates.add(ConstantsUtils.formatDateTime(date));
+      }
+
+      if (additionalInfo.podcastDate1 != null && additionalInfo.podcastDate1! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1!);
+        formattedDates.add(ConstantsUtils.formatDateTime(date));
+      }
+
+      if (additionalInfo.podcastDate2 != null && additionalInfo.podcastDate2! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2!);
+        formattedDates.add(ConstantsUtils.formatDateTime(date));
+      }
+
+      podcastDates.value = formattedDates.isEmpty ? ["N/A"] : formattedDates;
+
+      // Set podcast mode and other details
+      podcastMode.value = additionalInfo.interviewOrPanelDiscussion ?? 'N/A';
+      preferredLanguage.value = additionalInfo.languages?.join(', ') ?? 'N/A';
+      expectedDuration.value = additionalInfo.duration ?? 'N/A';
+      commercial.value = additionalInfo.format ?? 'N/A';
+      preferredIndustry.value = additionalInfo.preferredTopics ?? 'N/A';
+    }
+
+    likeCount.value = exploreModel.likesCount.value ?? 0;
+    commentCount.value = exploreModel.commentsCount ?? 0;
+    shareCount.value = exploreModel.sharesCount.value ?? 0;
+
+
+    updateRequestInfo();
+    updateDetailsData();
+
   }
 
   // initialize
@@ -124,95 +170,63 @@ class DetailsPageController extends GetxController {
     final response = await ConstantsUtils.getStoredLoginResponse();
     if (response != null) {
       loginResponse.value = response;
-      await getDetailsData(
-        loginResponse.value?.data?.uniqueId,
-        exploreModel.requestType ?? '',
-        exploreModel.id ?? '',
-      );
+      // await getDetailsData(
+      //   loginResponse.value?.data?.uniqueId,
+      //   exploreModel.requestType ?? '',
+      //   exploreModel.id ?? '',
+      // );
     } else {
       errorMessage.value = 'Failed to load login response';
     }
   }
 
   // Fetch profile data from API
-  Future<void> getDetailsData(
-      String? uniqueId,
-      String requestType,
-      String requestId,
-      ) async {
-    if (uniqueId == null || uniqueId.isEmpty) return;
-
-    try {
-      isLoading(true);
-      errorMessage.value = '';
-
-      final dataList = await repository.getDetailsData(
-        uniqueId: uniqueId,
-        requestType: requestType,
-        requestId: requestId,
-      );
-
-      if (dataList.isEmpty || dataList.first.donationRequestInfo == null) {
-        errorMessage.value = 'No data found';
-        return;
-      }
-
-      final info = dataList.first.donationRequestInfo;
-      final userInfo = dataList.first.donationRequestInfo.userInfo;
-      title.value = info.title ?? '';
-      imageUrl.value = info.defaultImageUrl ?? '';
-
-      final due = DateTime.fromMillisecondsSinceEpoch(info.dueDate ?? 0);
-      daysLeft.value = '${due.difference(DateTime.now()).inDays} days left';
-
-      // Handle podcast specific data
-      if (info.additionalInfo != null) {
-        final additionalInfo = info.additionalInfo!;
-
-        // Format podcast dates
-        List<String> formattedDates = [];
-        if (additionalInfo.podcastDate > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate);
-          formattedDates.add(ConstantsUtils.formatDateTime(date));
-        }
-        if (additionalInfo.podcastDate1 > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1);
-          formattedDates.add(ConstantsUtils.formatDateTime(date));
-        }
-        if (additionalInfo.podcastDate2 > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2);
-          formattedDates.add(ConstantsUtils.formatDateTime(date));
-        }
-
-        podcastDates.value = formattedDates.isEmpty ? ["N/A"] : formattedDates;
-
-        // Set podcast mode and other details
-        podcastMode.value = additionalInfo.interviewOrPanelDiscussion ?? 'N/A';
-        preferredLanguage.value = additionalInfo.languages?.join(', ') ?? 'N/A';
-        expectedDuration.value = additionalInfo.duration ?? 'N/A';
-        commercial.value = additionalInfo.format ?? 'N/A';
-        preferredIndustry.value = additionalInfo.preferredTopics ?? 'N/A';
-      }
-
-      likeCount.value = info.likeCount ?? 0;
-      commentCount.value = info.commentCount ?? 0;
-      shareCount.value = info.shareCount ?? 0;
-      
-      updateRequestInfo(info, userInfo);
-      updateDetailsData(info);
-
-    } catch (e) {
-      print('Details fetch error: $e');
-      errorMessage.value = 'Something went wrong';
-    } finally {
-      isLoading(false);
-    }
-  }
+  // Future<void> getDetailsData(
+  //     String? uniqueId,
+  //     String requestType,
+  //     String requestId,
+  //     ) async {
+  //   if (uniqueId == null || uniqueId.isEmpty) return;
+  //
+  //   try {
+  //     isLoading(true);
+  //     errorMessage.value = '';
+  //
+  //     final dataList = await repository.getDetailsData(
+  //       uniqueId: uniqueId,
+  //       requestType: requestType,
+  //       requestId: requestId,
+  //     );
+  //
+  //     if (dataList.isEmpty || dataList.first.  exploreModel == null) {
+  //       errorMessage.value = 'No data found';
+  //       return;
+  //     }
+  //
+  //     final info = dataList.first.exploreModel;
+  //     final userInfo = dataList.first.  exploreModel.userInfo;
+  //     title.value = info.title ?? '';
+  //     imageUrl.value = info.defaultImageUrl ?? '';
+  //
+  //     final due = DateTime.fromMillisecondsSinceEpoch(info.dueDate ?? 0);
+  //     daysLeft.value = '${due.difference(DateTime.now()).inDays} days left';
+  //
+  //
+  //     updateRequestInfo(info, userInfo);
+  //     updateDetailsData(info);
+  //
+  //   } catch (e) {
+  //     print('Details fetch error: $e');
+  //     errorMessage.value = 'Something went wrong';
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
 
 
-  void updateDetailsData(DonationRequestInfo donationRequestInfo) {
-    final requestType = donationRequestInfo.requestType ?? '';
-     print('Received title: $requestType');
+  void updateDetailsData() {
+    final requestType =   exploreModel.requestType ?? '';
+    print('Received title: $requestType');
     if (requestType == "podcast") {
       // Update titles
       preferredTitle.value = "Podcast Dates:";
@@ -221,7 +235,7 @@ class DetailsPageController extends GetxController {
       // Format podcast date
       final podcastDate = exploreModel.dueDate;
       if (podcastDate != null && podcastDate > 0) {
-        preferredValue.value = formatDateFromMillis(podcastDate);
+        preferredValue.value = ConstantsUtils.convertMillisecondsToFormattedDate(podcastDate);
       } else {
         preferredValue.value = "N/A";
       }
@@ -241,13 +255,13 @@ class DetailsPageController extends GetxController {
       languageTitle.value = "Event Mode:";
 
       // Format event dates
-      final startDate = formatDateFromMillis(exploreModel.startDate ?? 0);
-      final endDate = formatDateFromMillis(exploreModel.dueDate ?? 0);
+      final startDate = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.startDate ?? 0);
+      final endDate = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.dueDate ?? 0);
       preferredValue.value = "$startDate-$endDate";
 
       // Format event mode
       final mode = exploreModel.format;
-      if (mode != null && mode.isNotEmpty) {
+      if (mode.isNotEmpty) {
         languageValue.value = capitalizeEachWord(mode);
       } else {
         languageValue.value = "No format available";
@@ -259,21 +273,23 @@ class DetailsPageController extends GetxController {
       languageTitle.value = "Preferred Language:";
 
       // Format industry
-      final requestedFor = donationRequestInfo.requestedFor;
+      final requestedFor =   exploreModel.requestedFor;
       if (requestedFor != null && requestedFor.isNotEmpty) {
         preferredValue.value = ConstantsUtils.capitalizeFirst(requestedFor);
       } else {
         preferredValue.value = "N/A";
       }
 
-      if (donationRequestInfo.additionalInfo?.languages != null &&
-          donationRequestInfo.additionalInfo!.languages.isNotEmpty) {
-        languageValue.value = donationRequestInfo.additionalInfo!.languages
+      final langs =   exploreModel.additionalInfo?.languages;
+      print("object $langs");
+      if (langs != null && langs.isNotEmpty) {
+        languageValue.value = langs
             .map((lang) => ConstantsUtils.capitalizeFirst(lang))
             .join(", ");
       } else {
         languageValue.value = "N/A";
       }
+
     } else {
       // Default case (board member)
       preferredTitle.value = "Preferred Industry:";
@@ -285,14 +301,15 @@ class DetailsPageController extends GetxController {
           .join(", ");
       preferredValue.value = expertise.isNotEmpty ? expertise : "N/A";
 
-      if (donationRequestInfo.additionalInfo?.languages != null &&
-          donationRequestInfo.additionalInfo!.languages.isNotEmpty) {
-        languageValue.value = donationRequestInfo.additionalInfo!.languages
-            .map((lang) => ConstantsUtils.capitalizeFirst(lang))
-            .join(", ");
-      } else {
-        languageValue.value = "N/A";
-      }
+      final langs = exploreModel.additionalInfo?.languages
+          ?.whereType<String>()
+          .map(ConstantsUtils.capitalizeFirst)
+          .toList();
+
+      languageValue.value = (langs != null && langs.isNotEmpty)
+          ? langs.join(", ")
+          : "N/A";
+
     }
 
     // Update UI states based on scholarship and favorites
@@ -306,6 +323,89 @@ class DetailsPageController extends GetxController {
 
   }
 
+  // Update values in getDetailsData
+  void updateRequestInfo() {
+    currentRequestType.value = exploreModel.requestType;
+    print('Current request type: ${currentRequestType.value}');
+
+
+    /// PODCAST
+    if (currentRequestType.value == "podcast") {
+      final additionalInfo = exploreModel.additionalInfo;
+
+      podcastDescription.value = additionalInfo?.interviewOrPanelDiscussion ?? 'N/A';
+      podcastName.value = additionalInfo?.podcastName ?? 'N/A';
+      podcastType.value = exploreModel.requestedFor;
+      hostName.value = additionalInfo?.hostName ?? 'N/A';
+
+      if (exploreModel.additionalInfo != null) {
+        final additionalInfo = exploreModel.additionalInfo!;
+
+        List<String> formattedDates = [];
+
+        if (additionalInfo.podcastDate != null && additionalInfo.podcastDate! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate!);
+          formattedDates.add(ConstantsUtils.formatDateTime(date));
+        }
+
+        if (additionalInfo.podcastDate1 != null && additionalInfo.podcastDate1! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1!);
+          formattedDates.add(ConstantsUtils.formatDateTime(date));
+        }
+
+        if (additionalInfo.podcastDate2 != null && additionalInfo.podcastDate2! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2!);
+          formattedDates.add(ConstantsUtils.formatDateTime(date));
+        }
+
+        podcastDates.value = formattedDates.isEmpty ? ["N/A"] : formattedDates;
+
+        // Set podcast mode and other details
+        podcastMode.value = additionalInfo.interviewOrPanelDiscussion ?? 'N/A';
+        preferredLanguage.value = additionalInfo.languages?.join(', ') ?? 'N/A';
+        expectedDuration.value = additionalInfo.duration ?? 'N/A';
+        commercial.value = additionalInfo.format ?? 'N/A';
+        preferredIndustry.value = additionalInfo.preferredTopics ?? 'N/A';
+      }
+
+
+      guestRequirements.value = additionalInfo?.preferredTopics ?? 'N/A';
+      preferredLanguage.value = ((additionalInfo?.languages?.isNotEmpty ?? false)
+          ? additionalInfo!.languages?.join(', ')
+          : 'N/A')!;
+
+
+      expectedDuration.value = additionalInfo?.duration ?? 'N/A';
+      commercial.value = additionalInfo?.preferredConsultationMode ?? 'N/A';
+      stipendFee.value = exploreModel.quantity?.toString() ?? 'N/A';
+    }
+
+
+
+    // Update profile info
+    profileLocation.value = exploreModel.userInfo?.address?.city ?? '';
+
+    final firstName = exploreModel.userInfo?.name?.firstName ?? '';
+    final lastName = exploreModel.userInfo?.name?.lastName ?? '';
+    profileName.value = "$firstName $lastName".trim();
+    profileDate.value = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.createdAt ?? 0);
+    profileImageUrl.value = exploreModel.userInfo?.imageUrl ?? '';
+
+
+
+    // Update organization info if available
+    final org = exploreModel.orgId;
+    showOrganization.value = org != null;
+
+    if (org != null) {
+      orgName.value = org.orgName ?? 'N/A';
+      orgLocation.value = org.orgAddress?.city ?? 'N/A';
+      orgImageUrl.value = org.defaultImageUrl ?? 'N/A';
+      orgDate.value = ConstantsUtils.formatDate(org.createdAt);
+    }
+
+  }
+
   // Helper method to capitalize each word in a string
   String capitalizeEachWord(String text) {
     if (text.isEmpty) return text;
@@ -314,73 +414,13 @@ class DetailsPageController extends GetxController {
         .join(" ");
   }
 
-  String formatDateFromMillis(int millis) {
-    final date = DateTime.fromMillisecondsSinceEpoch(millis);
-    return "${date.day}-${date.month}-${date.year}";
-  }
+
 
   @override
   void dispose() {
     super.dispose();
   }
 
-  // Update values in getDetailsData
-  void updateRequestInfo(DonationRequestInfo? donationRequestInfo, UserInfo? userInfo) {
-    if (donationRequestInfo == null) return;
-
-    currentRequestType.value = donationRequestInfo.requestType ?? '';
-    print('Current request type: ${currentRequestType.value}');
-
-    if (currentRequestType.value == "podcast") {
-      final additionalInfo = donationRequestInfo.additionalInfo;
-      podcastDescription.value = additionalInfo?.interviewOrPanelDiscussion ?? 'N/A';
-      podcastName.value = additionalInfo?.podcastName ?? 'N/A';
-      podcastType.value = donationRequestInfo.requestedFor ?? 'N/A';
-      hostName.value = additionalInfo?.hostName ?? 'N/A';
-
-      // Set single podcast date for now
-      List<String> formattedDates = [];
-      if (additionalInfo.podcastDate > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate);
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-      }
-      if (additionalInfo.podcastDate1 > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1);
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-      }
-      if (additionalInfo.podcastDate2 > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2);
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-}
-      podcastDates.value = formattedDates.isNotEmpty? formattedDates : ["N/A"];
-
-      guestRequirements.value = donationRequestInfo.additionalInfo.preferredTopics?? 'N/A';
-
-      preferredLanguage.value = donationRequestInfo.additionalInfo.languages.join(', ')?? 'N/A';
-     // guestConfirmationDeadline.value = formatDateFromMillis(donationRequestInfo.guestConfirmationDeadline ?? 0);
-      expectedDuration.value = donationRequestInfo.additionalInfo.duration?? 'N/A';
-      commercial.value = donationRequestInfo.additionalInfo.preferredConsultationMode?? 'N/A';
-      stipendFee.value = donationRequestInfo.quantity.toString() ?? "N/A";
-    }
-
-    // Update profile info
-    final firstName = userInfo?.name.firstName ?? '';
-    final lastName = userInfo?.name.lastName ?? '';
-    profileName.value = "$firstName $lastName".trim();
-    profileDate.value = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.createdAt?? 0);
-    profileLocation.value = userInfo?.address.city ?? '';
-    profileImageUrl.value = userInfo?.imageUrl ?? '';
-
-    // Update organization info if available
-    final orgId = donationRequestInfo.orgId;
-    showOrganization.value = orgId != null;
-    if (showOrganization.value) {
-      orgName.value = orgId?.orgName ?? 'N/A';
-      orgLocation.value = orgId?.orgAddress?.city ?? '';
-      orgImageUrl.value = orgId?.defaultImageUrl ?? '';
-      orgDate.value = ConstantsUtils.formatDate(exploreModel.orgId?.createdAt);
-    }
-  }
 
   // Helper method
   String orNA(String? value) =>
@@ -391,6 +431,5 @@ class DetailsPageController extends GetxController {
     return orgId.id.toString().isEmpty;
   }
 
-
-
 }
+
