@@ -162,7 +162,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  ConstantsUtils().formatDate(donationData.donationRequestInfo!.createdAt) ?? 'N/A',
+                                  ConstantsUtils.formatDate(donationData.donationRequestInfo!.createdAt) ?? 'N/A',
                                   style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                               ],

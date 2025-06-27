@@ -59,7 +59,8 @@ class GenericApiService {
       {Map<String, dynamic>? params, String? token}) async {
     try {
       final url = '${AppEnvironment.baseApiUrl}$endpoint';
-      print('Making GET request to: $url');
+
+      // Create URI to properly encode query parameters
 
       final response = await _dio.get(
         url,
@@ -95,6 +96,9 @@ class GenericApiService {
       rethrow;
     }
   }
+
+
+
   // Put
   Future<T> put<T>(
       String endpoint,

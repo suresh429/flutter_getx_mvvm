@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:get/get.dart';
@@ -63,7 +65,7 @@ class _ExploreCardState extends State<ExploreCard> {
                     left: 8, // Position 8px from the left
                     child: Container(
                       padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(15),
@@ -89,10 +91,10 @@ class _ExploreCardState extends State<ExploreCard> {
                       ),
                       child: Obx(
                         // still OK, but rebuilds Column unnecessarily
-                        () => IconButton(
+                            () => IconButton(
                           onPressed: () {
                             widget.exploreModel.isFavorite.value =
-                                !widget.exploreModel.isFavorite.value;
+                            !widget.exploreModel.isFavorite.value;
                             controller.addToFav(
                                 [widget.exploreModel.id],
                                 widget.exploreModel.isFavorite.value
@@ -140,7 +142,7 @@ class _ExploreCardState extends State<ExploreCard> {
                           child: Text(
                             "${widget.exploreModel.city.isNotEmpty ? widget.exploreModel.city : 'Unknown City'}, ${widget.exploreModel.country.isNotEmpty ? widget.exploreModel.country : 'Unknown Country'}",
                             style:
-                                const TextStyle(fontSize: 12, color: Colors.grey),
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ),
                       ],
