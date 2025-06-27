@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../view_model/details_page_controller.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
@@ -11,6 +15,7 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
+  final DetailsPageController controller = Get.put(DetailsPageController());
   late final dynamic exploreModel;
   int _currentTabIndex = 0; // Track current tab
 
@@ -36,82 +41,189 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: DefaultTabController(
         length: 3,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                expandedHeight: 400,
+                expandedHeight: 380,
                 floating: false,
                 pinned: true,
                 elevation: 0,
-                toolbarHeight: kToolbarHeight,
                 backgroundColor: Colors.white,
-                title: Text(
-                  exploreModel?.title ?? "Request Details",
-                  style: const TextStyle(color: Colors.black),
-                ),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () => Get.back(),
                 ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite_outline, color: Colors.black),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert, color: Colors.black),
+                    onPressed: () {},
+                  ),
+                ],
+                title: const Text(
+                  "Request Details",
+                  style: TextStyle(color: Colors.black),
+                ),
                 flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.parallax,
                   background: Stack(
+                    fit: StackFit.loose,
                     children: [
                       // Banner Image
-                      Container(
-                        height: 280,
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: kToolbarHeight + 16),
-                        child: Image.asset(
-                          'assets/banner_image.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      // Header Card
                       Positioned(
-                        top: 140,
-                        left: 16,
-                        right: 16,
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: const BorderSide(color: Colors.grey, width: 1),
+                        top: kToolbarHeight,
+                        left: 0,
+                        right: 0,
+                        height: 150,
+                        child: Obx(() => Image.network(
+                          controller.imageUrl.value,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                            'assets/card_default_image.webp',
+                            fit: BoxFit.cover,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: _buildHeaderCard(),
+                        )),
+                      ),
+                      // White Card
+                      Positioned(
+                        top: kToolbarHeight + 80,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(() => Text(
+                                    controller.title.value,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                                      const SizedBox(width: 4),
+                                      Obx(() => Text(
+                                        controller.daysLeft.value,
+                                        style: const TextStyle(color: Colors.grey),
+                                      )),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Obx(() => Text(
+                                    controller.preferredTitle.value,
+                                    style: const TextStyle(color: Colors.grey),
+                                  )),
+                                  Obx(() => Text(
+                                    controller.preferredValue.value,
+                                    style: const TextStyle(color: Colors.black),
+                                  )),
+                                  const SizedBox(height: 12),
+                                  Obx(() => Text(
+                                    controller.languageTitle.value,
+                                    style: const TextStyle(color: Colors.grey),
+                                  )),
+                                  Obx(() => Row(
+                                    children: [
+                                      if (controller.languageTitle.value.contains("Mode"))
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 8.0),
+                                          child: Icon(Icons.videocam,
+                                            size: 20,
+                                            color: Colors.grey[600]
+                                          ),
+                                        ),
+                                      Expanded(
+                                        child: Text(
+                                          controller.languageValue.value,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Obx(() => Icon(
+                                            Icons.thumb_up_outlined,
+                                            color: controller.isLiked.value ? Colors.red : Colors.grey,
+                                          )),
+                                          const SizedBox(width: 4),
+                                          Obx(() => Text(controller.likeCount.toString())),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.comment_outlined),
+                                          const SizedBox(width: 4),
+                                          Obx(() => Text(controller.commentCount.toString())),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.share_outlined),
+                                          const SizedBox(width: 4),
+                                          Obx(() => Text(controller.shareCount.toString())),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
+
                     ],
                   ),
                 ),
                 bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(kToolbarHeight + 32),
-                  child: Column(
-                    children: [
-                      Container(
-                        color: Colors.white,
-                        child: TabBar(
-                          controller: _tabController,
-                          padding: EdgeInsets.zero,
-                          indicatorPadding: EdgeInsets.zero,
-                          labelPadding: const EdgeInsets.symmetric(horizontal: 16),
-                          tabs: const [
-                            Tab(text: 'Request Info'),
-                            Tab(text: 'Uploads (1)'),
-                            Tab(text: 'Comments'),
-                          ],
-                          labelColor: Colors.black,
-                          indicatorColor: Colors.red,
+                  preferredSize: const Size.fromHeight(48),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.black12,
+                          width: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 32),
-                    ],
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: Colors.black,
+                      tabs: const [
+                        Tab(text: 'Request Info'),
+                        Tab(text: 'Uploads'),
+                        Tab(text: 'Comments'),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -192,88 +304,357 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
     );
   }
 
+  Widget _buildHtmlDescription(String htmlContent) {
+    return Html(
+      data: htmlContent,
+      style: {
+        "body": Style(
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          fontSize: FontSize(14.0),
+          color: Colors.black87,
+        ),
+        "p": Style(
+          margin: Margins.only(bottom: 8),
+        ),
+        "li": Style(
+          margin: Margins.only(bottom: 8),
+        ),
+        "ul": Style(
+          margin: Margins.only(top: 8, bottom: 8),
+        ),
+        "ol": Style(
+          margin: Margins.only(top: 8, bottom: 8),
+        ),
+      },
+    );
+  }
+
   Widget _buildRequestInfo() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return SingleChildScrollView(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Description", style: TextStyle(fontWeight: FontWeight.bold)),
-          const Text("General Board Meeting"),
-          const SizedBox(height: 10),
-          const Text("Skills/ Expertise Needed", style: TextStyle(fontWeight: FontWeight.bold)),
-          Wrap(
-            spacing: 8,
-            children: const [
-              Chip(label: Text("Management")),
-              Chip(label: Text("Fundraising")),
-              Chip(label: Text("Operations")),
-            ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Obx(() {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Description",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Text(controller.podcastDescription.value,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                            height: 1.5,
+                          )
+                        ),
+                    const SizedBox(height: 24),
+
+                    const Text("Podcast Details",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem("Podcast Name", controller.podcastName.value),
+                    _buildDetailItem("Podcast Type", controller.podcastType.value),
+                    _buildDetailItem("Host Name", controller.hostName.value),
+
+                    const SizedBox(height: 16),
+                    const Text("Preferred Recording Slot(s)",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Obx( () {
+                        return  Text(controller.podcastDates.join("\n"),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          )
+                        );
+                      }
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Text("Guest Requirements",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 12),
+                    Text(controller.guestRequirements.value,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        height: 1.5,
+                      )
+                    ),
+
+                    const SizedBox(height: 24),
+                    Obx(() => _buildDetailItem(
+                      "Preferred Language",
+                      controller.preferredLanguage.value
+                    )),
+                    Obx(() => _buildDetailItem(
+                      "Deadline for Guest Confirmation",
+                      controller.guestConfirmationDeadline.value ?? ' N/A'
+                    )),
+                    Obx(() => _buildDetailItem(
+                      "Expected Duration",
+                      "${controller.expectedDuration.value}"
+                    )),
+                    Obx(() => _buildDetailItem(
+                      "Commercial",
+                      controller.commercial.value
+                    )),
+                    Obx(() => _buildDetailItem(
+                      "Speaker Fee",
+                      "\$${controller.stipendFee.value}"
+                    )),
+                  ],
+                );
+              }
+            ),
           ),
-          const SizedBox(height: 10),
-          const Text("Expected Time(hours/month): 26"),
-          const Text("Term length(Years): 3"),
-          const SizedBox(height: 10),
-          const Text("Personality Traits", style: TextStyle(fontWeight: FontWeight.bold)),
-          Wrap(
-            spacing: 8,
-            children: const [
-              Chip(label: Text("Trustworthy")),
-              Chip(label: Text("Approachable")),
-              Chip(label: Text("Diligent")),
-            ],
+
+          // Created By Card
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Obx(() {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Created By",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        )
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Obx(() {
+                            final imageUrl = controller.profileImageUrl.value;
+                            final profileInitial = controller.profileName.value.isNotEmpty
+                                ? controller.profileName.value[0].toUpperCase()
+                                : "A";
+
+                            return CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.green,
+                              backgroundImage: (imageUrl.isNotEmpty)
+                                  ? NetworkImage(imageUrl)
+                                  : null, // Only set if image is not empty
+                              child: (imageUrl.isEmpty)
+                                  ? Text(
+                                profileInitial,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                                  : null, // If image is loaded, no child needed
+                            );
+                          }),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(controller.profileName.value,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                  )
+                                ),
+                                const SizedBox(height: 4),
+                                Text(controller.profileDate.value,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey[600],
+                                  )
+                                ),
+                                const SizedBox(height: 4),
+                                Obx(() => Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on,
+                                      size: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      controller.profileLocation.value,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ))
+
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
-          const Text("Board Member Responsibilities"),
-          const Text("Test Responsibility"),
-          const SizedBox(height: 10),
-          const Text("Qualifications Required", style: TextStyle(fontWeight: FontWeight.bold)),
-          Wrap(
-            spacing: 8,
-            children: const [
-              Chip(label: Text("Experience in nonprofit management")),
-              Chip(label: Text("Financial expertise")),
-              Chip(label: Text("Legal expertise")),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Text("Requested Date", style: TextStyle(fontWeight: FontWeight.bold)),
-          const Text("December 17, 2025"),
-          const SizedBox(height: 20),
-          _buildInfoCard("Created By", "Harishwar Miryanam", "17-Jun-2025", "Hyderabad", Colors.purple, 'H'),
-          const SizedBox(height: 10),
-          _buildInfoCard("Beneficiary", "New Organization", "05-Jun-2025", "West Delhi", Colors.red, 'O'),
+          const SizedBox(height: 16),
+
+          // Beneficiary Card
+          Obx(() {
+            if (!controller.showOrganization.value) return const SizedBox.shrink();
+
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Beneficiary",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              controller.orgImageUrl.value,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Icon(
+                                Icons.business,
+                                color: Colors.grey[400],
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.orgName.value,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                controller.orgDate.value,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Obx(() => Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 14,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    controller.orgLocation.value,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildInfoCard(String title, String name, String date, String location, Color avatarColor, String initial) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const Divider(),
-            Row(
-              children: [
-                CircleAvatar(radius: 24, backgroundColor: avatarColor, child: Text(initial, style: const TextStyle(color: Colors.white))),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text(date),
-                    Row(children: [const Icon(Icons.location_on, size: 14), Text(location)])
-                  ],
-                )
-              ],
+  Widget _buildDetailItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
             )
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(value,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+            )
+          ),
+        ],
       ),
     );
   }
@@ -293,66 +674,125 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
   Widget _buildComments() {
     return Stack(
       children: [
-        SingleChildScrollView(
+        ListView(
           padding: const EdgeInsets.all(16).copyWith(bottom: 80),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(backgroundImage: AssetImage('assets/avatar.png')),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("LaLisa Manoban", style: TextStyle(fontWeight: FontWeight.bold)),
-                        const Text("20-Jun-2025 02:35 PM", style: TextStyle(fontSize: 12)),
-                        const SizedBox(height: 8),
-                        const Text("hi"),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: const [
-                            Text("Reply", style: TextStyle(color: Colors.blue)),
-                          ],
-                        ),
-                      ],
-                    ),
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CircleAvatar(
+                  backgroundImage: AssetImage('assets/avatar.png'),
+                  radius: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "LaLisa Manoban",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                "20-Jun-2025 02:02 PM",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_horiz),
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
+                            onSelected: (value) {
+                              // Handle menu item selection
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text("hi"),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Reply",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert, size: 20),
-                    onPressed: () {
-                      _showCommentOptionsDialog(context);
-                    },
-                  ),
-                ],
-              ),
-              const Divider(),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
           child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const CircleAvatar(backgroundImage: AssetImage('assets/avatar.png'), radius: 16),
-                const SizedBox(width: 8),
+                const CircleAvatar(
+                  backgroundImage: AssetImage('assets/avatar.png'),
+                  radius: 18,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Add a comment...",
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.send, color: Colors.red),
-                        onPressed: () {},
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      suffixIcon: Container(
+                        margin: const EdgeInsets.all(8),
+                        child: IconButton(
+                          icon: const Icon(Icons.send, color: Colors.red),
+                          onPressed: () {},
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
                   ),
                 ),

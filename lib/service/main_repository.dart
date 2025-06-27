@@ -1,4 +1,5 @@
 // services/main_repository.dart
+import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/model/CommonModel.dart' hide Data;
 import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
@@ -6,17 +7,17 @@ import 'package:flutter_getx_mvvm/model/LoginModel.dart';
 import 'package:flutter_getx_mvvm/model/ShareModel.dart' hide Data;
 import 'package:flutter_getx_mvvm/model/UserModel.dart' hide Data;
 import 'package:flutter_getx_mvvm/model/location_model.dart' hide Datum;
+import 'package:flutter_getx_mvvm/model/vote_leader_model.dart' as vote_leader;
 import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
 import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
 import 'package:flutter_getx_mvvm/payload/like_unlike_payload.dart';
 import 'package:flutter_getx_mvvm/payload/login_payload.dart';
 import 'package:flutter_getx_mvvm/payload/user_update_payload.dart';
-
-import '../model/vote_leader_model.dart';
+import 'package:flutter_getx_mvvm/utilites/constants_Utils.dart';
+import '../model/details_model.dart';
 import 'generic_api_service.dart';
 
 class MainRepository {
-
   final GenericApiService service = GenericApiService();
 
   static const String _login = "login";
@@ -28,20 +29,19 @@ class MainRepository {
   static const String _share = "donationRequest/analytics";
   static const String _user = "user";
   static const String _reminder = "donationRequest/reminder/donee";
+
   // Add new endpoint constants
   static const String _voteLeadersAction = "voteLeaders/action";
   static const String _voteLeaders = "users";
   static const String _cities = "cities";
   static const String changeUserName = "change/username";
 
-
-
   // Specific API methods using the generic methods
   Future<LoginModel> login(LoginPayload payload) async {
     return await service.post<LoginModel>(
       _login,
       payload.toJson(),
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
     );
   }
 
@@ -49,16 +49,19 @@ class MainRepository {
     return await service.post<CommonModel>(
       _inviteTalLeaders,
       payload.toJson(),
-          (data) => CommonModel.fromJson(data),
+      (data) => CommonModel.fromJson(data),
       token: token,
     );
   }
 
-  Future<CommonModel> likeUnlikeRequest(LikeUnlikePayload payload, String? token) async {
+  Future<CommonModel> likeUnlikeRequest(
+    LikeUnlikePayload payload,
+    String? token,
+  ) async {
     return await service.post<CommonModel>(
       _likeUnlike,
       payload.toJson(),
-          (data) => CommonModel.fromJson(data),
+      (data) => CommonModel.fromJson(data),
       token: token,
     );
   }
@@ -68,22 +71,23 @@ class MainRepository {
     return await service.put<ShareModel>(
       '$_share/$id/share',
       emptyPayload,
-          (data) => ShareModel.fromJson(data),
+      (data) => ShareModel.fromJson(data),
       token: token,
     );
   }
 
-  Future<LoginModel> managePreferencesRequest(String? token, String? userId, UserUpdatePayload payload) async {
+  Future<LoginModel> managePreferencesRequest(
+    String? token,
+    String? userId,
+    UserUpdatePayload payload,
+  ) async {
     return await service.put<LoginModel>(
       '$_user/$userId',
       payload.toJson(),
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
-
-
-
 
   // In your repository
   Future<UserModel> getProfile(String uniqueId) async {
@@ -91,7 +95,7 @@ class MainRepository {
       print('Making API call to user endpoint with ID: $uniqueId');
       return await service.get<UserModel>(
         '$_user/$uniqueId',
-            (data) => UserModel.fromJson(data),
+        (data) => UserModel.fromJson(data),
       );
     } catch (e) {
       print('Repository error: $e');
@@ -99,24 +103,24 @@ class MainRepository {
     }
   }
 
-
-
   // get cities
   Future<List<LocationModel>> fetchCities(String? keyword) async {
-    final params = {
-    'limit': 10,
-    'keyword': keyword,
-    };
+    final params = {'limit': 10, 'keyword': keyword};
     final data = await service.get<Map<String, dynamic>>(
       _cities,
-          (data) => data,
+      (data) => data,
       params: params,
     );
-    return (data['data'] as List).map((explore) => LocationModel.fromJson(explore)).toList();
+    return (data['data'] as List)
+        .map((explore) => LocationModel.fromJson(explore))
+        .toList();
   }
 
-
-  Future<List<ExploreModel>> fetchRecommendations(String? uniqueId, String requestType, String language) async {
+  Future<List<ExploreModel>> fetchRecommendations(
+    String? uniqueId,
+    String requestType,
+    String language,
+  ) async {
     final params = {
       'limit': 3,
       'user_id': uniqueId,
@@ -129,17 +133,19 @@ class MainRepository {
     };
     final data = await service.get<Map<String, dynamic>>(
       _donationRequest,
-          (data) => data,
+      (data) => data,
       params: params,
     );
-    return (data['data'] as List).map((explore) => ExploreModel.fromJson(explore)).toList();
+    return (data['data'] as List)
+        .map((explore) => ExploreModel.fromJson(explore))
+        .toList();
   }
 
   Future<CommonModel> addToFavorite(FavPayload payload, String? token) async {
     return await service.post<CommonModel>(
       _addToFav,
       payload.toJson(),
-          (data) => CommonModel.fromJson(data['data']),
+      (data) => CommonModel.fromJson(data['data']),
       token: token,
     );
   }
@@ -167,13 +173,13 @@ class MainRepository {
     };
     final data = await service.get<Map<String, dynamic>>(
       _donationRequest,
-          (data) => data,
+      (data) => data,
       params: params,
     );
-    return (data['data'] as List).map((item) => ExploreModel.fromJson(item)).toList();
+    return (data['data'] as List)
+        .map((item) => ExploreModel.fromJson(item))
+        .toList();
   }
-
-
 
   // Fetch donation requests
   Future<List<DonationRequestResponse>> fetchActivityRequests({
@@ -192,27 +198,31 @@ class MainRepository {
     };
     final data = await service.get<Map<String, dynamic>>(
       _donationRequestResponse,
-          (data) => data,
+      (data) => data,
       params: params,
     );
-    return (data['data'] as List).map((item) => DonationRequestResponse.fromJson(item)).toList();
+    return (data['data'] as List)
+        .map((item) => DonationRequestResponse.fromJson(item))
+        .toList();
   }
-
 
   Future<CommonModel> reminderPost(String requestId, String? token) async {
     return await service.post<CommonModel>(
       _reminder,
       {"requestId": requestId},
-          (data) => CommonModel.fromJson(data),
+      (data) => CommonModel.fromJson(data),
       token: token,
     );
   }
 
-  Future<DonationRequestResponseData> reminderPut(String requestId, String? token) async {
+  Future<DonationRequestResponseData> reminderPut(
+    String requestId,
+    String? token,
+  ) async {
     return await service.put<DonationRequestResponseData>(
       '$_donationRequestResponse/$requestId',
       {"reminderSent": true},
-          (data) => DonationRequestResponseData.fromJson(data),
+      (data) => DonationRequestResponseData.fromJson(data),
       token: token,
     );
   }
@@ -224,13 +234,8 @@ class MainRepository {
     );
   }
 
-
-
-
-
-
   // Fetch vote leaders
-  Future<List<Datum>> fetchVoteLeaders({
+  Future<List<vote_leader.Datum>> fetchVoteLeaders({
     required String profileVerificationStatus,
     required int limit,
     required int offset,
@@ -247,34 +252,27 @@ class MainRepository {
       'inactiveUsers': 'yes',
       'sortBy': sortBy,
       'sortOrder': sortOrder,
-
     };
 
     final data = await service.get<Map<String, dynamic>>(
       _voteLeaders,
-          (data) => data,
+      (data) => data,
       params: params,
     );
-    return (data['data'] as List).map((item) => Datum.fromJson(item)).toList();
+    return (data['data'] as List)
+        .map((item) => vote_leader.Datum.fromJson(item))
+        .toList();
   }
 
-
-
-
-
-
-
-// Like a leader
+  // Like a leader
   Future<CommonModel> likeLeader(String? token, String id) async {
     return await service.put<CommonModel>(
       'user/$id/like',
       null, // No payload
-          (data) => CommonModel.fromJson(data),
+      (data) => CommonModel.fromJson(data),
       token: token,
     );
   }
-
-
 
   // unLike a leader
   Future<CommonModel> unLikeLeader(String? id, String token) async {
@@ -282,64 +280,81 @@ class MainRepository {
     return CommonModel.fromJson(data);
   }
 
-
-
-// Approve or reject a leader
-  Future<CommonModel> approveRejectLeader(String leaderId, Map<String, dynamic> payload, String? token) async {
+  // Approve or reject a leader
+  Future<CommonModel> approveRejectLeader(
+    String leaderId,
+    Map<String, dynamic> payload,
+    String? token,
+  ) async {
     return await service.post<CommonModel>(
       '$_voteLeadersAction/$leaderId/approve-reject',
       payload,
-          (data) => CommonModel.fromJson(data),
+      (data) => CommonModel.fromJson(data),
       token: token,
     );
   }
 
-
-
-// update profile
-  Future<LoginModel> updateProfileRequest(String? token, String? userId, Map<String, dynamic> payload) async {
+  // update profile
+  Future<LoginModel> updateProfileRequest(
+    String? token,
+    String? userId,
+    Map<String, dynamic> payload,
+  ) async {
     return await service.put<LoginModel>(
       '$_user/$userId',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
-
-// update profile URL
-  Future<LoginModel> updateProfileUrlRequest(String? token, Map<String, dynamic> payload) async {
+  // update profile URL
+  Future<LoginModel> updateProfileUrlRequest(
+    String? token,
+    Map<String, dynamic> payload,
+  ) async {
     return await service.post<LoginModel>(
       changeUserName,
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
   // update public profile
-  Future<LoginModel> updatePublicProfileRequest(String? token, Map<String, dynamic> payload,String? userId) async {
+  Future<LoginModel> updatePublicProfileRequest(
+    String? token,
+    Map<String, dynamic> payload,
+    String? userId,
+  ) async {
     return await service.put<LoginModel>(
       '$_user/$userId',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
-
   // update Honors and Awards
-  Future<LoginModel> updateHonorsAndAwards(String? token, Map<String, dynamic> payload,String? userId) async {
+  Future<LoginModel> updateHonorsAndAwards(
+    String? token,
+    Map<String, dynamic> payload,
+    String? userId,
+  ) async {
     return await service.put<LoginModel>(
       '$_user/$userId/achievements',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
   // delete Honors and Awards
-  Future<Map<String, dynamic>> deleteHonorsAndAwards(String? userId,String? requestId, String? token) async {
+  Future<Map<String, dynamic>> deleteHonorsAndAwards(
+    String? userId,
+    String? requestId,
+    String? token,
+  ) async {
     return await service.delete(
       '$_user/$userId/achievements/$requestId',
       token: token,
@@ -347,30 +362,38 @@ class MainRepository {
   }
 
   // update Experience
-  Future<LoginModel> updateExperience(String? token, Map<String, dynamic> payload,String? userId) async {
+  Future<LoginModel> updateExperience(
+    String? token,
+    Map<String, dynamic> payload,
+    String? userId,
+  ) async {
     return await service.put<LoginModel>(
       '$_user/$userId/experience',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
   // delete Experience
-  Future<Map<String, dynamic>> deleteExperience(String? userId,String? requestId, String? token) async {
+  Future<Map<String, dynamic>> deleteExperience(
+    String? userId,
+    String? requestId,
+    String? token,
+  ) async {
     return await service.delete(
       '$_user/$userId/experience/$requestId',
       token: token,
     );
   }
 
-// get public profile
+  // get public profile
   Future<Data> getPublicProfile(String uniqueId) async {
     try {
       print('Making API call to user endpoint with ID: $uniqueId');
       return await service.get<Data>(
         '$_user/$uniqueId',
-            (data) => Data.fromJson(data),
+        (data) => Data.fromJson(data),
       );
     } catch (e) {
       print('Repository error: $e');
@@ -378,25 +401,58 @@ class MainRepository {
     }
   }
 
-
   // change password
-  Future<LoginModel> changePassword(String? token, Map<String, dynamic> payload) async {
+  Future<LoginModel> changePassword(
+    String? token,
+    Map<String, dynamic> payload,
+  ) async {
     return await service.post<LoginModel>(
       'change/user/password',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
   // change password
-  Future<LoginModel> disbandUser(String? token, Map<String, dynamic> payload) async {
+  Future<LoginModel> disbandUser(
+    String? token,
+    Map<String, dynamic> payload,
+  ) async {
     return await service.post<LoginModel>(
       'disband/user',
       payload,
-          (data) => LoginModel.fromJson(data),
+      (data) => LoginModel.fromJson(data),
       token: token,
     );
   }
 
+  // details page data
+  Future<List<Datum>> getDetailsData({
+    required String uniqueId,
+    required String requestType,
+    required String requestId,
+  }) async {
+    final params = {
+      'requestType': requestType,
+      'donationRequestId': requestId,
+      'userId': uniqueId,
+    };
+
+    final response = await service.get<Map<String, dynamic>>(
+      _donationRequestResponse,
+      (data) => data,
+      params: params,
+    );
+
+    print('params : $params');
+
+    if (response['data'] is List) {
+      return (response['data'] as List)
+          .map((item) => Datum.fromJson(item))
+          .toList();
+    } else {
+      return [];
+    }
+  }
 }
