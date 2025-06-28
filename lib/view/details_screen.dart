@@ -142,12 +142,14 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
                                   )),
                                   Obx(() => Row(
                                     children: [
-                                      if (controller.languageTitle.value.contains("Mode"))
+                                      if (controller.currentRequestType.value == "podcast" &&
+                                          controller.languageTitle.value.contains("Mode"))
                                         Padding(
                                           padding: const EdgeInsets.only(right: 8.0),
-                                          child: Icon(Icons.videocam,
+                                          child: Icon(
+                                            Icons.videocam,
                                             size: 20,
-                                            color: Colors.grey[600]
+                                            color: Colors.grey[600],
                                           ),
                                         ),
                                       Expanded(
@@ -339,6 +341,109 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
           Container(
             padding: const EdgeInsets.all(16),
             child: Obx(() {
+              if (controller.currentRequestType.value == "eventSpeaker") {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Description",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Text(controller.speakerDescription.value,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        height: 1.5,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Event Details",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem("Event Name", controller.eventName.value),
+                    _buildDetailItem("Event Type", controller.eventType.value),
+
+                    const Divider(height: 32),
+
+                    const Text("Event Location",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem("Venue Name", controller.venueName.value),
+                    _buildDetailItem("Location", controller.eventLocation.value),
+
+                    const Divider(height: 32),
+
+                    const Text("Speaker Requirements",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem("Speaker Responsibilities", controller.speakerResponsibilities.value),
+
+                    const Text("Qualifications Required",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.speakerQualifications.map((qual) =>
+                        Chip(
+                          label: Text(qual),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildDetailItem("Preferred Speaking Topics", controller.speakerTopics.value),
+                    _buildDetailItem("Expected Duration of Speech (minutes)", controller.speakerDuration.value),
+                    _buildDetailItem("Audience Size", controller.audienceSize.value),
+                    _buildDetailItem("Commercials", controller.commercialMode.value),
+                    _buildDetailItem("Speaker Fee", controller.speakerFee.value),
+
+                    const Text("Preferred Languages",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.speakerLanguages.map((lang) =>
+                        Chip(
+                          label: Text(lang),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildDetailItem("Deadline for Speaker Confirmation", controller.speakerDeadline.value),
+                  ],
+                );
+              } else if (controller.currentRequestType.value == "podcast") {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -361,7 +466,7 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
 
                     const Text("Podcast Details",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       )
@@ -417,7 +522,7 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
                       controller.guestConfirmationDeadline.value ?? ' N/A'
                     )),
                     Obx(() => _buildDetailItem(
-                      "Expected Duration",
+                      "Expected Duration of Speech (minutes)",
                       "${controller.expectedDuration.value}"
                     )),
                     Obx(() => _buildDetailItem(
@@ -430,8 +535,247 @@ class _DetailsScreenState extends State<DetailsScreen> with SingleTickerProvider
                     )),
                   ],
                 );
+              } else if (controller.currentRequestType.value == "mentoring") {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Description",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.mentorDescription.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Mentor Responsibilities",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.mentorResponsibilities.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Qualifications Required",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.mentorQualifications.map((qual) =>
+                        Chip(
+                          label: Text(qual),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Mentor Mode",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(controller.mentorMode.value,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        )
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Expected Time Commitment (hours/month)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.mentorExpectedTime.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Deadline",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.mentorDeadline.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                  ],
+                );
+              } else {
+                // Board Member case
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Description",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.boardDescription.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Skills & Expertise Needed",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.boardExpertise.map((skill) =>
+                        Chip(
+                          label: Text(skill),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Expected Time (hours/year)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.boardExpectedTime.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Term Length (years)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.boardTermLength.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Personal Traits",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.boardPersonalTraits.map((trait) =>
+                        Chip(
+                          label: Text(trait),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Board Member Responsibilities",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.boardResponsibilities.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Qualifications Required",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: controller.boardQualifications.map((qual) =>
+                        Chip(
+                          label: Text(qual),
+                          backgroundColor: Colors.grey[200],
+                        )
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text("Request End Date",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(controller.boardEndDate.value,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      )
+                    ),
+                  ],
+                );
               }
-            ),
+              return Container();
+            }),
           ),
 
           // Created By Card

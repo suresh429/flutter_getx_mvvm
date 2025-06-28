@@ -217,11 +217,23 @@ class AdditionalInfo {
         this.preferredTopics,
         this.languages,
         this.podcastDate2,
+        this.speakerDeadline,
         this.interviewOrPanelDiscussion,
         this.format,
         this.podcastName,
         this.podcastDate1,
         this.podcastWebsite,
+        this.speakerResponsibilities,
+        this.speakingTopics,
+        this.speechduration,
+        this.preferredCommercialMode,
+        this.socialProblem,
+        this.numberOfCommitsPerYear,
+        this.termLength,
+        this.responsibilities,
+        this.qualificationsRequired,
+        this.functionalExpertise,
+        this.personalTraits,
     });
 
     int? podcastDate;
@@ -231,11 +243,23 @@ class AdditionalInfo {
     String? preferredTopics;
     List<String>? languages;
     int? podcastDate2;
+    int? speakerDeadline;
     String? interviewOrPanelDiscussion;
     String? format;
     String? podcastName;
     int? podcastDate1;
     String? podcastWebsite;
+    String? speakerResponsibilities;
+    String? speakingTopics;
+    String? speechduration;
+    String? preferredCommercialMode;
+    String? socialProblem;
+    String? numberOfCommitsPerYear;
+    String? termLength;
+    String? responsibilities;
+    List<String>? qualificationsRequired;
+    List<String>? functionalExpertise;
+    List<String>? personalTraits;
 
     factory AdditionalInfo.fromJson(Map<dynamic, dynamic> json) => AdditionalInfo(
         podcastDate: json["podcastDate"] as int?,
@@ -245,11 +269,24 @@ class AdditionalInfo {
         preferredTopics: json["preferredTopics"] as String?,
         languages: json["languages"] != null ? List<String>.from(json["languages"].map((x) => x as String)) : [],
         podcastDate2: json["podcastDate2"] as int?,
+        speakerDeadline: json["speakerDeadline"] as int?,
         interviewOrPanelDiscussion: json["interviewOrPanelDiscussion"] as String?,
         format: json["format"] as String?,
         podcastName: json["podcastName"] as String?,
         podcastDate1: json["podcastDate1"] as int?,
         podcastWebsite: json["podcastWebsite"] as String?,
+        speakerResponsibilities: json["speakerResponsibilities"] as String?,
+        speakingTopics: json["speakingTopics"] as String?,
+        speechduration: json["speechduration"] as String?,
+        preferredCommercialMode: json["preferredCommercialMode"] as String?,
+        socialProblem: json["socialProblem"] as String?,
+        numberOfCommitsPerYear: json["numberOfCommitsPerYear"] as String?,
+        termLength: json["termLength"] as String?,
+        responsibilities: json["responsibilities"] as String?,
+        qualificationsRequired: json["qualificationsRequired"] != null ? List<String>.from(json["qualificationsRequired"].map((x) => x as String)) : [],
+        functionalExpertise: json["functionalExpertise"] != null ? List<String>.from(json["functionalExpertise"].map((x) => x as String)) : [],
+        personalTraits: json["personalTraits"] != null ? List<String>.from(json["personalTraits"].map((x) => x as String)) : [],
+
     );
 
     Map<dynamic, dynamic> toJson() => {
@@ -260,11 +297,23 @@ class AdditionalInfo {
         "preferredTopics": preferredTopics,
         "languages": languages != null ? List<dynamic>.from(languages!.map((x) => x)) : [],
         "podcastDate2": podcastDate2,
+        "speakerDeadline": speakerDeadline,
         "interviewOrPanelDiscussion": interviewOrPanelDiscussion,
         "format": format,
         "podcastName": podcastName,
         "podcastDate1": podcastDate1,
         "podcastWebsite": podcastWebsite,
+        "speakerResponsibilities": speakerResponsibilities,
+        "speakingTopics": speakingTopics,
+        "speechduration": speechduration,
+        "preferredCommercialMode": preferredCommercialMode,
+        "socialProblem": socialProblem,
+        "numberOfCommitsPerYear": numberOfCommitsPerYear,
+        "termLength": termLength,
+        "responsibilities": responsibilities,
+        "qualificationsRequired": qualificationsRequired != null ? List<dynamic>.from(qualificationsRequired!.map((x) => x)) : [],
+        "functionalExpertise": functionalExpertise != null ? List<dynamic>.from(functionalExpertise!.map((x) => x)) : [],
+        "personalTraits": personalTraits != null ? List<dynamic>.from(personalTraits!.map((x) => x)) : [],
     };
 }
 
