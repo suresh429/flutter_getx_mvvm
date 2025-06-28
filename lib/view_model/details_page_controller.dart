@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import '../model/ExploreModel.dart';
 import '../model/LoginModel.dart';
@@ -17,7 +18,7 @@ class DetailsPageController extends GetxController {
   RxString errorMessage = ''.obs;
   final MainRepository repository = MainRepository(); // API service instance
   final ConnectivityService connectivityService =
-  Get.find<ConnectivityService>(); // Connectivity service instance
+      Get.find<ConnectivityService>(); // Connectivity service instance
 
   // Add currentRequestType
   RxString currentRequestType = ''.obs;
@@ -115,7 +116,6 @@ class DetailsPageController extends GetxController {
     super.onInit();
     initializeController();
 
-
     exploreModel = Get.arguments as ExploreModel;
     print('Received title: ${exploreModel.title}');
     print('Received requestType: ${exploreModel.requestType}');
@@ -130,18 +130,27 @@ class DetailsPageController extends GetxController {
 
       List<String> formattedDates = [];
 
-      if (additionalInfo.podcastDate != null && additionalInfo.podcastDate! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate!);
+      if (additionalInfo.podcastDate != null &&
+          additionalInfo.podcastDate! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(
+          additionalInfo.podcastDate!,
+        );
         formattedDates.add(ConstantsUtils.formatDateTime(date));
       }
 
-      if (additionalInfo.podcastDate1 != null && additionalInfo.podcastDate1! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1!);
+      if (additionalInfo.podcastDate1 != null &&
+          additionalInfo.podcastDate1! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(
+          additionalInfo.podcastDate1!,
+        );
         formattedDates.add(ConstantsUtils.formatDateTime(date));
       }
 
-      if (additionalInfo.podcastDate2 != null && additionalInfo.podcastDate2! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2!);
+      if (additionalInfo.podcastDate2 != null &&
+          additionalInfo.podcastDate2! > 0) {
+        final date = DateTime.fromMillisecondsSinceEpoch(
+          additionalInfo.podcastDate2!,
+        );
         formattedDates.add(ConstantsUtils.formatDateTime(date));
       }
 
@@ -159,10 +168,8 @@ class DetailsPageController extends GetxController {
     commentCount.value = exploreModel.commentsCount ?? 0;
     shareCount.value = exploreModel.sharesCount.value ?? 0;
 
-
     updateRequestInfo();
     updateDetailsData();
-
   }
 
   // initialize
@@ -223,9 +230,8 @@ class DetailsPageController extends GetxController {
   //   }
   // }
 
-
   void updateDetailsData() {
-    final requestType =   exploreModel.requestType ?? '';
+    final requestType = exploreModel.requestType ?? '';
     print('Received title: $requestType');
     if (requestType == "podcast") {
       // Update titles
@@ -235,7 +241,8 @@ class DetailsPageController extends GetxController {
       // Format podcast date
       final podcastDate = exploreModel.dueDate;
       if (podcastDate != null && podcastDate > 0) {
-        preferredValue.value = ConstantsUtils.convertMillisecondsToFormattedDate(podcastDate);
+        preferredValue.value =
+            ConstantsUtils.convertMillisecondsToFormattedDate(podcastDate);
       } else {
         preferredValue.value = "N/A";
       }
@@ -247,40 +254,41 @@ class DetailsPageController extends GetxController {
       } else {
         languageValue.value = "No format available";
       }
-
-    }
-    else if (requestType == "eventSpeaker") {
+    } else if (requestType == "eventSpeaker") {
       // Update titles
       preferredTitle.value = "Event Dates:";
       languageTitle.value = "Event Mode:";
 
       // Format event dates
-      final startDate = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.startDate ?? 0);
-      final endDate = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.dueDate ?? 0);
+      final startDate = ConstantsUtils.convertMillisecondsToFormattedDate2(
+        exploreModel.startDate ?? 0,
+      );
+      final endDate = ConstantsUtils.convertMillisecondsToFormattedDate2(
+        exploreModel.dueDate ?? 0,
+      );
       preferredValue.value = "$startDate-$endDate";
 
       // Format event mode
-      final mode = exploreModel.format;
+      final mode = exploreModel.preferredConsultationMode;
       if (mode.isNotEmpty) {
         languageValue.value = capitalizeEachWord(mode);
       } else {
         languageValue.value = "No format available";
       }
-
     } else if (requestType == "mentoring") {
       // Update titles
       preferredTitle.value = "Preferred Industry:";
       languageTitle.value = "Preferred Language:";
 
       // Format industry
-      final requestedFor =   exploreModel.requestedFor;
+      final requestedFor = exploreModel.requestedFor;
       if (requestedFor != null && requestedFor.isNotEmpty) {
         preferredValue.value = ConstantsUtils.capitalizeFirst(requestedFor);
       } else {
         preferredValue.value = "N/A";
       }
 
-      final langs =   exploreModel.additionalInfo?.languages;
+      final langs = exploreModel.additionalInfo?.languages;
       print("object $langs");
       if (langs != null && langs.isNotEmpty) {
         languageValue.value = langs
@@ -289,7 +297,6 @@ class DetailsPageController extends GetxController {
       } else {
         languageValue.value = "N/A";
       }
-
     } else {
       // Default case (board member)
       preferredTitle.value = "Preferred Industry:";
@@ -301,26 +308,25 @@ class DetailsPageController extends GetxController {
           .join(", ");
       preferredValue.value = expertise.isNotEmpty ? expertise : "N/A";
 
-      final langs = exploreModel.additionalInfo?.languages
-          ?.whereType<String>()
-          .map(ConstantsUtils.capitalizeFirst)
-          .toList();
+      final langs =
+          exploreModel.additionalInfo?.languages
+              ?.whereType<String>()
+              .map(ConstantsUtils.capitalizeFirst)
+              .toList();
 
-      languageValue.value = (langs != null && langs.isNotEmpty)
-          ? langs.join(", ")
-          : "N/A";
-
+      languageValue.value =
+          (langs != null && langs.isNotEmpty) ? langs.join(", ") : "N/A";
     }
 
     // Update UI states based on scholarship and favorites
-    isScholarshipApplied.value = exploreModel.isScholarshipApplied.value ?? false;
+    isScholarshipApplied.value =
+        exploreModel.isScholarshipApplied.value ?? false;
     showInterestSent.value = isScholarshipApplied.value;
     showConnectButton.value = !isScholarshipApplied.value;
     showWithdrawButton.value = isScholarshipApplied.value;
 
     isFavorite.value = exploreModel.isFavorite.value;
     isLiked.value = exploreModel.isLike.value;
-
   }
 
   // Update values in getDetailsData
@@ -328,12 +334,12 @@ class DetailsPageController extends GetxController {
     currentRequestType.value = exploreModel.requestType;
     print('Current request type: ${currentRequestType.value}');
 
-
     /// PODCAST
     if (currentRequestType.value == "podcast") {
       final additionalInfo = exploreModel.additionalInfo;
 
-      podcastDescription.value = additionalInfo?.interviewOrPanelDiscussion ?? 'N/A';
+      podcastDescription.value =
+          additionalInfo?.interviewOrPanelDiscussion ?? 'N/A';
       podcastName.value = additionalInfo?.podcastName ?? 'N/A';
       podcastType.value = exploreModel.requestedFor;
       hostName.value = additionalInfo?.hostName ?? 'N/A';
@@ -343,18 +349,27 @@ class DetailsPageController extends GetxController {
 
         List<String> formattedDates = [];
 
-        if (additionalInfo.podcastDate != null && additionalInfo.podcastDate! > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate!);
+        if (additionalInfo.podcastDate != null &&
+            additionalInfo.podcastDate! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(
+            additionalInfo.podcastDate!,
+          );
           formattedDates.add(ConstantsUtils.formatDateTime(date));
         }
 
-        if (additionalInfo.podcastDate1 != null && additionalInfo.podcastDate1! > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate1!);
+        if (additionalInfo.podcastDate1 != null &&
+            additionalInfo.podcastDate1! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(
+            additionalInfo.podcastDate1!,
+          );
           formattedDates.add(ConstantsUtils.formatDateTime(date));
         }
 
-        if (additionalInfo.podcastDate2 != null && additionalInfo.podcastDate2! > 0) {
-          final date = DateTime.fromMillisecondsSinceEpoch(additionalInfo.podcastDate2!);
+        if (additionalInfo.podcastDate2 != null &&
+            additionalInfo.podcastDate2! > 0) {
+          final date = DateTime.fromMillisecondsSinceEpoch(
+            additionalInfo.podcastDate2!,
+          );
           formattedDates.add(ConstantsUtils.formatDateTime(date));
         }
 
@@ -368,19 +383,107 @@ class DetailsPageController extends GetxController {
         preferredIndustry.value = additionalInfo.preferredTopics ?? 'N/A';
       }
 
-
       guestRequirements.value = additionalInfo?.preferredTopics ?? 'N/A';
-      preferredLanguage.value = ((additionalInfo?.languages?.isNotEmpty ?? false)
-          ? additionalInfo!.languages?.join(', ')
-          : 'N/A')!;
-
+      preferredLanguage.value =
+          ((additionalInfo?.languages?.isNotEmpty ?? false)
+              ? additionalInfo!.languages?.join(', ')
+              : 'N/A')!;
 
       expectedDuration.value = additionalInfo?.duration ?? 'N/A';
       commercial.value = additionalInfo?.preferredConsultationMode ?? 'N/A';
       stipendFee.value = exploreModel.quantity?.toString() ?? 'N/A';
+    } else if (currentRequestType.value == "eventSpeaker") {
+      final additionalInfo = exploreModel.additionalInfo;
+
+      speakerDescription.value = exploreModel.description;
+      eventName.value = exploreModel.eventName ?? 'N/A';
+      eventType.value = exploreModel.requestedFor;
+      venueName.value = '${exploreModel.shippingAddress?.line1}';
+
+      final addressParts = [
+        exploreModel.shippingAddress?.city,
+        exploreModel.shippingAddress?.state,
+        exploreModel.shippingAddress?.country
+      ].where((e) => e != null && e.isNotEmpty).toList();
+
+      eventLocation.value = addressParts.isNotEmpty
+          ? addressParts.join(", ")
+          : "N/A";
+
+      speakerResponsibilities.value = additionalInfo?.speakerResponsibilities ?? 'N/A';
+      final qualifications = additionalInfo?.qualificationsRequired;
+      speakerQualifications.value = (qualifications != null && qualifications.isNotEmpty)
+          ? qualifications
+          : ["No qualifications available"];
+
+      speakerTopics.value = additionalInfo?.speakingTopics ?? 'N/A';
+      speakerDuration.value = additionalInfo?.speechduration ?? 'N/A';
+      audienceSize.value = exploreModel.size != null ? exploreModel.size.toString() : 'N/A';
+      commercialMode.value = additionalInfo?.preferredCommercialMode ?? 'N/A';
+
+      // Handle languages
+      speakerLanguages.value = exploreModel.languages;
+
+      final deadline = additionalInfo?.speakerDeadline;
+      speakerDeadline.value = (deadline != null && deadline > 0)
+          ? ConstantsUtils.convertMillisecondsToFormattedDate2(deadline)
+          : 'N/A';
+
+      // Format speaker fee
+      final symbol = (exploreModel.units.toLowerCase() == "usd") ? "\$" : "₹";
+      speakerFee.value = exploreModel.quantity != null
+          ? "$symbol ${exploreModel.quantity}"
+          : "N/A";
     }
+    else if (currentRequestType.value == "mentoring") {
+      mentorDescription.value = exploreModel.description;
+      mentorResponsibilities.value = exploreModel.whyYouNeedHelp ?? 'N/A';
+      mentorExpectedTime.value = exploreModel.additionalInfo?.socialProblem != null
+          ? "${exploreModel.additionalInfo!.socialProblem} hrs / months"
+          : "N/A";
+      mentorMode.value = exploreModel.additionalInfo?.preferredConsultationMode ?? 'N/A';
+      mentorDeadline.value = exploreModel.dueDate != null && exploreModel.dueDate! > 0
+          ? ConstantsUtils.convertMillisecondsToFormattedDate2(exploreModel.dueDate!)
+          : 'N/A';
 
+      // Handle qualifications similar to eventSpeaker
+      mentorQualifications.value = exploreModel.additionalInfo?.qualificationsRequired is List
+          ? (exploreModel.additionalInfo!.qualificationsRequired as List).whereType<String>().toList()
+          : exploreModel.additionalInfo?.qualificationsRequired is String
+              ? [exploreModel.additionalInfo!.qualificationsRequired as String]
+              : ["N/A"];
+    } else {
+      // Board Member case
+      boardDescription.value = exploreModel.description ?? 'N/A';
 
+      // Handle functional expertise
+      boardExpertise.value = exploreModel.additionalInfo?.functionalExpertise
+          ?.map((e) => e ?? 'N/A')
+          ?.toList() ?? [];
+
+      boardExpectedTime.value = exploreModel.additionalInfo?.numberOfCommitsPerYear ?? 'N/A';
+      boardTermLength.value = exploreModel.additionalInfo?.termLength ?? 'N/A';
+
+      // Handle personal traits
+      boardPersonalTraits.value = exploreModel.additionalInfo?.personalTraits
+          ?.map((e) => e ?? 'N/A')
+          ?.toList() ?? [];
+
+      boardResponsibilities.value = exploreModel.additionalInfo?.responsibilities ?? 'N/A';
+
+      // Handle qualifications similar to eventSpeaker
+      boardQualifications.value = exploreModel.additionalInfo?.qualificationsRequired is List
+          ? (exploreModel.additionalInfo!.qualificationsRequired as List).whereType<String>().toList()
+          : exploreModel.additionalInfo?.qualificationsRequired is String
+          ? [exploreModel.additionalInfo!.qualificationsRequired as String]
+          : ["No qualifications available"];
+
+      // Format end date
+      boardEndDate.value = (exploreModel.dueDate ?? 0) > 0
+          ? ConstantsUtils.convertMillisecondsToFormattedDate2(exploreModel.dueDate!)
+          : 'N/A';
+
+    }
 
     // Update profile info
     profileLocation.value = exploreModel.userInfo?.address?.city ?? '';
@@ -388,10 +491,10 @@ class DetailsPageController extends GetxController {
     final firstName = exploreModel.userInfo?.name?.firstName ?? '';
     final lastName = exploreModel.userInfo?.name?.lastName ?? '';
     profileName.value = "$firstName $lastName".trim();
-    profileDate.value = ConstantsUtils.convertMillisecondsToFormattedDate(exploreModel.createdAt ?? 0);
+    profileDate.value = ConstantsUtils.convertMillisecondsToFormattedDate(
+      exploreModel.createdAt ?? 0,
+    );
     profileImageUrl.value = exploreModel.userInfo?.imageUrl ?? '';
-
-
 
     // Update organization info if available
     final org = exploreModel.orgId;
@@ -403,24 +506,26 @@ class DetailsPageController extends GetxController {
       orgImageUrl.value = org.defaultImageUrl ?? 'N/A';
       orgDate.value = ConstantsUtils.formatDate(org.createdAt);
     }
-
   }
 
   // Helper method to capitalize each word in a string
   String capitalizeEachWord(String text) {
     if (text.isEmpty) return text;
-    return text.split(" ")
-        .map((word) => word.isEmpty ? "" : "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}")
+    return text
+        .split(" ")
+        .map(
+          (word) =>
+              word.isEmpty
+                  ? ""
+                  : "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}",
+        )
         .join(" ");
   }
-
-
 
   @override
   void dispose() {
     super.dispose();
   }
-
 
   // Helper method
   String orNA(String? value) =>
@@ -431,5 +536,13 @@ class DetailsPageController extends GetxController {
     return orgId.id.toString().isEmpty;
   }
 
+  // Helper method to format qualifications
+  List<String> _formatQualifications(dynamic qualifications) {
+    if (qualifications is List) {
+      return qualifications.whereType<String>().toList();
+    } else if (qualifications is String) {
+      return [qualifications];
+    }
+    return ["No qualifications available"];
+  }
 }
-
