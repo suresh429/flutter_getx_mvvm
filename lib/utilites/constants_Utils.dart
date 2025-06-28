@@ -294,4 +294,11 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     final formatter = DateFormat('dd-MMM-yyyy');
     return formatter.format(date);
   }
+
+  static String convertMillisecondsToFormattedDate2(int? milliseconds) {
+    if (milliseconds == null || milliseconds == 0) return 'N/A';
+    final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    final formatter = DateFormat('MMM dd, yyyy');
+    return formatter.format(date);
+  }
 }
