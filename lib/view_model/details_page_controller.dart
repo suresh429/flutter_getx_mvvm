@@ -115,61 +115,26 @@ class DetailsPageController extends GetxController {
   void onInit() {
     super.onInit();
     initializeController();
+    loadData();
+  }
 
-    exploreModel = Get.arguments as ExploreModel;
-    print('Received title: ${exploreModel.title}');
-    print('Received requestType: ${exploreModel.requestType}');
-    title.value = exploreModel.title ?? '';
-    imageUrl.value = exploreModel.defaultImageUrl ?? '';
-    final due = DateTime.fromMillisecondsSinceEpoch(exploreModel.dueDate ?? 0);
-    daysLeft.value = '${due.difference(DateTime.now()).inDays} days left';
+  Future<void> loadData() async {
+    try {
+      isLoading.value = true;
+      exploreModel = Get.arguments as ExploreModel;
+      print('Received title: ${exploreModel.title}');
+      print('Received requestType: ${exploreModel.requestType}');
+      title.value = exploreModel.title;
+      imageUrl.value = exploreModel.defaultImageUrl;
+      final due = DateTime.fromMillisecondsSinceEpoch(exploreModel.dueDate ?? 0);
+      daysLeft.value = '${due.difference(DateTime.now()).inDays} days left';
 
-    // Handle podcast specific data
-    if (exploreModel.additionalInfo != null) {
-      final additionalInfo = exploreModel.additionalInfo!;
-
-      List<String> formattedDates = [];
-
-      if (additionalInfo.podcastDate != null &&
-          additionalInfo.podcastDate! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(
-          additionalInfo.podcastDate!,
-        );
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-      }
-
-      if (additionalInfo.podcastDate1 != null &&
-          additionalInfo.podcastDate1! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(
-          additionalInfo.podcastDate1!,
-        );
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-      }
-
-      if (additionalInfo.podcastDate2 != null &&
-          additionalInfo.podcastDate2! > 0) {
-        final date = DateTime.fromMillisecondsSinceEpoch(
-          additionalInfo.podcastDate2!,
-        );
-        formattedDates.add(ConstantsUtils.formatDateTime(date));
-      }
-
-      podcastDates.value = formattedDates.isEmpty ? ["N/A"] : formattedDates;
-
-      // Set podcast mode and other details
-      podcastMode.value = additionalInfo.interviewOrPanelDiscussion ?? 'N/A';
-      preferredLanguage.value = additionalInfo.languages?.join(', ') ?? 'N/A';
-      expectedDuration.value = additionalInfo.duration ?? 'N/A';
-      commercial.value = additionalInfo.format ?? 'N/A';
-      preferredIndustry.value = additionalInfo.preferredTopics ?? 'N/A';
+      await Future.delayed(const Duration(milliseconds: 500)); // Add small delay for smoother UX
+      updateRequestInfo();
+      updateDetailsData();
+    } finally {
+      isLoading.value = false;
     }
-
-    likeCount.value = exploreModel.likesCount.value ?? 0;
-    commentCount.value = exploreModel.commentsCount ?? 0;
-    shareCount.value = exploreModel.sharesCount.value ?? 0;
-
-    updateRequestInfo();
-    updateDetailsData();
   }
 
   // initialize
@@ -239,10 +204,10 @@ class DetailsPageController extends GetxController {
       languageTitle.value = "Podcast Mode:";
 
       // Format podcast date
-      final podcastDate = exploreModel.dueDate;
+      final podcastDate = exploreModel.additionalInfo?.podcastDate;
       if (podcastDate != null && podcastDate > 0) {
         preferredValue.value =
-            ConstantsUtils.convertMillisecondsToFormattedDate(podcastDate);
+            ConstantsUtils.convertMillisecondsToFormattedDate2(podcastDate);
       } else {
         preferredValue.value = "N/A";
       }
@@ -319,14 +284,16 @@ class DetailsPageController extends GetxController {
     }
 
     // Update UI states based on scholarship and favorites
-    isScholarshipApplied.value =
-        exploreModel.isScholarshipApplied.value ?? false;
+    isScholarshipApplied.value = exploreModel.isScholarshipApplied.value ?? false;
     showInterestSent.value = isScholarshipApplied.value;
     showConnectButton.value = !isScholarshipApplied.value;
     showWithdrawButton.value = isScholarshipApplied.value;
 
     isFavorite.value = exploreModel.isFavorite.value;
     isLiked.value = exploreModel.isLike.value;
+    likeCount.value = exploreModel.likesCount.value ?? 0;
+    commentCount.value = exploreModel.commentsCount ?? 0;
+    shareCount.value = exploreModel.sharesCount.value ?? 0;
   }
 
   // Update values in getDetailsData
@@ -527,22 +494,4 @@ class DetailsPageController extends GetxController {
     super.dispose();
   }
 
-  // Helper method
-  String orNA(String? value) =>
-      value?.trim().isNotEmpty == true ? value! : "N/A";
-
-  bool isOrgIdEmpty(OrgId? orgId) {
-    if (orgId == null) return true;
-    return orgId.id.toString().isEmpty;
-  }
-
-  // Helper method to format qualifications
-  List<String> _formatQualifications(dynamic qualifications) {
-    if (qualifications is List) {
-      return qualifications.whereType<String>().toList();
-    } else if (qualifications is String) {
-      return [qualifications];
-    }
-    return ["No qualifications available"];
-  }
 }
