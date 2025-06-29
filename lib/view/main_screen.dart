@@ -22,6 +22,17 @@ class _MainScreenState extends State<MainScreen> {
   Get.put(BottomNavController());
   final storage = GetStorage();
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   final args = Get.arguments;
+  //   if (args != null && args['index'] != null) {
+  //     Future.delayed(Duration.zero, () {
+  //       bottomNavController.changeIndex(args['index']);
+  //     });
+  //   }
+  // }
+
   // Access GetStorage
   @override
   Widget build(BuildContext context) {

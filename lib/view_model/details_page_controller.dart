@@ -555,6 +555,39 @@ class DetailsPageController extends GetxController {
   }
 
 
+  Future<void> reportSpamRequest({required String reportId,required String reason}) async {
+    print("Withdraw API called ${reportId}");
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final Map<String, dynamic> requestBody = {
+        "status": -3,
+        "user_id": loginResponse.value?.data?.uniqueId,
+        "flagReason": reason,
+      };
+
+      final dataResponse = await repository.reportSpam(loginResponse.value?.data?.tokenDetail?.token, requestBody,reportId);
+
+      print("Withdraw API response: $dataResponse");
+
+      if (dataResponse.status == 'success') {
+
+        Get.snackbar('Success', 'Report Successfully submitted');
+      } else {
+        Get.snackbar('Error', 'Failed to connect');
+      }
+
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      Get.snackbar('Error', errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+
 
   @override
   void dispose() {

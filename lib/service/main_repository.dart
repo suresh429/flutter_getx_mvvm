@@ -471,4 +471,18 @@ class MainRepository {
     );
   }
 
+
+  // report request
+  Future<CommonModel> reportSpam(
+      String? token,
+      Map<String, dynamic> payload,
+      String? reportId,
+      ) async {
+    return await service.put<CommonModel>(
+      '$_donationRequest/$reportId',
+      payload,
+          (data) => CommonModel.fromJson(data),
+      token: token,
+    );
+  }
 }
