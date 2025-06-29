@@ -161,26 +161,49 @@ class _ExploreCardState extends State<ExploreCard> {
                               ),
                             ],
                           ),
-                          OutlinedButton(
-                            onPressed: () => Get.toNamed('/details', arguments: widget.exploreModel),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFEFEF),
-                              side: BorderSide.none,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("Details", style: TextStyle(color: ColorUtils.colorPrimary)),
-                                const SizedBox(width: 5),
-                                Icon(Icons.arrow_forward, color: ColorUtils.colorPrimary, size: 16),
-                              ],
-                            ),
+                  widget.exploreModel.isScholarshipApplied.value
+                      ? Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          color: ColorUtils.colorGreen,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Interest Sent',
+                          style: TextStyle(
+                            color: ColorUtils.colorGreen,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  )
+                      : OutlinedButton(
+                    onPressed: () => Get.toNamed('/details', arguments: widget.exploreModel),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide.none,
+                      backgroundColor: const Color(0xFFFFEFEF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Details", style: TextStyle(color: ColorUtils.colorPrimary)),
+                        const SizedBox(width: 5),
+                        Icon(Icons.arrow_forward, color: ColorUtils.colorPrimary, size: 16),
+                      ],
+                    ),
+                  )
+                  ],
                       ),
                       const SizedBox(height: 8),
                       Container(

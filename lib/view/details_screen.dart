@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../env/app_env.dart';
+import '../utilites/colors.dart';
 import '../view_model/details_page_controller.dart';
 
 class DetailsScreen extends StatefulWidget {
@@ -64,7 +65,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                     ) {
                       return [
                         SliverAppBar(
-                          expandedHeight: 420,
+                          expandedHeight: controller.isScholarshipApplied.value ? 460 : 430, // Adjust height dynamically
                           floating: false,
                           pinned: true,
                           elevation: 0,
@@ -152,7 +153,7 @@ class _DetailsScreenState extends State<DetailsScreen>
 
                                 // White Card
                                 Positioned(
-                                  top: kToolbarHeight + 130,
+                                  top: kToolbarHeight + 120, // Adjusted to fit below banner image
                                   left: 0,
                                   right: 0,
                                   child: Container(
@@ -229,11 +230,11 @@ class _DetailsScreenState extends State<DetailsScreen>
                                               )),
                                               const SizedBox(height: 16),
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                 children: [
                                                   // Like Button
                                                   SizedBox(
-                                                    width: 80, // Fixed width for each button group
+                                                    width: 80,
                                                     child: Row(
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
@@ -273,7 +274,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                   ),
                                                   // Comment Button
                                                   SizedBox(
-                                                    width: 80, // Fixed width for each button group
+                                                    width: 80,
                                                     child: Row(
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
@@ -296,7 +297,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                   ),
                                                   // Share Button
                                                   SizedBox(
-                                                    width: 80, // Fixed width for each button group
+                                                    width: 80,
                                                     child: Row(
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
@@ -323,6 +324,36 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                   ),
                                                 ],
                                               ),
+                                              const SizedBox(height: 8),
+                                              // Conditionally render Interest Sent container
+                                              Obx(() => controller.isScholarshipApplied.value
+                                                  ? Container(
+                                                width: double.infinity,
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0x1D8AD37F),
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.check_circle_outline_outlined,
+                                                      color: ColorUtils.colorGreen,
+                                                      size: 18,
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    Text(
+                                                      'Interest Sent',
+                                                      style: TextStyle(
+                                                        color: ColorUtils.colorGreen,
+                                                        fontSize: 18,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ) : const SizedBox.shrink()),
                                             ],
                                           ),
                                         ),
@@ -374,58 +405,88 @@ class _DetailsScreenState extends State<DetailsScreen>
                   ),
                 ),
       ),
-      bottomNavigationBar:
-          _currentTabIndex !=
-                  2 // Hide for Comments tab
-              ? Container(
-                color: Colors.white,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 10.0,
-                      right: 10.0,
-                      bottom: 20.0,
-                      top: 5.0,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {},
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              // ensures it only takes as much width as needed
-                              children: [
-                                Icon(Icons.share, size: 20),
-                                SizedBox(width: 8),
-                                Text("Share"),
-                              ],
-                            ),
-                          ),
+      bottomNavigationBar: Obx(() {
+        if (controller.isScholarshipApplied == null) {
+          print("Error: isScholarshipApplied is null");
+          return const SizedBox.shrink(); // Fallback UI
+        }
+        if (_currentTabIndex != 2) {
+          return Container(
+          color: Colors.white,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 15.0, right: 15.0, bottom: 20.0, top: 5.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: controller.exploreModel != null
+                          ? () {
+                        controller.exploreModel.sharesCount++;
+                        exploreController.shareRequest(controller.exploreModel.id);
+                        var title = controller.exploreModel.title.replaceAll(' ', '-');
+                        var url = "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                        Share.share(url, subject: 'TALLeaders');
+                      }
+                          : null,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: const Text("Connect"),
-                          ),
-                        ),
-                      ],
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.share, size: 20),
+                          SizedBox(width: 8),
+                          Text("Share"),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-              : null,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print("isScholarshipApplied: ${controller.isScholarshipApplied.value}");
+                        final type = controller.isScholarshipApplied.value ? "withdraw" : "connect";
+                        _showConnectDialog(context, type);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: controller.isScholarshipApplied.value ? Colors.transparent : Colors.red,
+                        foregroundColor: controller.isScholarshipApplied.value ? Colors.grey : Colors.white,
+                        side: controller.isScholarshipApplied.value
+                            ? const BorderSide(color: Colors.grey, width: 1)
+                            : BorderSide.none,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        elevation: 0, // no shadow for outline
+                      ),
+                      child: Text(
+                        controller.isScholarshipApplied.value ? "Withdraw" : "Connect",
+                        style: TextStyle(
+                          color: controller.isScholarshipApplied.value ? Colors.grey : Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        } else {
+          return const SizedBox();
+        }
+      }),
     );
   }
 
@@ -1354,6 +1415,164 @@ class _DetailsScreenState extends State<DetailsScreen>
       },
     );
   }
+
+  void _showConnectDialog(BuildContext context, String type) {
+    final regularText = type == "connect"
+        ? "Are you sure you want to Connect & express your interest for "
+        : "Are you sure you want to withdraw your interest from ";
+
+    final titleText = "${controller.exploreModel.title} ?";
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: regularText,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  TextSpan(
+                    text: titleText,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildContactRow(
+              Icons.phone,
+              controller.exploreModel.isScholarshipApplied == true ?
+                  (controller.exploreModel.userInfo?.phone ?? "")
+                  : _maskPhoneNumber(
+                      controller.exploreModel.userInfo?.phone ?? ""),
+            ),
+            const SizedBox(height: 16),
+            _buildContactRow(
+              Icons.email,
+              controller.exploreModel.isScholarshipApplied == true
+                  ? (controller.exploreModel.userInfo?.email ?? "")
+                  : _maskEmail(controller.exploreModel.userInfo?.email ?? ""),
+            ),
+            const SizedBox(height: 16),
+            _buildContactRow(
+              Icons.location_on,
+              _formatLocation(
+                controller.exploreModel.userInfo?.address?.city,
+                controller.exploreModel.userInfo?.address?.state,
+                controller.exploreModel.userInfo?.address?.country,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text(
+                      "No, Thanks",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (type == "connect") {
+                        await controller.sendConnectRequest(donationRequestId: controller.exploreModel.id);
+                      } else {
+                        await controller.sendWithdrawRequest(connectId: controller.connectId.value);
+                      }
+                      Navigator.of(dialogContext).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      type == "connect" ? "Connect" : "Withdraw",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _maskPhoneNumber(String phone) {
+    if (phone.isEmpty) return "N/A";
+    final visible = phone.substring(phone.length - 4);
+    return "XXXXXX$visible";
+  }
+
+  String _maskEmail(String email) {
+    if (email.isEmpty) return "N/A";
+    final parts = email.split('@');
+    if (parts.length != 2) return email;
+
+    final username = parts[0];
+    final domain = parts[1];
+    final maskedUsername = username.length > 2
+        ? "${username[0]}${username[1]}${'X' * (username.length - 2)}"
+        : username;
+
+    return "$maskedUsername@$domain";
+  }
+
+  String _formatLocation(String? city, String? state, String? country) {
+    final parts = [city, state, country]
+        .where((part) => part != null && part.isNotEmpty)
+        .toList();
+    return parts.isEmpty ? "N/A" : parts.join(", ");
+  }
+
+  // ...existing code...
+
 }
 
 class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {

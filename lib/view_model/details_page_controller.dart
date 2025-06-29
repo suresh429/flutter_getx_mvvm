@@ -8,6 +8,7 @@ import '../model/details_model.dart';
 import '../service/ConnectivityService.dart';
 import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
+import '../utilites/error_handler.dart';
 
 class DetailsPageController extends GetxController {
   final storage = GetStorage();
@@ -44,6 +45,7 @@ class DetailsPageController extends GetxController {
   RxString preferredValue = "N/A".obs;
   RxString languageValue = "N/A".obs;
   RxString location = "".obs;
+  RxString connectId = ''.obs;
   RxBool isScholarshipApplied = false.obs;
   RxBool isFavorite = false.obs;
   RxBool isLiked = false.obs;
@@ -488,6 +490,71 @@ class DetailsPageController extends GetxController {
         )
         .join(" ");
   }
+
+  Future<void> sendConnectRequest({required String donationRequestId}) async {
+    try {
+      isLoading.value = true;
+
+      final Map<String, dynamic> requestBody = {
+        "donation_request_info": donationRequestId,
+        "user_id": loginResponse.value?.data?.uniqueId,
+      };
+
+      print('Sending connect request payload: $requestBody');
+
+      final response = await repository.connectRequest(
+        loginResponse.value?.data?.tokenDetail?.token,
+        requestBody,
+      );
+
+      if (response.status == "success") {
+        print('Connect request Id: ${response.data?.id}');
+        connectId.value = response.data?.id?? '';
+        isScholarshipApplied.value = true;
+        showInterestSent.value = true;
+        showConnectButton.value = false;
+        showWithdrawButton.value = true;
+        Get.snackbar('Success', response.message ?? 'Successfully connected');
+      } else {
+        Get.snackbar('Error', response.message ?? 'Failed to connect');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Something went wrong');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> sendWithdrawRequest({required String connectId}) async {
+    print("Withdraw API called ${connectId}");
+    try {
+      if (isLoading.value || loginResponse.value == null) return;
+
+      isLoading(true);
+
+      final dataResponse = await repository.withdraw(connectId, loginResponse.value?.data?.tokenDetail?.token);
+
+      print("Withdraw API response: $dataResponse");
+
+      if (dataResponse['status'] == 'success') {
+        isScholarshipApplied.value = false;
+        showInterestSent.value = false;
+        showConnectButton.value = true;
+        showWithdrawButton.value = false;
+        Get.snackbar('Success', 'Withdraw Successfully connected');
+      } else {
+        Get.snackbar('Error', 'Failed to connect');
+      }
+
+    } catch (e) {
+      String errorMsg = await ErrorHandler.handleError(e);
+      Get.snackbar('Error', errorMsg);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+
 
   @override
   void dispose() {
