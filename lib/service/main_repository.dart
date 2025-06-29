@@ -1,6 +1,7 @@
 // services/main_repository.dart
 import 'package:flutter_getx_mvvm/env/app_env.dart';
 import 'package:flutter_getx_mvvm/model/CommonModel.dart' hide Data;
+import 'package:flutter_getx_mvvm/model/ConnectReponse.dart' hide Data;
 import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
 import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
 import 'package:flutter_getx_mvvm/model/LoginModel.dart';
@@ -455,4 +456,19 @@ class MainRepository {
       return [];
     }
   }
+
+
+  // connect logic
+  Future<ConnectResponse> connectRequest(
+      String? token,
+      Map<String, dynamic> payload,
+      ) async {
+    return await service.post<ConnectResponse>(
+      _donationRequestResponse,
+      payload,
+          (data) => ConnectResponse.fromJson(data),
+      token: token,
+    );
+  }
+
 }
