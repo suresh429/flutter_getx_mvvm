@@ -10,6 +10,7 @@ import 'package:flutter_getx_mvvm/view/manage_preferences.dart';
 import 'package:flutter_getx_mvvm/view/public_profile_screen.dart';
 import 'package:flutter_getx_mvvm/view/settings_screen.dart';
 import 'package:flutter_getx_mvvm/view/user_profile_screen.dart';
+import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'utilites/colors.dart';
@@ -25,6 +26,7 @@ void commonMain() async {
   Get.put(ConnectivityService()); // Initialize the ConnectivityService
   // local storage
   await GetStorage.init();
+
 
   runApp(const MyApp());
 }
