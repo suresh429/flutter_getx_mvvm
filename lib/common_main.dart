@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_getx_mvvm/service/ConnectivityService.dart';
@@ -26,6 +27,9 @@ void commonMain() async {
   Get.put(ConnectivityService()); // Initialize the ConnectivityService
   // local storage
   await GetStorage.init();
+
+  // firebase initialization
+  await Firebase.initializeApp();
 
 
   runApp(const MyApp());

@@ -1,4 +1,4 @@
-package com.example.flutter_getx_mvvm
+package com.touchalife.talleaders
 
 import io.flutter.embedding.android.FlutterActivity
 
