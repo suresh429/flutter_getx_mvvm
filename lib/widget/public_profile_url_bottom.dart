@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart'
+import 'package:TALLeaders/view_model/public_profile_controller.dart'
     hide PublicProfileController;
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart';
+import 'package:TALLeaders/view_model/public_profile_controller.dart';
 
 import '../env/app_env.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/model/vote_leader_model.dart';
+import 'package:TALLeaders/model/vote_leader_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // Assuming you have a way to access the current user's ID, e.g., via GetX
 import 'package:get/get.dart'; // If using GetX for state management

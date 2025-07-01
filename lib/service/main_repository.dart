@@ -1,20 +1,20 @@
 // services/main_repository.dart
-import 'package:flutter_getx_mvvm/env/app_env.dart';
-import 'package:flutter_getx_mvvm/model/CommonModel.dart' hide Data;
-import 'package:flutter_getx_mvvm/model/ConnectReponse.dart' hide Data;
-import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
-import 'package:flutter_getx_mvvm/model/ExploreModel.dart';
-import 'package:flutter_getx_mvvm/model/LoginModel.dart';
-import 'package:flutter_getx_mvvm/model/ShareModel.dart' hide Data;
-import 'package:flutter_getx_mvvm/model/UserModel.dart' hide Data;
-import 'package:flutter_getx_mvvm/model/location_model.dart' hide Datum;
-import 'package:flutter_getx_mvvm/model/vote_leader_model.dart' as vote_leader;
-import 'package:flutter_getx_mvvm/payload/fav_payload.dart';
-import 'package:flutter_getx_mvvm/payload/invite_payload.dart';
-import 'package:flutter_getx_mvvm/payload/like_unlike_payload.dart';
-import 'package:flutter_getx_mvvm/payload/login_payload.dart';
-import 'package:flutter_getx_mvvm/payload/user_update_payload.dart';
-import 'package:flutter_getx_mvvm/utilites/constants_Utils.dart';
+import 'package:TALLeaders/env/app_env.dart';
+import 'package:TALLeaders/model/CommonModel.dart' hide Data;
+import 'package:TALLeaders/model/ConnectReponse.dart' hide Data;
+import 'package:TALLeaders/model/DonationRequestResponse.dart';
+import 'package:TALLeaders/model/ExploreModel.dart';
+import 'package:TALLeaders/model/LoginModel.dart';
+import 'package:TALLeaders/model/ShareModel.dart' hide Data;
+import 'package:TALLeaders/model/UserModel.dart' hide Data;
+import 'package:TALLeaders/model/location_model.dart' hide Datum;
+import 'package:TALLeaders/model/vote_leader_model.dart' as vote_leader;
+import 'package:TALLeaders/payload/fav_payload.dart';
+import 'package:TALLeaders/payload/invite_payload.dart';
+import 'package:TALLeaders/payload/like_unlike_payload.dart';
+import 'package:TALLeaders/payload/login_payload.dart';
+import 'package:TALLeaders/payload/user_update_payload.dart';
+import 'package:TALLeaders/utilites/constants_Utils.dart';
 import '../model/details_model.dart';
 import 'generic_api_service.dart';
 

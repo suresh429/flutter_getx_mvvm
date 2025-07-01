@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/utilites/constants_Utils.dart';
+import 'package:TALLeaders/utilites/constants_Utils.dart';
 import 'package:get/get.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';

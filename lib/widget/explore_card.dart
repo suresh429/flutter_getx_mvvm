@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/env/app_env.dart';
+import 'package:TALLeaders/env/app_env.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CityDropdownField extends StatelessWidget {
   final TextEditingController textController;
@@ -16,7 +16,7 @@ class CityDropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TypeAheadFormField<String>(
+    return TypeAheadField<String>(
       textFieldConfiguration: TextFieldConfiguration(
         controller: textController,
         decoration: const InputDecoration(

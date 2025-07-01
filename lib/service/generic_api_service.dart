@@ -1,7 +1,7 @@
 // services/generic_api_service.dart
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_getx_mvvm/env/app_env.dart';
+import 'package:TALLeaders/env/app_env.dart';
 
 class GenericApiService {
   final Dio _dio = Dio();

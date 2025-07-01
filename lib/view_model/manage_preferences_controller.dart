@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_getx_mvvm/payload/user_update_payload.dart';
+import 'package:TALLeaders/payload/user_update_payload.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../model/AreaOption.dart';

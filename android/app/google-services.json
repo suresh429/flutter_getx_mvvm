@@ -1,0 +1,420 @@
+{
+  "project_info": {
+    "project_number": "337428230933",
+    "firebase_url": "https://touch-a-life-dev.firebaseio.com",
+    "project_id": "touch-a-life-dev",
+    "storage_bucket": "touch-a-life-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:48585270b823efce556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-5pqg66dl63jhovhp2vp0lsartt5ag60f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "1edf50282ed6eca6faa7cffaa85507908f5487f0"
+          }
+        },
+        {
+          "client_id": "337428230933-d6587oih9g2v2qitump8i4oi10bh0c2h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "d81694e21b221d719b1111fdae1fdf18fac5118c"
+          }
+        },
+        {
+          "client_id": "337428230933-e8opub5c8mgcj21vrefe43ma5cqs69lu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "eec94aeb72b9a7116946685cb19203b41c98b957"
+          }
+        },
+        {
+          "client_id": "337428230933-is2rjrciokk05erok5kuk915uevhh9hr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "9f7cfe748fef3e4a462ff14a78f991fbc5cfc612"
+          }
+        },
+        {
+          "client_id": "337428230933-qe3m8vf1ulbogc7mo3t5led1toik1m98.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "a08da42bc03dc6226ec8f070761bc385b74319a4"
+          }
+        },
+        {
+          "client_id": "337428230933-u6cptpeic71cjhi08p7dhs389rh9tqis.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.app",
+            "certificate_hash": "b50500ada806ce6445232621e8bb04aa19b2c4ff"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:cb6effafe8164dc7556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.talbloodaid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-btij1knmh39v3dkt74em91kprnjnobaj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talbloodaid",
+            "certificate_hash": "8dcd297c3d573ff2bad265c13d227869861919be"
+          }
+        },
+        {
+          "client_id": "337428230933-ha7s87cq65kebu0j1541tnv4gtdaj8jq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talbloodaid",
+            "certificate_hash": "0b8b29f81be6313462beea74cd80fcf78465b15d"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:5d6012ced47103e7556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.talhospitals"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-73nn3uljjni56h977983s4sltnljhpht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talhospitals",
+            "certificate_hash": "eb6a43d36566240cfa804258ca2e0c546e896c71"
+          }
+        },
+        {
+          "client_id": "337428230933-losi6ocl39pvq2r22t600038hdon1c1i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talhospitals",
+            "certificate_hash": "9f7cfe748fef3e4a462ff14a78f991fbc5cfc612"
+          }
+        },
+        {
+          "client_id": "337428230933-pqult5lelqp2a1fvr65ktctmlqcvea3m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talhospitals",
+            "certificate_hash": "0b8b29f81be6313462beea74cd80fcf78465b15d"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:2314e867dbb48bef556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.talleaders"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-nk3ormsh1sigdbds6hd75j2iscm3qlmr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talleaders",
+            "certificate_hash": "0b8b29f81be6313462beea74cd80fcf78465b15d"
+          }
+        },
+        {
+          "client_id": "337428230933-ontpp8t49q6m2q1pthcvbo948950mn3b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talleaders",
+            "certificate_hash": "9f7cfe748fef3e4a462ff14a78f991fbc5cfc612"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:4aaa4ef08074a14c556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.talradio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-crfhmffjhrkh5581u68upbia509a00ue.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talradio",
+            "certificate_hash": "a08da42bc03dc6226ec8f070761bc385b74319a4"
+          }
+        },
+        {
+          "client_id": "337428230933-u939rjent8da2vmlh8it6e5hg7jp3qm8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talradio",
+            "certificate_hash": "49082410faeb8f14e4423012e942e5223162b3e8"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:ae347e96ea505550556f1c",
+        "android_client_info": {
+          "package_name": "com.touchalife.talscouts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-dt8ke2g1mhk1lc86540a1nob7jsp7huc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talscouts",
+            "certificate_hash": "9f7cfe748fef3e4a462ff14a78f991fbc5cfc612"
+          }
+        },
+        {
+          "client_id": "337428230933-mlrnll0e5tqq2v6lulgorcooj7hsfej1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchalife.talscouts",
+            "certificate_hash": "b50500ada806ce6445232621e8bb04aa19b2c4ff"
+          }
+        },
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337428230933:android:8f3d8b131708b1eb556f1c",
+        "android_client_info": {
+          "package_name": "com.zenrth.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHRYDme6lQxCbtEujV_ddznePwTq84i2M"
+        },
+        {
+          "current_key": "AIzaSyBTaB95dM3sf6FvBZBKmVB78DPrbGtwxR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337428230933-lpgs8o4ah7ltc7o9q83rvk9htqsmgtg0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "337428230933-01n2408ioeegq7ta0786m1fmlh1a1cog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.touchalife.talhospitals"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
