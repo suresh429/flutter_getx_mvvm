@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_getx_mvvm/model/LoginModel.dart' hide Experience;
-import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart';
+import 'package:TALLeaders/model/LoginModel.dart' hide Experience;
+import 'package:TALLeaders/view_model/public_profile_controller.dart';
 import '../model/experience_model.dart';
 
 class PublicProfileExperienceBottomSheet extends StatefulWidget {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
+import 'package:TALLeaders/view_model/explore_controller.dart';
 import 'package:get/get.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 

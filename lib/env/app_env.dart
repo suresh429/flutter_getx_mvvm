@@ -1,8 +1,9 @@
 abstract class AppEnvironment {
-  //static late String headerKey;
   static late String baseApiUrl;
   static late String baseWebUrl;
   static late String title;
+  static late int apiTimeout;
+  static const String apiKey = "AIzaSyCfc46u8GKalnAS8ODg1Zo1T_Xg0u7RNDM";
   static late Environment _environment;
   static Environment get environment => _environment;
 
@@ -11,22 +12,21 @@ abstract class AppEnvironment {
     switch (env) {
       case Environment.dev:
         {
-          //headerKey = 'Authorization';
           baseApiUrl = 'https://touch-a-life-dev.web.app/api/v1/';
           baseWebUrl = 'https://talleaders-dev.vercel.app/';
           title = "TALLeaders dev";
+          apiTimeout = 30000;
           break;
         }
       case Environment.prod: {
-       // headerKey = 'Authorization';
         baseApiUrl = 'https://v1.talgiving.org/api/v1/';
         baseWebUrl = 'https://talleaders-prod.vercel.app/';
         title = "TALLeaders";
+        apiTimeout = 30000;
         break;
       }
     }
   }
-
 
 }
 

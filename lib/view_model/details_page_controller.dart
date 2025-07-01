@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_html/flutter_html.dart';
 
 import '../model/ExploreModel.dart';
 import '../model/LoginModel.dart';

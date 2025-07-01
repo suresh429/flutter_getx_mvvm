@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
+import 'package:TALLeaders/view_model/explore_controller.dart';
 import 'package:get/get.dart';
 import '../service/ConnectivityService.dart';
 import '../utilites/colors.dart';

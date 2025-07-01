@@ -1,23 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_getx_mvvm/service/ConnectivityService.dart';
-import 'package:flutter_getx_mvvm/view/comments_screen.dart';
-import 'package:flutter_getx_mvvm/view/details_screen.dart';
-import 'package:flutter_getx_mvvm/view/explore_screen.dart';
-import 'package:flutter_getx_mvvm/view/login_view.dart';
-import 'package:flutter_getx_mvvm/view/main_screen.dart';
-import 'package:flutter_getx_mvvm/view/manage_preferences.dart';
-import 'package:flutter_getx_mvvm/view/public_profile_screen.dart';
-import 'package:flutter_getx_mvvm/view/settings_screen.dart';
-import 'package:flutter_getx_mvvm/view/user_profile_screen.dart';
-import 'package:flutter_getx_mvvm/view_model/explore_controller.dart';
+import 'package:TALLeaders/service/ConnectivityService.dart';
+import 'package:TALLeaders/view/comments_screen.dart';
+import 'package:TALLeaders/view/details_screen.dart';
+import 'package:TALLeaders/view/explore_screen.dart';
+import 'package:TALLeaders/view/login_view.dart';
+import 'package:TALLeaders/view/main_screen.dart';
+import 'package:TALLeaders/view/manage_preferences.dart';
+import 'package:TALLeaders/view/public_profile_screen.dart';
+import 'package:TALLeaders/view/settings_screen.dart';
+import 'package:TALLeaders/view/user_profile_screen.dart';
+import 'package:TALLeaders/view_model/explore_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'firebase_options.dart';
 import 'utilites/colors.dart';
 
+
 void commonMain() async {
- /// await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized(); // VERY IMPORTANT
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.white, // Change this to your desired color
@@ -28,8 +30,11 @@ void commonMain() async {
   // local storage
   await GetStorage.init();
 
-  // firebase initialization
-  await Firebase.initializeApp();
+  // firebase initialization with platform-specific options
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  print('Firebase initialized');
 
 
   runApp(const MyApp());

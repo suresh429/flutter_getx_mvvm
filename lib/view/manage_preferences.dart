@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/utilites/colors.dart';
+import 'package:TALLeaders/utilites/colors.dart';
 import 'package:get/get.dart';
 import '../model/AreaOption.dart';
 import '../model/CategoryModel.dart';

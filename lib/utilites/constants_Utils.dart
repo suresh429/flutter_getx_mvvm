@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
-import 'package:flutter_getx_mvvm/model/LoginModel.dart';
-import 'package:flutter_getx_mvvm/model/UserModel.dart';
-import 'package:flutter_getx_mvvm/utilites/colors.dart';
+import 'package:TALLeaders/model/LoginModel.dart';
+import 'package:TALLeaders/model/UserModel.dart';
+import 'package:TALLeaders/utilites/colors.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';

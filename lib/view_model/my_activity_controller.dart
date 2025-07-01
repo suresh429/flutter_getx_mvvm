@@ -1,4 +1,4 @@
-import 'package:flutter_getx_mvvm/model/DonationRequestResponse.dart';
+import 'package:TALLeaders/model/DonationRequestResponse.dart';
 import 'package:get/get.dart';
 import '../model/LoginModel.dart';
 import '../service/main_repository.dart';

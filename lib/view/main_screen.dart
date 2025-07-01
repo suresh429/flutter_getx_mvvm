@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view/explore_screen.dart';
-import 'package:flutter_getx_mvvm/view/my_activity_screen.dart';
-import 'package:flutter_getx_mvvm/widget/profile_progressbar.dart';
-import 'package:flutter_getx_mvvm/view/vote_leaders_screen.dart';
-import 'package:flutter_getx_mvvm/widget/custom_header.dart';
+import 'package:TALLeaders/view/explore_screen.dart';
+import 'package:TALLeaders/view/my_activity_screen.dart';
+import 'package:TALLeaders/widget/profile_progressbar.dart';
+import 'package:TALLeaders/view/vote_leaders_screen.dart';
+import 'package:TALLeaders/widget/custom_header.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 

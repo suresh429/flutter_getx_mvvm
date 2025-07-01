@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_getx_mvvm/view_model/public_profile_controller.dart';
+import 'package:TALLeaders/view_model/public_profile_controller.dart';
 
 class PublicProfileAboutBottom extends StatelessWidget {
   final PublicProfileController controller;
