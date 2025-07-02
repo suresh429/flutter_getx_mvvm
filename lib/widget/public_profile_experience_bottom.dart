@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:TALLeaders/model/LoginModel.dart' hide Experience;
 import 'package:TALLeaders/view_model/public_profile_controller.dart';
@@ -30,6 +34,8 @@ class _PublicProfileExperienceBottomSheetState
     super.initState();
     final item = widget.editItem;
 
+    // Always reset picked image
+    widget.controller.pickedImageFile.value = null;
     if (item != null) {
       widget.controller.roleController.text = item.role ?? '';
       widget.controller.companyController.text = item.company ?? '';
@@ -48,9 +54,12 @@ class _PublicProfileExperienceBottomSheetState
           'dd-MMM-yyyy',
         ).format(DateTime.fromMillisecondsSinceEpoch(item.experienceEndDate!));
       }
+      // Set company logo url for edit
+      widget.controller.companyLogoUrl.value = item.logoUrl ?? '';
     } else {
       widget.controller.clearExperienceControllers();
       isCurrentlyWorking = false;
+      widget.controller.companyLogoUrl.value = '';
     }
   }
 
@@ -136,58 +145,87 @@ class _PublicProfileExperienceBottomSheetState
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-
-                Stack(
-                  alignment: Alignment.topLeft,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        widget.controller.companyLogoUrl.value,
-                        // 🔁 Replace with your actual image URL
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: Image.asset(
-                              'assets/profile_placeholder.png',
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: InkWell(
-                        onTap: () {
-                          // TODO: Add image picker or edit logic
-                          widget.controller.pickAndUploadImage(
-                              "CompanyLogo",
-                               companyId: widget.editItem?.id,
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            shape: BoxShape.circle,
+                Obx(() {
+                  final pickedFile = widget.controller.pickedImageFile.value;
+                  Widget imageWidget;
+                  if (pickedFile != null) {
+                    imageWidget = Image.file(
+                      pickedFile,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    );
+                  } else if (widget.controller.companyLogoUrl.value.isNotEmpty) {
+                    imageWidget = Image.network(
+                      widget.controller.companyLogoUrl.value,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: Image.asset(
+                            'assets/profile_placeholder.png',
+                            fit: BoxFit.cover,
                           ),
-                          child: const Icon(
-                            Icons.edit,
-                            size: 16,
-                            color: Colors.white,
+                        );
+                      },
+                    );
+                  } else {
+                    imageWidget = Container(
+                      width: 80,
+                      height: 80,
+                      color: Colors.grey[300],
+                      child: Image.asset(
+                        'assets/profile_placeholder.png',
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  }
+                  return Stack(
+                    alignment: Alignment.topLeft,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: imageWidget,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () async {
+                            // For add: only pick image, for edit: pick and upload
+                            final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            if (picked != null) {
+                              widget.controller.pickedImageFile.value = File(picked.path);
+                              if (widget.editItem != null && widget.editItem!.id != null) {
+                                // For edit, upload immediately
+                                await widget.controller.pickAndUploadImage(
+                                  "CompanyLogo",
+                                  companyId: widget.editItem!.id,
+                                );
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              size: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                }),
 
                 const SizedBox(height: 24),
                 SizedBox(

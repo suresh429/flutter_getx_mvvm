@@ -159,6 +159,26 @@ class PublicProfileController extends GetxController {
       } else if (imageUploadFrom == "CompanyLogo") {
         companyLogoUrl.value = downloadUrl; // update local profile
         pickedImageFile.value = null;        // clear local file
+        // Update experience with logoUrl in API if companyId is provided
+        if (companyId != null) {
+          final updateBody = {
+            "experience": {
+              "logoUrl": downloadUrl,
+            },
+            "experienceId": companyId,
+          };
+          await repository.updateExperience(
+            loginResponse.value?.data?.tokenDetail?.token,
+            updateBody,
+            loginResponse.value?.data?.uniqueId,
+          );
+          // Update local experience object with new logoUrl
+          final idx = experiences.indexWhere((e) => e.id == companyId);
+          if (idx != -1) {
+            final updated = experiences[idx].copyWith(logoUrl: downloadUrl);
+            experiences[idx] = updated;
+          }
+        }
       } else {
         coverBgImage.value = downloadUrl; // update local profile
         pickedImageFile.value = null;
