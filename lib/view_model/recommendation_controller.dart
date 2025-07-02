@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -11,6 +12,7 @@ import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
 class RecommendationController extends GetxController {
+  final databaseReviews = FirebaseDatabase.instance.ref('conversations');
   final recommendations = <ExploreModel>[].obs;
   final isLoading = false.obs;
   var errorMessage = ''.obs;
@@ -36,6 +38,19 @@ class RecommendationController extends GetxController {
 
     initializeController();
   }
+
+  void listenCommentCount(ExploreModel explore) {
+    databaseReviews.child(explore.id).onValue.listen((event) {
+      int count = 0;
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        count = dataSnapshot.children.length;
+      }
+      explore.commentsCount.value = count;
+      print('Comment count updated for ${explore.id}: $count'); // Debugging log
+    });
+  }
+
 
   // initialize
   Future<void> initializeController() async {
@@ -164,6 +179,12 @@ class RecommendationController extends GetxController {
       final fetchedRecommendations =
       await repository.fetchRecommendations(uniqueId, requestType, requestLanguage);
       recommendations.assignAll(fetchedRecommendations);
+
+      // 🔥 Attach Firebase comment count listeners
+      for (var item in fetchedRecommendations) {
+        listenCommentCount(item);
+      }
+
     } catch (e) {
       // Use the updated error handler
       String errorMsg = await ErrorHandler.handleError(e);

@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,13 +11,13 @@ import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart';
 import '../utilites/error_handler.dart';
 
-class ExploreController extends GetxController
-    with GetSingleTickerProviderStateMixin {
+class ExploreController extends GetxController with GetSingleTickerProviderStateMixin {
+  final databaseReviews = FirebaseDatabase.instance.ref('conversations');
+
   RxString title = ''.obs;
   var subtitle = ''.obs;
   final errorMessage = ''.obs;
-  final exploreData =
-      <ExploreModel>[].obs; // Observable list to hold explore data
+  final exploreData = <ExploreModel>[].obs; // Observable list to hold explore data
   final isLoading = <int, bool>{}.obs; // Loading state for each tab
   late TabController tabController;
   late LoginModel? loginResponse;
@@ -78,6 +79,18 @@ class ExploreController extends GetxController
 
     // Check connectivity on initialization and whenever it changes
     checkAndFetchData(selectedIndex.value);
+  }
+
+  void listenCommentCount(ExploreModel explore) {
+    databaseReviews.child(explore.id).onValue.listen((event) {
+      int count = 0;
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        count = dataSnapshot.children.length;
+      }
+      explore.commentsCount.value = count;
+      print('Comment count updated for ${explore.id}: $count'); // Debugging log
+    });
   }
 
   @override
@@ -159,8 +172,12 @@ class ExploreController extends GetxController
             ?.addAll(uniqueData); // Add new data to tab's data list
         tabPage[tabIndex] = tabPage[tabIndex]! + 1;
 
-        print(
-            'Unique data added for tab index $tabIndex: ${uniqueData.length}'); // Debugging log
+        // 🔥 Attach Firebase comment count listeners
+        for (var item in uniqueData) {
+          listenCommentCount(item);
+        }
+
+        print('Unique data added for tab index $tabIndex: ${uniqueData.length}'); // Debugging log
       }
 
       // Clear error message on successful fetch

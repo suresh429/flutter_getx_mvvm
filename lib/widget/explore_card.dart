@@ -262,11 +262,14 @@ class _ExploreCardState extends State<ExploreCard> {
                                     onPressed: () {},
                                   ),
                                   Flexible(
-                                    child: Text(
-                                      widget.exploreModel.commentsCount.toString(),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: const TextStyle(fontSize: 16),
+                                    child: Obx( () {
+                                        return Text(
+                                          widget.exploreModel.commentsCount.value.toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(fontSize: 16),
+                                        );
+                                      }
                                     ),
                                   ),
                                 ],

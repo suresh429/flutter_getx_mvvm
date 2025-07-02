@@ -11,13 +11,6 @@ class PublicProfileUserBottom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final roleItems = [
-      'Google - Developer',
-      'Apple - Designer',
-      'Microsoft - PM',
-    ];
-    final locationItems = ['Hyderabad', 'Bangalore', 'Chennai'];
-
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
@@ -116,7 +109,7 @@ class PublicProfileUserBottom extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.edit, size: 16),
-                            onPressed: () => controller.pickImage(),
+                            onPressed: () => controller.pickAndUploadImage("ProfileImage"),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                           ),

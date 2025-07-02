@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:TALLeaders/model/AreaOption.dart';
 import 'package:get/get.dart';
@@ -59,6 +60,7 @@ class PublicProfileController extends GetxController {
           .obs;
   final RxString coverBgImage = ''.obs;
   final RxString profileImageUrl = ''.obs;
+  final RxString companyLogoUrl = ''.obs;
   final RxString aboutMe = ''.obs;
   RxBool isAboutExpanded = false.obs;
   final RxList<String> companyRoleOptions = <String>[].obs;
@@ -104,15 +106,76 @@ class PublicProfileController extends GetxController {
     initializeController();
   }
 
-  Future<void> pickImage() async {
+  Future<void> pickAndUploadImage(String type, {String? companyId}) async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         pickedImageFile.value = File(image.path);
-        profileImageUrl.value = image.path; // for local display fallback
+        await uploadImageToFirebase(
+          pickedImageFile.value!,
+          type,
+          companyId: companyId,
+        );
       }
     } catch (e) {
-      print('Error picking image: $e');
+      print("Error picking image: $e");
+    }
+  }
+
+
+  Future<void> uploadImageToFirebase(File file, String imageUploadFrom,
+      {String? companyId})
+
+  async {
+    try {
+      isLoading(true);
+
+      final uniqueId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Determine upload path
+      String uploadPath = "";
+      if (imageUploadFrom == "ProfileImage") {
+        uploadPath = "/ProfilePictures/${loginResponse.value?.data?.uniqueId}/images/$uniqueId.png";
+      } else if (imageUploadFrom == "CompanyLogo") {
+        uploadPath = "/User/${loginResponse.value?.data?.uniqueId}/TALLeaders/${companyId ?? 'defaultCompany'}/CompanyLogos/images/$uniqueId.png";
+      } else {
+        uploadPath = "/CoverPictures/${loginResponse.value?.data?.uniqueId}/images/$uniqueId.png";
+      }
+
+      print("Uploading to: $uploadPath");
+
+      final refStorage = FirebaseStorage.instance.ref().child(uploadPath);
+      final uploadTask = await refStorage.putFile(file);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      print("Uploaded image URL: $downloadUrl");
+
+      // Perform updates based on image type
+      if (imageUploadFrom == "ProfileImage") {
+        profileImageUrl.value = downloadUrl; // update local profile
+        pickedImageFile.value = null;        // clear local file
+        // show a preview instantly if needed (via Obx Image)
+        ConstantsUtils.showToast("Profile image updated");
+      } else if (imageUploadFrom == "CompanyLogo") {
+        companyLogoUrl.value = downloadUrl; // update local profile
+        pickedImageFile.value = null;        // clear local file
+      } else {
+        coverBgImage.value = downloadUrl; // update local profile
+        pickedImageFile.value = null;
+        // clear local file
+        await repository.updateProfileRequest(
+            loginResponse.value?.data?.tokenDetail?.token,
+            loginResponse.value?.data?.uniqueId,
+            {"coverImageUrl": coverBgImage.value}
+        );
+        ConstantsUtils.showToast("Cover image updated");
+      }
+
+    } catch (e) {
+      print("Error uploading image: $e");
+      Get.snackbar("Error", "Failed to upload image");
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -365,7 +428,7 @@ class PublicProfileController extends GetxController {
         "twitterProfileUrl": twitterController.text.trim(),
         "facebookProfileUrl": facebookController.text.trim(),
         "address": {"city": city, "state": state, "country": country},
-        "imageUrl": profileImageUrl.value,
+        "image_url": profileImageUrl.value,
       };
 
       final response = await repository.updatePublicProfileRequest(
@@ -691,12 +754,12 @@ class PublicProfileController extends GetxController {
     }
   }
 
-  // Methods for Experience section
   Future<void> addOrUpdateExperince({
     String? expId,
     required BuildContext bottomSheetContext,
     required int status,
-    Experience? editItem, // Pass existing item if editing
+    Experience? editItem,
+    String? localImageFilePath, // new param
   })
   async {
     try {
@@ -705,43 +768,30 @@ class PublicProfileController extends GetxController {
 
       final isEditing = expId != null;
 
-      // Determine if the user is currently working
       final isChecked = status == 1 || status == 2;
 
-      // Parse and convert dates to milliseconds
-      final startMillis = ConstantsUtils.convertDobToTimestamp(
-        startDateController.text.trim(),
-      );
-      final endMillis =
-          isChecked
-              ? 0
-              : ConstantsUtils.convertDobToTimestamp(
-                endDateController.text.trim(),
-              );
+      final startMillis = ConstantsUtils.convertDobToTimestamp(startDateController.text.trim());
+      final endMillis = isChecked ? 0 : ConstantsUtils.convertDobToTimestamp(endDateController.text.trim());
 
-      // Determine the final status
       int finalStatus;
       if (isEditing && isChecked && (editItem?.status == 2)) {
-        finalStatus = 2; // Preserve status == 2 from backend
+        finalStatus = 2;
       } else {
-        finalStatus =
-            isChecked ? 1 : 0; // 1 = currently working, 0 = not working
+        finalStatus = isChecked ? 1 : 0;
       }
 
-      // Create request payload
-      final Map<String, dynamic> userProfileBody = {
+      // Prepare body WITHOUT logoUrl (upload later)
+      final userProfileBody = {
         "experience": {
           "company": companyController.text.trim(),
           "experienceEndDate": endMillis,
           "experienceStartDate": startMillis,
-          "logoUrl": '',
           "role": roleController.text.trim(),
           "status": finalStatus,
         },
         if (expId != null) "experienceId": expId,
       };
 
-      // Send update request
       final response = await repository.updateExperience(
         loginResponse.value?.data?.tokenDetail?.token,
         userProfileBody,
@@ -753,19 +803,28 @@ class PublicProfileController extends GetxController {
         loginResponse.value = response;
         experiences.value = response.data?.experience ?? [];
 
-        // Clear input fields
+        // 🔥 If added new experience & has local image to upload
+        if (!isEditing && localImageFilePath != null) {
+          // Get newly created expId from API response
+          final newExpId = response.data?.experience?.last.id;
+          if (newExpId != null) {
+            await uploadImageToFirebase(
+              File(localImageFilePath),
+              "CompanyLogo",
+              companyId: newExpId,
+            );
+          }
+        }
+
         roleController.clear();
         companyController.clear();
         startDateController.clear();
         endDateController.clear();
 
-        // Update main bottom nav controller
         final BottomNavController bottomNav = Get.find<BottomNavController>();
         bottomNav.loginResponse.value = response;
 
-        // Close bottom sheet
         Navigator.pop(bottomSheetContext);
-
         ConstantsUtils.showToast('Experience updated successfully');
       } else {
         errorMessage.value = response.message ?? 'Update failed';
@@ -776,6 +835,8 @@ class PublicProfileController extends GetxController {
       isLoading(false);
     }
   }
+
+
 
   // Method to delete an honor or award
   Future<void> deleteExperince(String expId) async {
