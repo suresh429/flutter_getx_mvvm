@@ -71,98 +71,112 @@ class _PublicProfileExperienceBottomSheetState
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: widget.controller.experienceFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: widget.controller.experienceFormKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.editItem != null
-                          ? 'Edit Experience'
-                          : 'Add Experience',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.editItem != null
+                              ? 'Edit Experience'
+                              : 'Add Experience',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(widget.bottomSheetContext),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(widget.bottomSheetContext),
+                    const SizedBox(height: 16),
+                    _buildTextField(widget.controller.roleController, 'Role'),
+                    const SizedBox(height: 12),
+                    _buildTextField(widget.controller.companyController, 'Company'),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: isCurrentlyWorking,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              isCurrentlyWorking = value ?? false;
+                            });
+                          },
+                        ),
+                        const Expanded(
+                          child: Text("I am currently working in this role."),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(widget.controller.roleController, 'Role'),
-                const SizedBox(height: 12),
-                _buildTextField(widget.controller.companyController, 'Company'),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: isCurrentlyWorking,
-                      activeColor: Theme.of(context).primaryColor,
-                      onChanged: (value) {
-                        setState(() {
-                          isCurrentlyWorking = value ?? false;
-                        });
-                      },
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDateField(
+                            widget.controller.startDateController,
+                            'Start Date',
+                            context,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildDateField(
+                            widget.controller.endDateController,
+                            'End Date',
+                            context,
+                            isDisabled: isCurrentlyWorking,
+                          ),
+                        ),
+                      ],
                     ),
-                    const Expanded(
-                      child: Text("I am currently working in this role."),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Company Logo (optional)',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDateField(
-                        widget.controller.startDateController,
-                        'Start Date',
-                        context,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDateField(
-                        widget.controller.endDateController,
-                        'End Date',
-                        context,
-                        isDisabled: isCurrentlyWorking,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Company Logo (optional)',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Obx(() {
-                  final pickedFile = widget.controller.pickedImageFile.value;
-                  Widget imageWidget;
-                  if (pickedFile != null) {
-                    imageWidget = Image.file(
-                      pickedFile,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    );
-                  } else if (widget.controller.companyLogoUrl.value.isNotEmpty) {
-                    imageWidget = Image.network(
-                      widget.controller.companyLogoUrl.value,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
+                    const SizedBox(height: 16),
+                    Obx(() {
+                      final pickedFile = widget.controller.pickedImageFile.value;
+                      Widget imageWidget;
+                      if (pickedFile != null) {
+                        imageWidget = Image.file(
+                          pickedFile,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        );
+                      } else if (widget.controller.companyLogoUrl.value.isNotEmpty) {
+                        imageWidget = Image.network(
+                          widget.controller.companyLogoUrl.value,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[300],
+                              child: Image.asset(
+                                'assets/profile_placeholder.png',
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        imageWidget = Container(
                           width: 80,
                           height: 80,
                           color: Colors.grey[300],
@@ -171,118 +185,118 @@ class _PublicProfileExperienceBottomSheetState
                             fit: BoxFit.cover,
                           ),
                         );
-                      },
-                    );
-                  } else {
-                    imageWidget = Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      child: Image.asset(
-                        'assets/profile_placeholder.png',
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                  return Stack(
-                    alignment: Alignment.topLeft,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: imageWidget,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: () async {
-                            // For add: only pick image, for edit: pick and upload
-                            final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-                            if (picked != null) {
-                              widget.controller.pickedImageFile.value = File(picked.path);
-                              if (widget.editItem != null && widget.editItem!.id != null) {
-                                // For edit, upload immediately
-                                await widget.controller.pickAndUploadImage(
-                                  "CompanyLogo",
-                                  companyId: widget.editItem!.id,
-                                );
-                              }
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              shape: BoxShape.circle,
+                      }
+                      return Stack(
+                        alignment: Alignment.topLeft,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: imageWidget,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: InkWell(
+                              onTap: () async {
+                                // For add: only pick image, for edit: pick and upload
+                                final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                if (picked != null) {
+                                  widget.controller.pickedImageFile.value = File(picked.path);
+                                  if (widget.editItem != null && widget.editItem!.id != null) {
+                                    // For edit, upload immediately
+                                    await widget.controller.pickAndUploadImage(
+                                      "CompanyLogo",
+                                      companyId: widget.editItem!.id,
+                                    );
+                                  }
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: Colors.white,
+                          ),
+                        ],
+                      );
+                    }),
+
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          if (widget.controller.experienceFormKey.currentState!
+                              .validate()) {
+                            widget.controller.addOrUpdateExperince(
+                              expId: widget.editItem?.id,
+                              bottomSheetContext: widget.bottomSheetContext,
+                              status: isCurrentlyWorking ? 1 : 0,
+                              editItem: widget.editItem,
+                              localImageFilePath: widget.controller.pickedImageFile.value?.path,
+                            );
+                          }
+                        },
+                        child: Text(
+                          widget.editItem != null ? 'Update' : 'Add',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    if (widget.editItem != null) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () {
+                            widget.controller.deleteExperince(widget.editItem!.id!);
+                            Navigator.pop(widget.bottomSheetContext);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                         ),
                       ),
                     ],
-                  );
-                }),
-
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (widget.controller.experienceFormKey.currentState!
-                          .validate()) {
-                        widget.controller.addOrUpdateExperince(
-                          expId: widget.editItem?.id,
-                          bottomSheetContext: widget.bottomSheetContext,
-                          status: isCurrentlyWorking ? 1 : 0,
-                          editItem: widget.editItem,
-                          localImageFilePath: widget.controller.pickedImageFile.value?.path,
-                        );
-                      }
-                    },
-                    child: Text(
-                      widget.editItem != null ? 'Update' : 'Add',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  ],
                 ),
-                if (widget.editItem != null) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      label: const Text(
-                        "Delete",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      onPressed: () {
-                        widget.controller.deleteExperince(widget.editItem!.id!);
-                        Navigator.pop(widget.bottomSheetContext);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+              ),
+            ),
+            Obx(() => widget.controller.isLoading.value
+                ? Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withOpacity(0.2),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
-                  ),
-                ],
-              ],
-            ),
-          ),
+                  )
+                : const SizedBox.shrink()),
+          ],
         ),
       ),
     );
