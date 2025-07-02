@@ -164,6 +164,15 @@ class _ExploreCardState extends State<ExploreCard> {
                   widget.exploreModel.isScholarshipApplied.value
                       ? Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(
+                        0x1D8AD37F,
+                      ),
+                      borderRadius:
+                      BorderRadius.circular(
+                        5,
+                      ),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

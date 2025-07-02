@@ -185,6 +185,23 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           ),
         ),
         Positioned(
+          top: 8,
+          left: 8,
+          child: InkWell(
+            onTap: (){
+              Get.back();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back, size: 18, color: Colors.red),
+            ),
+          ),
+        ),
+        Positioned(
           top: 90,
           left: 0,
           right: 0,
