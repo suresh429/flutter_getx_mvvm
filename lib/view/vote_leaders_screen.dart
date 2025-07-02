@@ -71,7 +71,7 @@ class VoteLeadersScreen extends StatelessWidget {
         }
 
         if (controller.requests.isEmpty) {
-          return const Center(child: Text("No Activities found."));
+          return const Center(child: Text("Uh-Oh! No new TALLeaders."));
         }
 
         return ListView.builder(

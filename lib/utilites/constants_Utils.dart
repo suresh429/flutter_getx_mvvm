@@ -301,4 +301,9 @@ static Future<LoginModel?> getStoredLoginResponse() async {
     final formatter = DateFormat('MMM dd, yyyy');
     return formatter.format(date);
   }
+
+  static String formatDateTimeComments(int? timestamp) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp!);
+    return DateFormat("dd-MMM-yyyy hh:mm a").format(dateTime);
+  }
 }

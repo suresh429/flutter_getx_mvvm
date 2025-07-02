@@ -5,7 +5,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../env/app_env.dart';
+import '../model/MedialModel.dart';
+import '../model/RevieModel.dart';
 import '../utilites/colors.dart';
+import '../utilites/constants_Utils.dart';
 import '../view_model/bottom_nav_controller.dart';
 import '../view_model/details_page_controller.dart';
 
@@ -49,424 +52,558 @@ class _DetailsScreenState extends State<DetailsScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       body: Obx(
-            () =>
-        controller.isLoading.value
-            ? const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-          ),
-        )
-            : DefaultTabController(
-          length: 3,
-          child: NestedScrollView(
-            headerSliverBuilder: (BuildContext context,
-                bool innerBoxIsScrolled,) {
-              return [
-                SliverAppBar(
-                  expandedHeight: controller.isScholarshipApplied.value
-                      ? 460
-                      : 430,
-                  // Adjust height dynamically
-                  floating: false,
-                  pinned: true,
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.black,
-                    ),
-                    onPressed: () => Get.back(),
+        () =>
+            controller.isLoading.value
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
                   ),
-                  actions: [
-                    Obx(() =>
-                        IconButton(
-                          onPressed: () {
-                            controller.exploreModel.isFavorite.value =
-                            !controller.exploreModel.isFavorite.value;
-                            exploreController.addToFav(
-                                [controller.exploreModel.id],
-                                controller.exploreModel.isFavorite.value
-                                    ? "favourite"
-                                    : 'unfavourite');
-                          },
-                          icon: Icon(
-                            controller.exploreModel.isFavorite.value
-                                ? Icons.favorite
-                                : Icons.favorite_border_outlined,
-                            size: 24,
-                            color: controller.exploreModel.isFavorite.value
-                                ? Colors.red
-                                : Colors.grey,
+                )
+                : DefaultTabController(
+                  length: 3,
+                  child: NestedScrollView(
+                    headerSliverBuilder: (
+                      BuildContext context,
+                      bool innerBoxIsScrolled,
+                    ) {
+                      return [
+                        SliverAppBar(
+                          expandedHeight:
+                              controller.isScholarshipApplied.value ? 460 : 430,
+                          // Adjust height dynamically
+                          floating: false,
+                          pinned: true,
+                          elevation: 0,
+                          backgroundColor: Colors.white,
+                          leading: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.black,
+                            ),
+                            onPressed: () => Get.back(),
                           ),
-                        ),
-                    ),
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.black),
-                      onSelected: (value) {
-                        if (value == 'report') {
-                          _showInitialReportDialog(context);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'report',
-                          child: Text('Report'),
-                        ),
-
-                      ],
-                    )
-
-                  ],
-                  title: const Text(
-                    "Request Details",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      fit: StackFit.loose,
-                      children: [
-                        // Banner Image
-                        Positioned(
-                          top: kToolbarHeight + 60,
-                          left: 0,
-                          right: 0,
-                          height: 150,
-                          child: Obx(
-                                () =>
-                                Image.network(
-                                  controller.imageUrl.value,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context,
-                                      error,
-                                      stackTrace,) =>
-                                      Image.asset(
-                                        'assets/card_default_image.webp',
-                                        fit: BoxFit.cover,
-                                      ),
+                          actions: [
+                            Obx(
+                              () => IconButton(
+                                onPressed: () {
+                                  controller.exploreModel.isFavorite.value =
+                                      !controller.exploreModel.isFavorite.value;
+                                  exploreController.addToFav(
+                                    [controller.exploreModel.id],
+                                    controller.exploreModel.isFavorite.value
+                                        ? "favourite"
+                                        : 'unfavourite',
+                                  );
+                                },
+                                icon: Icon(
+                                  controller.exploreModel.isFavorite.value
+                                      ? Icons.favorite
+                                      : Icons.favorite_border_outlined,
+                                  size: 24,
+                                  color:
+                                      controller.exploreModel.isFavorite.value
+                                          ? Colors.red
+                                          : Colors.grey,
                                 ),
-                          ),
-                        ),
-
-                        // White Card
-                        Positioned(
-                          top: kToolbarHeight + 120,
-                          // Adjusted to fit below banner image
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width - 32, // Match horizontal margins
                               ),
-                              child: Card(
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            ),
+                            PopupMenuButton<String>(
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Colors.black,
+                              ),
+                              onSelected: (value) {
+                                if (value == 'report') {
+                                  _showInitialReportDialog(context);
+                                }
+                              },
+                              itemBuilder:
+                                  (BuildContext context) =>
+                                      <PopupMenuEntry<String>>[
+                                        const PopupMenuItem<String>(
+                                          value: 'report',
+                                          child: Text('Report'),
+                                        ),
+                                      ],
+                            ),
+                          ],
+                          title: const Text(
+                            "Request Details",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Stack(
+                              fit: StackFit.loose,
+                              children: [
+                                // Banner Image
+                                Positioned(
+                                  top: kToolbarHeight + 60,
+                                  left: 0,
+                                  right: 0,
+                                  height: 150,
+                                  child: Obx(
+                                    () => Image.network(
+                                      controller.imageUrl.value,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) => Image.asset(
+                                            'assets/card_default_image.webp',
+                                            fit: BoxFit.cover,
+                                          ),
+                                    ),
+                                  ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Obx(() =>
-                                          Text(
-                                            controller.title.value,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          )),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                              Icons.access_time, size: 16,
-                                              color: Colors.grey),
-                                          const SizedBox(width: 4),
-                                          Obx(() =>
-                                              Text(
-                                                controller.daysLeft.value,
-                                                style: const TextStyle(
-                                                    color: Colors.grey),
-                                              )),
-                                        ],
+
+                                // White Card
+                                Positioned(
+                                  top: kToolbarHeight + 120,
+                                  // Adjusted to fit below banner image
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width -
+                                            32, // Match horizontal margins
                                       ),
-                                      const SizedBox(height: 12),
-                                      Obx(() =>
-                                          Text(
-                                            controller.preferredTitle.value,
-                                            style: const TextStyle(
-                                                color: Colors.grey),
-                                          )),
-                                      Obx(() =>
-                                          Text(
-                                            controller.preferredValue.value,
-                                            style: const TextStyle(
-                                                color: Colors.black),
-                                          )),
-                                      const SizedBox(height: 12),
-                                      Obx(() =>
-                                          Text(
-                                            controller.languageTitle.value,
-                                            style: const TextStyle(
-                                                color: Colors.grey),
-                                          )),
-                                      Obx(() =>
-                                          Row(
+                                      child: Card(
+                                        elevation: 2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              if (controller.currentRequestType
-                                                  .value == "podcast" &&
-                                                  controller.languageTitle.value
-                                                      .contains("Mode"))
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .only(right: 8.0),
-                                                  child: Icon(
-                                                    Icons.videocam,
-                                                    size: 20,
-                                                    color: Colors.grey[600],
+                                              Obx(
+                                                () => Text(
+                                                  controller.title.value,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              Expanded(
-                                                child: Text(
-                                                  controller.languageValue
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.access_time,
+                                                    size: 16,
+                                                    color: Colors.grey,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Obx(
+                                                    () => Text(
+                                                      controller.daysLeft.value,
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Obx(
+                                                () => Text(
+                                                  controller
+                                                      .preferredTitle
+                                                      .value,
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                              Obx(
+                                                () => Text(
+                                                  controller
+                                                      .preferredValue
                                                       .value,
                                                   style: const TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 16,
                                                   ),
                                                 ),
                                               ),
-                                            ],
-                                          )),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .spaceEvenly,
-                                        children: [
-                                          // Like Button
-                                          SizedBox(
-                                            width: 80,
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Obx(() {
-                                                  return IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints(),
-                                                    icon: Icon(
-                                                      Icons.thumb_up,
-                                                      size: 20,
-                                                      color: controller
-                                                          .exploreModel.isLike
-                                                          .value
-                                                          ? Colors.red
-                                                          : Colors.grey,
-                                                    ),
-                                                    onPressed: () {
-                                                      controller.exploreModel
-                                                          .isLike.value =
-                                                      !controller.exploreModel
-                                                          .isLike.value;
-                                                      if (controller
-                                                          .exploreModel.isLike
-                                                          .value) {
-                                                        controller.exploreModel
-                                                            .likesCount++;
-                                                      } else {
-                                                        controller.exploreModel
-                                                            .likesCount--;
-                                                      }
-                                                      exploreController
-                                                          .likeUnlikeRequest(
-                                                          controller
-                                                              .exploreModel.id,
-                                                          controller
-                                                              .exploreModel
-                                                              .isLike.value
-                                                              ? "like"
-                                                              : 'unlike');
-                                                    },
-                                                  );
-                                                }),
-                                                Obx(() =>
-                                                    Text(
-                                                      controller.exploreModel
-                                                          .likesCount
-                                                          .toString(),
-                                                      style: const TextStyle(
-                                                          fontSize: 14),
-                                                      overflow: TextOverflow
-                                                          .ellipsis,
-                                                      maxLines: 1,
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                          // Comment Button
-                                          SizedBox(
-                                            width: 80,
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  constraints: const BoxConstraints(),
-                                                  icon: const Icon(
-                                                      Icons.comment, size: 20,
-                                                      color: Colors.grey),
-                                                  onPressed: () {
-                                                    _tabController.animateTo(2);
-                                                  },
-                                                ),
-                                                Text(
-                                                  controller.exploreModel
-                                                      .commentsCount.toString(),
+                                              const SizedBox(height: 12),
+                                              Obx(
+                                                () => Text(
+                                                  controller
+                                                      .languageTitle
+                                                      .value,
                                                   style: const TextStyle(
-                                                      fontSize: 14),
-                                                  overflow: TextOverflow
-                                                      .ellipsis,
-                                                  maxLines: 1,
+                                                    color: Colors.grey,
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Share Button
-                                          SizedBox(
-                                            width: 80,
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  constraints: const BoxConstraints(),
-                                                  icon: const Icon(
-                                                      Icons.share, size: 20,
-                                                      color: Colors.grey),
-                                                  onPressed: () {
-                                                    controller.exploreModel
-                                                        .sharesCount++;
-                                                    exploreController
-                                                        .shareRequest(controller
-                                                        .exploreModel.id);
-                                                    var title = controller
-                                                        .exploreModel.title
-                                                        .replaceAll(' ', '-');
-                                                    var url = "${AppEnvironment
-                                                        .baseWebUrl}/donationRequest/$title";
-                                                    Share.share(url,
-                                                        subject: 'TALLeaders');
-                                                  },
-                                                ),
-                                                Obx(() =>
-                                                    Text(
-                                                      controller.exploreModel
-                                                          .sharesCount
-                                                          .toString(),
-                                                      style: const TextStyle(
-                                                          fontSize: 14),
-                                                      overflow: TextOverflow
-                                                          .ellipsis,
-                                                      maxLines: 1,
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      // Conditionally render Interest Sent container
-                                      Obx(() =>
-                                      controller.isScholarshipApplied.value
-                                          ? Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0x1D8AD37F),
-                                          borderRadius: BorderRadius.circular(
-                                              5),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons
-                                                  .check_circle_outline_outlined,
-                                              color: ColorUtils.colorGreen,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              'Interest Sent',
-                                              style: TextStyle(
-                                                color: ColorUtils.colorGreen,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
                                               ),
-                                            ),
-                                          ],
+                                              Obx(
+                                                () => Row(
+                                                  children: [
+                                                    if (controller
+                                                                .currentRequestType
+                                                                .value ==
+                                                            "podcast" &&
+                                                        controller
+                                                            .languageTitle
+                                                            .value
+                                                            .contains("Mode"))
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.only(
+                                                              right: 8.0,
+                                                            ),
+                                                        child: Icon(
+                                                          Icons.videocam,
+                                                          size: 20,
+                                                          color:
+                                                              Colors.grey[600],
+                                                        ),
+                                                      ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        controller
+                                                            .languageValue
+                                                            .value,
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  // Like Button
+                                                  SizedBox(
+                                                    width: 80,
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Obx(() {
+                                                          return IconButton(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            constraints:
+                                                                const BoxConstraints(),
+                                                            icon: Icon(
+                                                              Icons.thumb_up,
+                                                              size: 20,
+                                                              color:
+                                                                  controller
+                                                                          .exploreModel
+                                                                          .isLike
+                                                                          .value
+                                                                      ? Colors
+                                                                          .red
+                                                                      : Colors
+                                                                          .grey,
+                                                            ),
+                                                            onPressed: () {
+                                                              controller
+                                                                      .exploreModel
+                                                                      .isLike
+                                                                      .value =
+                                                                  !controller
+                                                                      .exploreModel
+                                                                      .isLike
+                                                                      .value;
+                                                              if (controller
+                                                                  .exploreModel
+                                                                  .isLike
+                                                                  .value) {
+                                                                controller
+                                                                    .exploreModel
+                                                                    .likesCount++;
+                                                              } else {
+                                                                controller
+                                                                    .exploreModel
+                                                                    .likesCount--;
+                                                              }
+                                                              exploreController.likeUnlikeRequest(
+                                                                controller
+                                                                    .exploreModel
+                                                                    .id,
+                                                                controller
+                                                                        .exploreModel
+                                                                        .isLike
+                                                                        .value
+                                                                    ? "like"
+                                                                    : 'unlike',
+                                                              );
+                                                            },
+                                                          );
+                                                        }),
+                                                        Obx(
+                                                          () => Text(
+                                                            controller
+                                                                .exploreModel
+                                                                .likesCount
+                                                                .toString(),
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 14,
+                                                                ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Comment Button
+                                                  SizedBox(
+                                                    width: 80,
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        IconButton(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          constraints:
+                                                              const BoxConstraints(),
+                                                          icon: const Icon(
+                                                            Icons.comment,
+                                                            size: 20,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          onPressed: () {
+                                                            _tabController
+                                                                .animateTo(2);
+                                                          },
+                                                        ),
+                                                        Obx(() {
+                                                            return Text(
+                                                              controller
+                                                                  .exploreModel
+                                                                  .commentsCount
+                                                                  .toString(),
+                                                              style:
+                                                                  const TextStyle(
+                                                                    fontSize: 14,
+                                                                  ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              maxLines: 1,
+                                                            );
+                                                          }
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Share Button
+                                                  SizedBox(
+                                                    width: 80,
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        IconButton(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          constraints:
+                                                              const BoxConstraints(),
+                                                          icon: const Icon(
+                                                            Icons.share,
+                                                            size: 20,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          onPressed: () {
+                                                            controller
+                                                                .exploreModel
+                                                                .sharesCount++;
+                                                            exploreController
+                                                                .shareRequest(
+                                                                  controller
+                                                                      .exploreModel
+                                                                      .id,
+                                                                );
+                                                            var title =
+                                                                controller
+                                                                    .exploreModel
+                                                                    .title
+                                                                    .replaceAll(
+                                                                      ' ',
+                                                                      '-',
+                                                                    );
+                                                            var url =
+                                                                "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                                            Share.share(
+                                                              url,
+                                                              subject:
+                                                                  'TALLeaders',
+                                                            );
+                                                          },
+                                                        ),
+                                                        Obx(
+                                                          () => Text(
+                                                            controller
+                                                                .exploreModel
+                                                                .sharesCount
+                                                                .toString(),
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 14,
+                                                                ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              // Conditionally render Interest Sent container
+                                              Obx(
+                                                () =>
+                                                    controller
+                                                            .isScholarshipApplied
+                                                            .value
+                                                        ? Container(
+                                                          width:
+                                                              double.infinity,
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 10,
+                                                                vertical: 8,
+                                                              ),
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(
+                                                              0x1D8AD37F,
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  5,
+                                                                ),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .check_circle_outline_outlined,
+                                                                color:
+                                                                    ColorUtils
+                                                                        .colorGreen,
+                                                                size: 18,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 5,
+                                                              ),
+                                                              Text(
+                                                                'Interest Sent',
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      ColorUtils
+                                                                          .colorGreen,
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                        : const SizedBox.shrink(),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ) : const SizedBox.shrink()),
-                                    ],
+                                      ),
+                                    ),
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          bottom: PreferredSize(
+                            preferredSize: const Size.fromHeight(48),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.black12,
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                              child: TabBar(
+                                controller: _tabController,
+                                labelColor: Colors.black,
+                                unselectedLabelColor: Colors.grey,
+                                indicatorColor: Colors.black,
+                                tabs: const [
+                                  Tab(text: 'Request Info'),
+                                  Tab(text: 'Uploads'),
+                                  Tab(text: 'Comments'),
+                                ],
                               ),
                             ),
                           ),
                         ),
+                      ];
+                    },
+                    body: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        SingleChildScrollView(
+                          child: Column(children: [_buildRequestInfo()]),
+                        ),
+                        Obx(() {
+                          if (controller.allMediaList.isEmpty) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Text("Uh-oh! No documents uploaded."),
+                              ),
+                            );
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.only(top: 8, bottom: 16),
+                            itemCount: controller.allMediaList.length,
+                            itemBuilder: (context, index) {
+                              return _buildUploads(
+                                controller.allMediaList[index],
+                              );
+                            },
+                          );
+                        }),
+
+                        _buildCommentsSection(controller),
                       ],
                     ),
                   ),
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(48),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black12,
-                            width: 0.5,
-                          ),
-                        ),
-                      ),
-                      child: TabBar(
-                        controller: _tabController,
-                        labelColor: Colors.black,
-                        unselectedLabelColor: Colors.grey,
-                        indicatorColor: Colors.black,
-                        tabs: const [
-                          Tab(text: 'Request Info'),
-                          Tab(text: 'Uploads'),
-                          Tab(text: 'Comments'),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
-              ];
-            },
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                SingleChildScrollView(
-                  child: Column(children: [_buildRequestInfo()]),
-                ),
-                SingleChildScrollView(child: _buildUploads()),
-                _buildComments(),
-              ],
-            ),
-          ),
-        ),
       ),
       bottomNavigationBar: Obx(() {
         if (controller.isScholarshipApplied == null) {
@@ -479,36 +616,36 @@ class _DetailsScreenState extends State<DetailsScreen>
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 15.0, right: 15.0, bottom: 20.0, top: 5.0),
+                  left: 15.0,
+                  right: 15.0,
+                  bottom: 20.0,
+                  top: 5.0,
+                ),
                 child: Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: controller.exploreModel != null
-                            ? () {
-                          controller.exploreModel.sharesCount++;
-                          exploreController.shareRequest(
-                              controller.exploreModel.id);
-                          var title = controller.exploreModel.title.replaceAll(
-                              ' ', '-');
-                          var url = "${AppEnvironment
-                              .baseWebUrl}/donationRequest/$title";
-                          Share.share(url, subject: 'TALLeaders');
-                        }
-                            : null,
+                        onPressed:
+                            controller.exploreModel != null
+                                ? () {
+                                  controller.exploreModel.sharesCount++;
+                                  exploreController.shareRequest(
+                                    controller.exploreModel.id,
+                                  );
+                                  var title = controller.exploreModel.title
+                                      .replaceAll(' ', '-');
+                                  var url =
+                                      "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                  Share.share(url, subject: 'TALLeaders');
+                                }
+                                : null,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Theme
-                              .of(context)
-                              .colorScheme
-                              .primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.primary,
                           side: BorderSide(
-                            color: Theme
-                                .of(context)
-                                .colorScheme
-                                .primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 10),
-
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -524,23 +661,31 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          print("isScholarshipApplied: ${controller
-                              .isScholarshipApplied.value}");
-                          final type = controller.isScholarshipApplied.value
-                              ? "withdraw"
-                              : "connect";
+                          print(
+                            "isScholarshipApplied: ${controller.isScholarshipApplied.value}",
+                          );
+                          final type =
+                              controller.isScholarshipApplied.value
+                                  ? "withdraw"
+                                  : "connect";
                           _showConnectDialog(context, type);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: controller.isScholarshipApplied.value
-                              ? Colors.transparent
-                              : Colors.red,
-                          foregroundColor: controller.isScholarshipApplied.value
-                              ? Colors.grey
-                              : Colors.white,
-                          side: controller.isScholarshipApplied.value
-                              ? const BorderSide(color: Colors.grey, width: 1)
-                              : BorderSide.none,
+                          backgroundColor:
+                              controller.isScholarshipApplied.value
+                                  ? Colors.transparent
+                                  : Colors.red,
+                          foregroundColor:
+                              controller.isScholarshipApplied.value
+                                  ? Colors.grey
+                                  : Colors.white,
+                          side:
+                              controller.isScholarshipApplied.value
+                                  ? const BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  )
+                                  : BorderSide.none,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
@@ -552,9 +697,10 @@ class _DetailsScreenState extends State<DetailsScreen>
                               ? "Withdraw"
                               : "Connect",
                           style: TextStyle(
-                            color: controller.isScholarshipApplied.value
-                                ? Colors.grey
-                                : Colors.white,
+                            color:
+                                controller.isScholarshipApplied.value
+                                    ? Colors.grey
+                                    : Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -658,15 +804,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.speakerQualifications
-                          .map(
-                            (qual) =>
-                            Chip(
-                              label: Text(qual),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.speakerQualifications
+                              .map(
+                                (qual) => Chip(
+                                  label: Text(qual),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 16),
 
@@ -699,15 +844,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.speakerLanguages
-                          .map(
-                            (lang) =>
-                            Chip(
-                              label: Text(lang),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.speakerLanguages
+                              .map(
+                                (lang) => Chip(
+                                  label: Text(lang),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 16),
 
@@ -800,40 +944,34 @@ class _DetailsScreenState extends State<DetailsScreen>
 
                     const SizedBox(height: 24),
                     Obx(
-                          () =>
-                          _buildDetailItem(
-                            "Preferred Language",
-                            controller.preferredLanguage.value,
-                          ),
+                      () => _buildDetailItem(
+                        "Preferred Language",
+                        controller.preferredLanguage.value,
+                      ),
                     ),
                     Obx(
-                          () =>
-                          _buildDetailItem(
-                            "Deadline for Guest Confirmation",
-                            controller.guestConfirmationDeadline.value ??
-                                ' N/A',
-                          ),
+                      () => _buildDetailItem(
+                        "Deadline for Guest Confirmation",
+                        controller.guestConfirmationDeadline.value ?? ' N/A',
+                      ),
                     ),
                     Obx(
-                          () =>
-                          _buildDetailItem(
-                            "Expected Duration of Speech (minutes)",
-                            "${controller.expectedDuration.value}",
-                          ),
+                      () => _buildDetailItem(
+                        "Expected Duration of Speech (minutes)",
+                        "${controller.expectedDuration.value}",
+                      ),
                     ),
                     Obx(
-                          () =>
-                          _buildDetailItem(
-                            "Commercial",
-                            controller.commercial.value,
-                          ),
+                      () => _buildDetailItem(
+                        "Commercial",
+                        controller.commercial.value,
+                      ),
                     ),
                     Obx(
-                          () =>
-                          _buildDetailItem(
-                            "Speaker Fee",
-                            "\$${controller.stipendFee.value}",
-                          ),
+                      () => _buildDetailItem(
+                        "Speaker Fee",
+                        "\$${controller.stipendFee.value}",
+                      ),
                     ),
                   ],
                 );
@@ -877,15 +1015,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.mentorQualifications
-                          .map(
-                            (qual) =>
-                            Chip(
-                              label: Text(qual),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.mentorQualifications
+                              .map(
+                                (qual) => Chip(
+                                  label: Text(qual),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 24),
 
@@ -968,15 +1105,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.boardExpertise
-                          .map(
-                            (skill) =>
-                            Chip(
-                              label: Text(skill),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.boardExpertise
+                              .map(
+                                (skill) => Chip(
+                                  label: Text(skill),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 24),
 
@@ -1016,15 +1152,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.boardPersonalTraits
-                          .map(
-                            (trait) =>
-                            Chip(
-                              label: Text(trait),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.boardPersonalTraits
+                              .map(
+                                (trait) => Chip(
+                                  label: Text(trait),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 24),
 
@@ -1050,15 +1185,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                     Wrap(
                       spacing: 8,
                       children:
-                      controller.boardQualifications
-                          .map(
-                            (qual) =>
-                            Chip(
-                              label: Text(qual),
-                              backgroundColor: Colors.grey[200],
-                            ),
-                      )
-                          .toList(),
+                          controller.boardQualifications
+                              .map(
+                                (qual) => Chip(
+                                  label: Text(qual),
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                              )
+                              .toList(),
                     ),
                     const SizedBox(height: 24),
 
@@ -1109,29 +1243,29 @@ class _DetailsScreenState extends State<DetailsScreen>
                         Obx(() {
                           final imageUrl = controller.profileImageUrl.value;
                           final profileInitial =
-                          controller.profileName.value.isNotEmpty
-                              ? controller.profileName.value[0]
-                              .toUpperCase()
-                              : "A";
+                              controller.profileName.value.isNotEmpty
+                                  ? controller.profileName.value[0]
+                                      .toUpperCase()
+                                  : "A";
 
                           return CircleAvatar(
                             radius: 20,
                             backgroundColor: Colors.green,
                             backgroundImage:
-                            (imageUrl.isNotEmpty)
-                                ? NetworkImage(imageUrl)
-                                : null, // Only set if image is not empty
+                                (imageUrl.isNotEmpty)
+                                    ? NetworkImage(imageUrl)
+                                    : null, // Only set if image is not empty
                             child:
-                            (imageUrl.isEmpty)
-                                ? Text(
-                              profileInitial,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                                : null, // If image is loaded, no child needed
+                                (imageUrl.isEmpty)
+                                    ? Text(
+                                      profileInitial,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                    : null, // If image is loaded, no child needed
                           );
                         }),
                         const SizedBox(width: 12),
@@ -1157,24 +1291,23 @@ class _DetailsScreenState extends State<DetailsScreen>
                               ),
                               const SizedBox(height: 4),
                               Obx(
-                                    () =>
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.location_on,
-                                          size: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          controller.profileLocation.value,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
+                                () => Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on,
+                                      size: 14,
+                                      color: Colors.grey,
                                     ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      controller.profileLocation.value,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -1229,8 +1362,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                               controller.orgImageUrl.value,
                               fit: BoxFit.cover,
                               errorBuilder:
-                                  (context, error, stackTrace) =>
-                                  Icon(
+                                  (context, error, stackTrace) => Icon(
                                     Icons.business,
                                     color: Colors.grey[400],
                                     size: 24,
@@ -1261,24 +1393,23 @@ class _DetailsScreenState extends State<DetailsScreen>
                               ),
                               const SizedBox(height: 4),
                               Obx(
-                                    () =>
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.location_on,
-                                          size: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          controller.orgLocation.value,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
+                                () => Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on,
+                                      size: 14,
+                                      color: Colors.grey,
                                     ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      controller.orgLocation.value,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -1313,151 +1444,321 @@ class _DetailsScreenState extends State<DetailsScreen>
     );
   }
 
-  Widget _buildUploads() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+  Widget _buildUploads(MediaItem media) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-        title: const Text("Board Member Document.pdf"),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading:
+            media.name.endsWith('.pdf')
+                ? const Icon(Icons.picture_as_pdf_outlined, color: Colors.grey)
+                : ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(
+                    media.url,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, color: Colors.grey),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+        title: Text(media.name),
         trailing: const Icon(Icons.visibility),
-        onTap: () {},
+        onTap: () {
+          if (media.name.endsWith('.pdf')) {
+            launchUrl(
+              Uri.parse(media.url),
+              mode: LaunchMode.externalApplication,
+            );
+          } else {
+            Get.dialog(
+              Dialog(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Image.network(
+                    media.url,
+                    fit: BoxFit.contain,
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            const Text('Could not load image'),
+                  ),
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget _buildComments() {
-    return Stack(
-      children: [
-        ListView(
-          padding: const EdgeInsets.all(16).copyWith(bottom: 80),
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  backgroundImage: AssetImage('assets/avatar.png'),
-                  radius: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "LaLisa Manoban",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                "20-Jun-2025 02:02 PM",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_horiz),
-                            itemBuilder:
-                                (context) =>
-                            [
-                              const PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit'),
-                              ),
-                              const PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Delete'),
-                              ),
-                            ],
-                            onSelected: (value) {
-                              // Handle menu item selection
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text("hi"),
-                      const SizedBox(height: 8),
-                      const Text("Reply", style: TextStyle(color: Colors.grey)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  backgroundImage: AssetImage('assets/avatar.png'),
-                  radius: 18,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Add a comment...",
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      suffixIcon: Container(
-                        margin: const EdgeInsets.all(8),
-                        child: IconButton(
-                          icon: const Icon(Icons.send, color: Colors.red),
-                          onPressed: () {},
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+  Widget _buildCommentsSection(DetailsPageController controller) {
+    return Obx(() {
+      return Stack(
+        children: [
+          // This is the scroll area (comments or empty text)
+          if (controller.isLoading.value)
+            const Center(child: CircularProgressIndicator())
+          else if (controller.listReviews.isEmpty)
+            ListView(
+              padding: const EdgeInsets.all(16),
+              children: const [
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Oh-no! No comments yet.",
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
               ],
+            )
+          else
+            ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: controller.listReviews.length,
+              itemBuilder: (context, index) {
+                final review = controller.listReviews[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundImage:
+                              (review.senderProfileImageUrl != null &&
+                                      review.senderProfileImageUrl!.isNotEmpty)
+                                  ? NetworkImage(review.senderProfileImageUrl!)
+                                  : const AssetImage(
+                                        'assets/profile_placeholder.png',
+                                      )
+                                      as ImageProvider,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        review.senderName ?? "Anonymous",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Text(
+                                        ConstantsUtils.formatDateTimeComments(
+                                          review.whenSent,
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  PopupMenuButton<String>(
+                                    icon: const Icon(Icons.more_horiz),
+                                    itemBuilder:
+                                        (context) => const [
+                                          PopupMenuItem(
+                                            value: 'edit',
+                                            child: Text('Edit'),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Text('Delete'),
+                                          ),
+                                        ],
+                                    onSelected: (value) {
+                                      // Handle actions
+                                      if (value == 'edit') {
+                                        controller.isEditClicked.value = true;
+                                        controller.editReviewModel.value = review;
+                                        controller.commentController.text = review.text ?? '';
+                                      } else if (value == 'delete') {
+                                        // handle delete
+                                        controller.deleteComment(review.id!,exploreModel.id?? "");
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(review.text ?? "No message"),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.reply, size: 16, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              InkWell(
+                                onTap: () {
+                                  Get.toNamed('/commentReply', arguments: {
+                                    'reviewId': review.id,
+                                    'exploreId': exploreModel.id,
+                                  });
+                                },
+                                child: const Text(
+                                  "Reply",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Divider(color: Colors.grey.shade300, thickness: 1),
+                          const SizedBox(height: 4),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          // Always show comment input box
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundImage:
+                        (controller.currentUserProfileUrl.isNotEmpty)
+                            ? NetworkImage(
+                              controller.currentUserProfileUrl.value,
+                            )
+                            : const AssetImage('assets/profile_placeholder.png')
+                                as ImageProvider,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: controller.commentController,
+                      decoration: InputDecoration(
+                        hintText: "Add a comment...",
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        suffixIcon: Container(
+                          margin: const EdgeInsets.all(8),
+                          child: IconButton(
+                            icon: const Icon(Icons.send, color: Colors.red),
+                            onPressed: () {
+                              // send comment
+                              final text = controller.commentController.text.trim();
+                              if (text.isEmpty) {
+                                Get.snackbar("Comment cannot be empty", "");
+                                return;
+                              }
+
+                              if (controller.isEditClicked.value && controller.editReviewModel.value != null) {
+                                final updatedReview = ReviewModel(
+                                  id: controller.editReviewModel.value!.id,
+                                  userId: controller.editReviewModel.value!.userId,
+                                  senderProfileImageUrl: controller.editReviewModel.value!.senderProfileImageUrl,
+                                  senderName: controller.editReviewModel.value!.senderName,
+                                  text: text,
+                                  whenSent: DateTime.now().millisecondsSinceEpoch,
+                                  type: controller.editReviewModel.value!.type ?? "Text",
+                                );
+
+                                // Update Firebase
+                                controller.databaseReviews
+                                    .child(exploreModel.id)
+                                    .child(updatedReview.id!)
+                                    .set(updatedReview.toMap());
+
+                                // Update local list
+                                final index = controller.listReviews.indexWhere(
+                                      (element) => element.id == updatedReview.id,
+                                );
+                                if (index != -1) {
+                                  controller.listReviews[index] = updatedReview;
+                                  controller.listReviews.refresh();
+                                }
+
+                                controller.isEditClicked.value = false;
+                                controller.editReviewModel.value = null;
+                                controller.commentController.clear();
+                              } else {
+                                controller.submitComment(text, exploreModel.id);
+                                controller.commentController.clear();
+                              }
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   void _showCommentOptionsDialog(BuildContext context) {
@@ -1516,17 +1817,18 @@ class _DetailsScreenState extends State<DetailsScreen>
   }
 
   void _showConnectDialog(BuildContext context, String type) {
-    final regularText = type == "connect"
-        ? "Are you sure you want to Connect & express your interest for "
-        : "Are you sure you want to withdraw your interest from ";
+    final regularText =
+        type == "connect"
+            ? "Are you sure you want to Connect & express your interest for "
+            : "Are you sure you want to withdraw your interest from ";
 
     final titleText = "${controller.exploreModel.title} ?";
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext dialogContext) =>
-          AlertDialog(
+      builder:
+          (BuildContext dialogContext) => AlertDialog(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -1562,10 +1864,11 @@ class _DetailsScreenState extends State<DetailsScreen>
                 const SizedBox(height: 24),
                 _buildContactRow(
                   Icons.phone,
-                  controller.exploreModel.isScholarshipApplied == true ?
-                  (controller.exploreModel.userInfo?.phone ?? "")
+                  controller.exploreModel.isScholarshipApplied == true
+                      ? (controller.exploreModel.userInfo?.phone ?? "")
                       : _maskPhoneNumber(
-                      controller.exploreModel.userInfo?.phone ?? ""),
+                        controller.exploreModel.userInfo?.phone ?? "",
+                      ),
                 ),
                 const SizedBox(height: 16),
                 _buildContactRow(
@@ -1573,7 +1876,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                   controller.exploreModel.isScholarshipApplied == true
                       ? (controller.exploreModel.userInfo?.email ?? "")
                       : _maskEmail(
-                      controller.exploreModel.userInfo?.email ?? ""),
+                        controller.exploreModel.userInfo?.email ?? "",
+                      ),
                 ),
                 const SizedBox(height: 16),
                 _buildContactRow(
@@ -1602,10 +1906,12 @@ class _DetailsScreenState extends State<DetailsScreen>
                         onPressed: () async {
                           if (type == "connect") {
                             await controller.sendConnectRequest(
-                                donationRequestId: controller.exploreModel.id);
+                              donationRequestId: controller.exploreModel.id,
+                            );
                           } else {
                             await controller.sendWithdrawRequest(
-                                connectId: controller.connectId.value);
+                              connectId: controller.connectId.value,
+                            );
                           }
                           Navigator.of(dialogContext).pop();
                         },
@@ -1637,10 +1943,7 @@ class _DetailsScreenState extends State<DetailsScreen>
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
       ],
@@ -1660,17 +1963,21 @@ class _DetailsScreenState extends State<DetailsScreen>
 
     final username = parts[0];
     final domain = parts[1];
-    final maskedUsername = username.length > 2
-        ? "${username[0]}${username[1]}${'X' * (username.length - 2)}"
-        : username;
+    final maskedUsername =
+        username.length > 2
+            ? "${username[0]}${username[1]}${'X' * (username.length - 2)}"
+            : username;
 
     return "$maskedUsername@$domain";
   }
 
   String _formatLocation(String? city, String? state, String? country) {
-    final parts = [city, state, country]
-        .where((part) => part != null && part.isNotEmpty)
-        .toList();
+    final parts =
+        [
+          city,
+          state,
+          country,
+        ].where((part) => part != null && part.isNotEmpty).toList();
     return parts.isEmpty ? "N/A" : parts.join(", ");
   }
 
@@ -1695,26 +2002,23 @@ class _DetailsScreenState extends State<DetailsScreen>
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                 child: Text(
                   "Report",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
                   "Why are you reporting this post?",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ),
               const Divider(height: 24),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -1725,7 +2029,10 @@ class _DetailsScreenState extends State<DetailsScreen>
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
@@ -1733,9 +2040,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                           child: const Center(
                             child: Text(
                               "It's spam",
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
+                              style: TextStyle(fontSize: 16),
                             ),
                           ),
                         ),
@@ -1750,7 +2055,10 @@ class _DetailsScreenState extends State<DetailsScreen>
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
@@ -1758,9 +2066,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                           child: const Center(
                             child: Text(
                               "It's inappropriate",
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
+                              style: TextStyle(fontSize: 16),
                             ),
                           ),
                         ),
@@ -1770,10 +2076,9 @@ class _DetailsScreenState extends State<DetailsScreen>
                 ),
               ),
 
-
               const SizedBox(height: 30),
             ],
-          )
+          ),
         );
       },
     );
@@ -1792,7 +2097,7 @@ class _DetailsScreenState extends State<DetailsScreen>
           "Bullying or harassment",
           "Intellectual property violation",
           "Unauthorised Content",
-          "Phishing or Malware I just don't like it"
+          "Phishing or Malware I just don't like it",
         ];
 
         return Container(
@@ -1812,17 +2117,12 @@ class _DetailsScreenState extends State<DetailsScreen>
                 const SizedBox(height: 16),
                 const Text(
                   "Report",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   "Why are you reporting this post?",
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 16),
                 const Divider(height: 1),
@@ -1832,26 +2132,31 @@ class _DetailsScreenState extends State<DetailsScreen>
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: reportList.map((reason) {
-                        return ChoiceChip(
-                          label: Text(reason),
-                          selected: false,
-                          onSelected: (selected) {
-                            if (selected) {
-                                controller.reportSpamRequest(
+                      children:
+                          reportList.map((reason) {
+                            return ChoiceChip(
+                              label: Text(reason),
+                              selected: false,
+                              onSelected: (selected) {
+                                if (selected) {
+                                  controller.reportSpamRequest(
                                     reportId: controller.exploreModel.id,
-                                    reason: reason);
-                              Navigator.pop(context);
-                            }
-                          },
-                          shape: RoundedRectangleBorder(
-                            side: const BorderSide(color: Colors.grey, width: 1.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          backgroundColor: Colors.transparent,
-                          labelStyle: const TextStyle(color: Colors.black),
-                        );
-                      }).toList(),
+                                    reason: reason,
+                                  );
+                                  Navigator.pop(context);
+                                }
+                              },
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 1.2,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              backgroundColor: Colors.transparent,
+                              labelStyle: const TextStyle(color: Colors.black),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ),
@@ -1883,9 +2188,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                 padding: EdgeInsets.all(16),
                 child: Text(
                   "Are you sure you want to report this request as Spam?",
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
               const Divider(height: 1),
@@ -1910,8 +2213,9 @@ class _DetailsScreenState extends State<DetailsScreen>
                       child: ElevatedButton(
                         onPressed: () {
                           controller.reportSpamRequest(
-                              reportId: controller.exploreModel.id,
-                              reason: 'spam');
+                            reportId: controller.exploreModel.id,
+                            reason: 'spam',
+                          );
                           Navigator.pop(context);
                           //Get.delete<ExploreController>();
                           //Get.offAllNamed('/main', arguments: {'index': 1});
@@ -1938,5 +2242,4 @@ class _DetailsScreenState extends State<DetailsScreen>
       },
     );
   }
-
 }

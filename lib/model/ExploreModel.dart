@@ -18,7 +18,7 @@ class ExploreModel {
   final int? size;
 
   RxInt likesCount;
-  final int commentsCount;
+  RxInt commentsCount;
   RxInt sharesCount;
 
   final String city;
@@ -58,7 +58,7 @@ class ExploreModel {
     this.quantity,
     this.size,
     required int likesCount,
-    required this.commentsCount,
+    required int commentsCount,
     required int sharesCount,
     required this.city,
     required this.state,
@@ -77,6 +77,7 @@ class ExploreModel {
     required bool isLike,
     required bool isScholarshipApplied,
   })  : likesCount = likesCount.obs,
+        commentsCount = commentsCount.obs,
         sharesCount = sharesCount.obs,
         isFavorite = isFavorite.obs,
         isLike = isLike.obs,

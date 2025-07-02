@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -12,6 +13,7 @@ import '../service/ConnectivityService.dart';
 import '../service/main_repository.dart';
 import '../utilites/constants_Utils.dart' show ConstantsUtils;
 import '../utilites/error_handler.dart';
+import 'bottom_nav_controller.dart';
 
 class ProfileController extends GetxController {
   RxBool isLoading = false.obs;
@@ -69,6 +71,8 @@ class ProfileController extends GetxController {
       if (image != null) {
         pickedImageFile.value = File(image.path);
         profileImageUrl.value = image.path; // for local display fallback
+        // 🔥 upload to Firebase immediately after pick
+        await uploadImageToFirebase(pickedImageFile.value!, "/ProfilePictures/${userId.value}/profile_image.png");
       }
     } catch (e) {
       print('Error picking image: $e');
@@ -76,6 +80,23 @@ class ProfileController extends GetxController {
   }
 
 
+  Future<void> uploadImageToFirebase(File file, String uploadProfilePath) async {
+    try {
+      isLoading (true);
+      final refStorage = FirebaseStorage.instance.ref().child(uploadProfilePath);
+
+      final uploadTask = await refStorage.putFile(file);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      profileImageUrl.value = downloadUrl; // now points to Firebase URL
+      isLoading(false);
+
+      print('Uploaded image URL: $downloadUrl');
+    } catch (e) {
+      print('Error uploading image: $e');
+      isLoading(false);
+      Get.snackbar('Error', 'Failed to upload image');
+    }
+  }
 
   // Fetch profile data from API
   Future<void> getProfileData(String? uniqueId) async {
@@ -223,6 +244,8 @@ class ProfileController extends GetxController {
       isLoading(true);
       errorMessage.value = '';
 
+      print('Updating profile for ID: ${profileImageUrl.value}');
+
       final Map<String, dynamic> userProfileBody = {
         "name": {
           "first_name": firstName.value,
@@ -233,7 +256,7 @@ class ProfileController extends GetxController {
         "phone": '${selectedCountryCode.value.dialCode}${mobile.value.trim()}',
         "dob": DateFormat('dd-MMM-yyyy').parse(dob.value).millisecondsSinceEpoch,
         "gender": gender.value.toLowerCase()[0], // "Female" → "f"
-        "imageUrl": profileImageUrl.value,
+        "image_url": profileImageUrl.value,
         "address": {
           "city": ConstantsUtils.extractCity(city.value),
           "state": ConstantsUtils.extractState(city.value),
@@ -245,6 +268,9 @@ class ProfileController extends GetxController {
       if (response.statusCode == 200) {
         print('Profile updated successfully');
         await storage.write('userData', jsonEncode(response.toJson()));
+        loginResponse.value = response;
+        final BottomNavController bottomNav = Get.find<BottomNavController>();
+        bottomNav.loginResponse.value = response;
         ConstantsUtils.showToast('Profile updated successfully');
       } else {
         print('Update failed: ${response.message}');

@@ -143,7 +143,7 @@ class _PublicProfileExperienceBottomSheetState
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        'https://via.placeholder.com/300x150',
+                        widget.controller.companyLogoUrl.value,
                         // 🔁 Replace with your actual image URL
                         width: 80,
                         height: 80,
@@ -167,7 +167,10 @@ class _PublicProfileExperienceBottomSheetState
                       child: InkWell(
                         onTap: () {
                           // TODO: Add image picker or edit logic
-                          print('Edit image tapped');
+                          widget.controller.pickAndUploadImage(
+                              "CompanyLogo",
+                               companyId: widget.editItem?.id,
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.all(6),
@@ -206,6 +209,7 @@ class _PublicProfileExperienceBottomSheetState
                           bottomSheetContext: widget.bottomSheetContext,
                           status: isCurrentlyWorking ? 1 : 0,
                           editItem: widget.editItem,
+                          localImageFilePath: widget.controller.pickedImageFile.value?.path,
                         );
                       }
                     },

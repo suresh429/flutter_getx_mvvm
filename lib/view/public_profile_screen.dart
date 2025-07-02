@@ -170,7 +170,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           top: 8,
           right: 8,
           child: InkWell(
-            onTap: controller.pickImage,
+            onTap: (){
+              controller.pickAndUploadImage("CoverImage");
+            },
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
@@ -935,8 +937,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                             child: PublicProfileExperienceBottomSheet(
                               controller: controller,
                               bottomSheetContext: context,
-                              editItem:
-                                  experience, // ✅ Use actual experience object
+                              editItem: experience, // ✅ Use actual experience object
                             ),
                           );
                         },

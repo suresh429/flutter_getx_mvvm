@@ -1,3 +1,4 @@
+import 'package:TALLeaders/view/comment_reply_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -128,6 +129,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/userProfile', page: () => ProfileScreen()),
         GetPage(name: '/comments', page: () => const CommentsScreen()),
         GetPage(name: '/publicProfile', page: () =>  const PublicProfileScreen()),
+        GetPage(name: '/commentReply', page: () =>   CommentReplyPage()),
 
       ],
     );
