@@ -644,8 +644,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                             children: [
                               _experienceItem(
                                 index,
-                                exp.role!,
-                                exp.company!,
+                                exp.role.toString(),
+                                exp.company.toString(),
                                 date,
                                 context: context,
                               ),

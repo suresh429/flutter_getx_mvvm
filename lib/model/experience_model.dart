@@ -52,4 +52,32 @@ class Experience {
     "description": description,
     "designation": designation,
   };
+
+  Experience copyWith({
+    String? id,
+    String? role,
+    String? company,
+    int? experienceStartDate,
+    int? experienceEndDate,
+    String? logoUrl,
+    int? status,
+    DateTime? updatedAt,
+    DateTime? createdAt,
+    dynamic description,
+    dynamic designation,
+  }) {
+    return Experience(
+      id: id ?? this.id,
+      role: role ?? this.role,
+      company: company ?? this.company,
+      experienceStartDate: experienceStartDate ?? this.experienceStartDate,
+      experienceEndDate: experienceEndDate ?? this.experienceEndDate,
+      logoUrl: logoUrl ?? this.logoUrl,
+      status: status ?? this.status,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
+      description: description ?? this.description,
+      designation: designation ?? this.designation,
+    );
+  }
 }
