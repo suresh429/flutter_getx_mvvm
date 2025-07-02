@@ -15,10 +15,10 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('Profile'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
-        ),
+        leading: BackButton(
+        color: Colors.black, // sets the icon color
+        onPressed: () => Get.back(), // override behavior if you want
+      ),
         backgroundColor: Colors.white,
         elevation: 0,
       ),

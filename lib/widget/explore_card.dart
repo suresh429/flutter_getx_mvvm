@@ -268,7 +268,7 @@ class _ExploreCardState extends State<ExploreCard> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
-                                    onPressed: () {},
+                                    onPressed: () => Get.toNamed('/details', arguments: widget.exploreModel),
                                   ),
                                   Flexible(
                                     child: Obx( () {
@@ -329,14 +329,14 @@ class _ExploreCardState extends State<ExploreCard> {
     if (widget.exploreModel.defaultImageUrl.isNotEmpty) {
       return Image.network(
         widget.exploreModel.defaultImageUrl,
-        height: 140,
+        height: 150,
         width: double.infinity,
         fit: BoxFit.cover,
       );
     } else {
       return Image.asset(
         'assets/card_default_image.webp',
-        height: 140,
+        height: 150,
         width: double.infinity,
         fit: BoxFit.cover,
       );
