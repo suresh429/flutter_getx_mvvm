@@ -30,36 +30,42 @@ class ConstantsUtils{
 
 
 static void showSuccessSnackbar(String? message) {
-  Get.snackbar(
-    'Success',
-    message.toString(),
-    snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: Colors.green,
-    colorText: Colors.white,
-      margin: const EdgeInsets.all(15)
-  );
+  // Get.snackbar(
+  //   'Success',
+  //   message.toString(),
+  //   snackPosition: SnackPosition.BOTTOM,
+  //   backgroundColor: Colors.green,
+  //   colorText: Colors.white,
+  //     margin: const EdgeInsets.all(15)
+  // );
+  Get.snackbar('Success', message.toString());
+
 }
 
 static void showErrorSnackbar(String message) {
-  Get.snackbar(
-    'Error',
-    message,
-    snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: Colors.red,
-    colorText: Colors.white,
-      margin: const EdgeInsets.all(15)
-  );
+  // Get.snackbar(
+  //   'Error',
+  //   message,
+  //   snackPosition: SnackPosition.BOTTOM,
+  //   backgroundColor: Colors.red,
+  //   colorText: Colors.white,
+  //     margin: const EdgeInsets.all(15)
+  // );
+
+  Get.snackbar('Error', message.toString());
 }
 
 static void showInfoSnackbar(String message) {
-  Get.snackbar(
-    'Info',
-    message,
-    snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: Colors.black,
-    colorText: Colors.white,
-      margin: const EdgeInsets.all(15)
-  );
+  // Get.snackbar(
+  //   'Info',
+  //   message,
+  //   snackPosition: SnackPosition.BOTTOM,
+  //   backgroundColor: Colors.black,
+  //   colorText: Colors.white,
+  //     margin: const EdgeInsets.all(15)
+  // );
+
+  Get.snackbar('Info', message.toString());
 }
 
 static void showToast(String message) {

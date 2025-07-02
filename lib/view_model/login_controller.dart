@@ -11,10 +11,12 @@ import '../utilites/error_handler.dart';
 import '../model/LoginModel.dart';
 
 class LoginController extends GetxController {
+  var domain = '@touchalife.org';
   final storage = GetStorage();
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  var isPasswordHidden = true.obs;
 
   var isLoading = false.obs;
   final MainRepository repository = MainRepository();
@@ -24,7 +26,7 @@ class LoginController extends GetxController {
     super.onInit();
 
     // Pre-fill for testing (optional)
-    emailController.text = "chandralekha@touchalife.org";
+    emailController.text = "chandralekha";
     passwordController.text = "Saybts@7";
   }
 
@@ -38,7 +40,7 @@ class LoginController extends GetxController {
     }
 
     final payload = LoginPayload(
-      account: email,
+      account: '$email$domain',
       password: password,
       rememberMe: true,
       sourceOfLogin: 'talleaders',

@@ -75,12 +75,9 @@ class _DetailsScreenState extends State<DetailsScreen>
                           pinned: true,
                           elevation: 0,
                           backgroundColor: Colors.white,
-                          leading: IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.black,
-                            ),
-                            onPressed: () => Get.back(),
+                          leading: BackButton(
+                            color: Colors.black, // sets the icon color
+                            onPressed: () => Get.back(), // override behavior if you want
                           ),
                           actions: [
                             Obx(
@@ -161,387 +158,229 @@ class _DetailsScreenState extends State<DetailsScreen>
                                 // White Card
                                 Positioned(
                                   top: kToolbarHeight + 120,
-                                  // Adjusted to fit below banner image
                                   left: 0,
                                   right: 0,
                                   child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
+                                    margin: const EdgeInsets.symmetric(horizontal: 16),
                                     child: ConstrainedBox(
                                       constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width -
-                                            32, // Match horizontal margins
+                                        maxWidth: MediaQuery.of(context).size.width - 32,
                                       ),
                                       child: Card(
                                         elevation: 2,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Obx(
-                                                () => Text(
-                                                  controller.title.value,
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Row(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // 👇 Normal content with padding
+                                            Padding(
+                                              padding: const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  const Icon(
-                                                    Icons.access_time,
-                                                    size: 16,
-                                                    color: Colors.grey,
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  Obx(
-                                                    () => Text(
-                                                      controller.daysLeft.value,
-                                                      style: const TextStyle(
-                                                        color: Colors.grey,
-                                                      ),
+                                                  Obx(() => Text(
+                                                    controller.title.value,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.w500,
                                                     ),
+                                                  )),
+                                                  const SizedBox(height: 8),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.access_time,
+                                                          size: 16, color: Colors.grey),
+                                                      const SizedBox(width: 4),
+                                                      Obx(() => Text(
+                                                        controller.daysLeft.value,
+                                                        style: const TextStyle(color: Colors.grey),
+                                                      )),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Obx(
-                                                () => Text(
-                                                  controller
-                                                      .preferredTitle
-                                                      .value,
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              ),
-                                              Obx(
-                                                () => Text(
-                                                  controller
-                                                      .preferredValue
-                                                      .value,
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Obx(
-                                                () => Text(
-                                                  controller
-                                                      .languageTitle
-                                                      .value,
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              ),
-                                              Obx(
-                                                () => Row(
-                                                  children: [
-                                                    if (controller
-                                                                .currentRequestType
-                                                                .value ==
-                                                            "podcast" &&
-                                                        controller
-                                                            .languageTitle
-                                                            .value
-                                                            .contains("Mode"))
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              right: 8.0,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.videocam,
-                                                          size: 20,
-                                                          color:
-                                                              Colors.grey[600],
+                                                  const SizedBox(height: 12),
+                                                  Obx(() => Text(
+                                                    controller.preferredTitle.value,
+                                                    style: const TextStyle(color: Colors.grey),
+                                                  )),
+                                                  Obx(() => Text(
+                                                    controller.preferredValue.value,
+                                                    style: const TextStyle(color: Colors.black),
+                                                  )),
+                                                  const SizedBox(height: 12),
+                                                  Obx(() => Text(
+                                                    controller.languageTitle.value,
+                                                    style: const TextStyle(color: Colors.grey),
+                                                  )),
+                                                  Obx(() => Row(
+                                                    children: [
+                                                      if (controller.currentRequestType.value == "podcast" &&
+                                                          controller.languageTitle.value.contains("Mode"))
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(right: 8.0),
+                                                          child: Icon(Icons.videocam,
+                                                              size: 20, color: Colors.grey[600]),
+                                                        ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          controller.languageValue.value,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 16,
+                                                          ),
                                                         ),
                                                       ),
-                                                    Expanded(
-                                                      child: Text(
-                                                        controller
-                                                            .languageValue
-                                                            .value,
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(height: 16),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  // Like Button
-                                                  SizedBox(
-                                                    width: 80,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Obx(() {
-                                                          return IconButton(
-                                                            padding:
-                                                                EdgeInsets.zero,
-                                                            constraints:
-                                                                const BoxConstraints(),
-                                                            icon: Icon(
-                                                              Icons.thumb_up,
-                                                              size: 20,
-                                                              color:
-                                                                  controller
-                                                                          .exploreModel
-                                                                          .isLike
-                                                                          .value
-                                                                      ? Colors
-                                                                          .red
-                                                                      : Colors
-                                                                          .grey,
-                                                            ),
-                                                            onPressed: () {
-                                                              controller
-                                                                      .exploreModel
-                                                                      .isLike
-                                                                      .value =
-                                                                  !controller
-                                                                      .exploreModel
-                                                                      .isLike
-                                                                      .value;
-                                                              if (controller
-                                                                  .exploreModel
-                                                                  .isLike
-                                                                  .value) {
-                                                                controller
-                                                                    .exploreModel
-                                                                    .likesCount++;
-                                                              } else {
-                                                                controller
-                                                                    .exploreModel
-                                                                    .likesCount--;
-                                                              }
-                                                              exploreController.likeUnlikeRequest(
-                                                                controller
-                                                                    .exploreModel
-                                                                    .id,
-                                                                controller
-                                                                        .exploreModel
-                                                                        .isLike
-                                                                        .value
-                                                                    ? "like"
-                                                                    : 'unlike',
+                                                    ],
+                                                  )),
+                                                  const SizedBox(height: 16),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      // Like Button
+                                                      SizedBox(
+                                                        width: 80,
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Obx(() {
+                                                              return IconButton(
+                                                                padding: EdgeInsets.zero,
+                                                                constraints: const BoxConstraints(),
+                                                                icon: Icon(
+                                                                  Icons.thumb_up,
+                                                                  size: 20,
+                                                                  color: controller.exploreModel.isLike.value
+                                                                      ? Colors.red
+                                                                      : Colors.grey,
+                                                                ),
+                                                                onPressed: () {
+                                                                  controller.exploreModel.isLike.value =
+                                                                  !controller.exploreModel.isLike.value;
+                                                                  if (controller.exploreModel.isLike.value) {
+                                                                    controller.exploreModel.likesCount++;
+                                                                  } else {
+                                                                    controller.exploreModel.likesCount--;
+                                                                  }
+                                                                  exploreController.likeUnlikeRequest(
+                                                                    controller.exploreModel.id,
+                                                                    controller.exploreModel.isLike.value
+                                                                        ? "like"
+                                                                        : 'unlike',
+                                                                  );
+                                                                },
                                                               );
-                                                            },
-                                                          );
-                                                        }),
-                                                        Obx(
-                                                          () => Text(
-                                                            controller
-                                                                .exploreModel
-                                                                .likesCount
-                                                                .toString(),
-                                                            style:
-                                                                const TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  // Comment Button
-                                                  SizedBox(
-                                                    width: 80,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        IconButton(
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                          constraints:
-                                                              const BoxConstraints(),
-                                                          icon: const Icon(
-                                                            Icons.comment,
-                                                            size: 20,
-                                                            color: Colors.grey,
-                                                          ),
-                                                          onPressed: () {
-                                                            _tabController
-                                                                .animateTo(2);
-                                                          },
-                                                        ),
-                                                        Obx(() {
-                                                            return Text(
-                                                              controller
-                                                                  .exploreModel
-                                                                  .commentsCount
-                                                                  .toString(),
-                                                              style:
-                                                                  const TextStyle(
-                                                                    fontSize: 14,
-                                                                  ),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
+                                                            }),
+                                                            Obx(() => Text(
+                                                              controller.exploreModel.likesCount.toString(),
+                                                              style: const TextStyle(fontSize: 14),
+                                                              overflow: TextOverflow.ellipsis,
                                                               maxLines: 1,
-                                                            );
-                                                          }
+                                                            )),
+                                                          ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  // Share Button
-                                                  SizedBox(
-                                                    width: 80,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        IconButton(
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                          constraints:
-                                                              const BoxConstraints(),
-                                                          icon: const Icon(
-                                                            Icons.share,
-                                                            size: 20,
-                                                            color: Colors.grey,
-                                                          ),
-                                                          onPressed: () {
-                                                            controller
-                                                                .exploreModel
-                                                                .sharesCount++;
-                                                            exploreController
-                                                                .shareRequest(
-                                                                  controller
-                                                                      .exploreModel
-                                                                      .id,
+                                                      ),
+                                                      // Comment Button
+                                                      SizedBox(
+                                                        width: 80,
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            IconButton(
+                                                              padding: EdgeInsets.zero,
+                                                              constraints: const BoxConstraints(),
+                                                              icon: const Icon(Icons.comment,
+                                                                  size: 20, color: Colors.grey),
+                                                              onPressed: () {
+                                                                _tabController.animateTo(2);
+                                                              },
+                                                            ),
+                                                            Obx(() => Text(
+                                                              controller
+                                                                  .exploreModel.commentsCount
+                                                                  .toString(),
+                                                              style: const TextStyle(fontSize: 14),
+                                                              overflow: TextOverflow.ellipsis,
+                                                              maxLines: 1,
+                                                            )),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      // Share Button
+                                                      SizedBox(
+                                                        width: 80,
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            IconButton(
+                                                              padding: EdgeInsets.zero,
+                                                              constraints: const BoxConstraints(),
+                                                              icon: const Icon(Icons.share,
+                                                                  size: 20, color: Colors.grey),
+                                                              onPressed: () {
+                                                                controller.exploreModel.sharesCount++;
+                                                                exploreController.shareRequest(
+                                                                  controller.exploreModel.id,
                                                                 );
-                                                            var title =
-                                                                controller
-                                                                    .exploreModel
-                                                                    .title
-                                                                    .replaceAll(
-                                                                      ' ',
-                                                                      '-',
-                                                                    );
-                                                            var url =
-                                                                "${AppEnvironment.baseWebUrl}/donationRequest/$title";
-                                                            Share.share(
-                                                              url,
-                                                              subject:
-                                                                  'TALLeaders',
-                                                            );
-                                                          },
+                                                                var title = controller.exploreModel.title
+                                                                    .replaceAll(' ', '-');
+                                                                var url =
+                                                                    "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                                                Share.share(url, subject: 'TALLeaders');
+                                                              },
+                                                            ),
+                                                            Obx(() => Text(
+                                                              controller.exploreModel.sharesCount.toString(),
+                                                              style: const TextStyle(fontSize: 14),
+                                                              overflow: TextOverflow.ellipsis,
+                                                              maxLines: 1,
+                                                            )),
+                                                          ],
                                                         ),
-                                                        Obx(
-                                                          () => Text(
-                                                            controller
-                                                                .exploreModel
-                                                                .sharesCount
-                                                                .toString(),
-                                                            style:
-                                                                const TextStyle(
-                                                                  fontSize: 14,
-                                                                ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // 🚀 This is OUTSIDE the Padding -> takes full Card width
+                                            Obx(() => controller.isScholarshipApplied.value
+                                                ? Container(
+                                              width: double.infinity,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 10),
+                                              decoration: const BoxDecoration(
+                                                color: Color(0x1D8AD37F),
+                                                borderRadius:
+                                                BorderRadius.vertical(bottom: Radius.circular(12)),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.check_circle_outline_outlined,
+                                                      color: ColorUtils.colorGreen, size: 18),
+                                                  const SizedBox(width: 5),
+                                                  Text(
+                                                    'Interest Sent',
+                                                    style: TextStyle(
+                                                      color: ColorUtils.colorGreen,
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 8),
-                                              // Conditionally render Interest Sent container
-                                              Obx(
-                                                () =>
-                                                    controller
-                                                            .isScholarshipApplied
-                                                            .value
-                                                        ? Container(
-                                                          width:
-                                                              double.infinity,
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 10,
-                                                                vertical: 8,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color: const Color(
-                                                              0x1D8AD37F,
-                                                            ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  5,
-                                                                ),
-                                                          ),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Icon(
-                                                                Icons
-                                                                    .check_circle_outline_outlined,
-                                                                color:
-                                                                    ColorUtils
-                                                                        .colorGreen,
-                                                                size: 18,
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              Text(
-                                                                'Interest Sent',
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      ColorUtils
-                                                                          .colorGreen,
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                        : const SizedBox.shrink(),
-                                              ),
-                                            ],
-                                          ),
+                                            )
+                                                : const SizedBox.shrink()),
+                                          ],
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
+
                               ],
                             ),
                           ),
