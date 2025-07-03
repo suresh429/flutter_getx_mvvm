@@ -157,7 +157,7 @@ class _DetailsScreenState extends State<DetailsScreen>
 
                                 // White Card
                                 Positioned(
-                                  top: kToolbarHeight + 120,
+                                  top: kToolbarHeight + 110,
                                   left: 0,
                                   right: 0,
                                   child: Container(
@@ -184,19 +184,20 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                   Obx(() => Text(
                                                     controller.title.value,
                                                     style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   )),
-                                                  const SizedBox(height: 8),
+                                                  const SizedBox(height: 10),
                                                   Row(
                                                     children: [
                                                       const Icon(Icons.access_time,
-                                                          size: 16, color: Colors.grey),
+                                                          size: 14, color: Colors.grey),
                                                       const SizedBox(width: 4),
                                                       Obx(() => Text(
                                                         controller.daysLeft.value,
-                                                        style: const TextStyle(color: Colors.grey),
+                                                        style: const TextStyle(color: Colors.grey, fontSize: 12),
                                                       )),
                                                     ],
                                                   ),
@@ -205,15 +206,17 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                     controller.preferredTitle.value,
                                                     style: const TextStyle(color: Colors.grey),
                                                   )),
+                                                  const SizedBox(height: 2),
                                                   Obx(() => Text(
                                                     controller.preferredValue.value,
-                                                    style: const TextStyle(color: Colors.black),
+                                                    style: const TextStyle(color: Colors.black, fontSize: 12),
                                                   )),
                                                   const SizedBox(height: 12),
                                                   Obx(() => Text(
                                                     controller.languageTitle.value,
                                                     style: const TextStyle(color: Colors.grey),
                                                   )),
+                                                  const SizedBox(height: 2),
                                                   Obx(() => Row(
                                                     children: [
                                                       if (controller.currentRequestType.value == "podcast" &&
@@ -221,125 +224,119 @@ class _DetailsScreenState extends State<DetailsScreen>
                                                         Padding(
                                                           padding: const EdgeInsets.only(right: 8.0),
                                                           child: Icon(Icons.videocam,
-                                                              size: 20, color: Colors.grey[600]),
+                                                              size: 18, color: Colors.grey[600]),
                                                         ),
                                                       Expanded(
                                                         child: Text(
                                                           controller.languageValue.value,
                                                           style: const TextStyle(
                                                             color: Colors.black,
-                                                            fontSize: 16,
+                                                            fontSize: 12,
                                                           ),
                                                         ),
                                                       ),
                                                     ],
                                                   )),
-                                                  const SizedBox(height: 16),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                    children: [
-                                                      // Like Button
-                                                      SizedBox(
-                                                        width: 80,
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            Obx(() {
-                                                              return IconButton(
+                                                  const SizedBox(height: 10),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey.withOpacity(0.07),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        // Like
+                                                        Expanded(
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Obx(() {
+                                                                return IconButton(
+                                                                  padding: EdgeInsets.zero,
+                                                                  constraints: const BoxConstraints(),
+                                                                  icon: Icon(
+                                                                    Icons.thumb_up,
+                                                                    size: 20,
+                                                                    color: controller.exploreModel.isLike.value
+                                                                        ? Colors.red
+                                                                        : Colors.grey,
+                                                                  ),
+                                                                  onPressed: () {
+                                                                    controller.exploreModel.isLike.value =
+                                                                    !controller.exploreModel.isLike.value;
+                                                                    if (controller.exploreModel.isLike.value) {
+                                                                      controller.exploreModel.likesCount++;
+                                                                    } else {
+                                                                      controller.exploreModel.likesCount--;
+                                                                    }
+                                                                    exploreController.likeUnlikeRequest(
+                                                                      controller.exploreModel.id,
+                                                                      controller.exploreModel.isLike.value ? "like" : "unlike",
+                                                                    );
+                                                                  },
+                                                                );
+                                                              }),
+                                                              Obx(() => Text(
+                                                                controller.exploreModel.likesCount.toString(),
+                                                                style: const TextStyle(fontSize: 14),
+                                                                overflow: TextOverflow.ellipsis,
+                                                                maxLines: 1,
+                                                              )),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        // Comment
+                                                        Expanded(
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              IconButton(
                                                                 padding: EdgeInsets.zero,
                                                                 constraints: const BoxConstraints(),
-                                                                icon: Icon(
-                                                                  Icons.thumb_up,
-                                                                  size: 20,
-                                                                  color: controller.exploreModel.isLike.value
-                                                                      ? Colors.red
-                                                                      : Colors.grey,
-                                                                ),
+                                                                icon: const Icon(Icons.comment, size: 20, color: Colors.grey),
                                                                 onPressed: () {
-                                                                  controller.exploreModel.isLike.value =
-                                                                  !controller.exploreModel.isLike.value;
-                                                                  if (controller.exploreModel.isLike.value) {
-                                                                    controller.exploreModel.likesCount++;
-                                                                  } else {
-                                                                    controller.exploreModel.likesCount--;
-                                                                  }
-                                                                  exploreController.likeUnlikeRequest(
-                                                                    controller.exploreModel.id,
-                                                                    controller.exploreModel.isLike.value
-                                                                        ? "like"
-                                                                        : 'unlike',
-                                                                  );
+                                                                  _tabController.animateTo(2);
                                                                 },
-                                                              );
-                                                            }),
-                                                            Obx(() => Text(
-                                                              controller.exploreModel.likesCount.toString(),
-                                                              style: const TextStyle(fontSize: 14),
-                                                              overflow: TextOverflow.ellipsis,
-                                                              maxLines: 1,
-                                                            )),
-                                                          ],
+                                                              ),
+                                                              Obx(() => Text(
+                                                                controller.exploreModel.commentsCount.toString(),
+                                                                style: const TextStyle(fontSize: 14),
+                                                                overflow: TextOverflow.ellipsis,
+                                                                maxLines: 1,
+                                                              )),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                      // Comment Button
-                                                      SizedBox(
-                                                        width: 80,
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            IconButton(
-                                                              padding: EdgeInsets.zero,
-                                                              constraints: const BoxConstraints(),
-                                                              icon: const Icon(Icons.comment,
-                                                                  size: 20, color: Colors.grey),
-                                                              onPressed: () {
-                                                                _tabController.animateTo(2);
-                                                              },
-                                                            ),
-                                                            Obx(() => Text(
-                                                              controller
-                                                                  .exploreModel.commentsCount
-                                                                  .toString(),
-                                                              style: const TextStyle(fontSize: 14),
-                                                              overflow: TextOverflow.ellipsis,
-                                                              maxLines: 1,
-                                                            )),
-                                                          ],
+                                                        // Share
+                                                        Expanded(
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              IconButton(
+                                                                padding: EdgeInsets.zero,
+                                                                constraints: const BoxConstraints(),
+                                                                icon: const Icon(Icons.share, size: 20, color: Colors.grey),
+                                                                onPressed: () {
+                                                                  controller.exploreModel.sharesCount++;
+                                                                  exploreController.shareRequest(controller.exploreModel.id);
+                                                                  var title = controller.exploreModel.title.replaceAll(' ', '-');
+                                                                  var url =
+                                                                      "${AppEnvironment.baseWebUrl}/donationRequest/$title";
+                                                                  Share.share(url, subject: 'TALLeaders');
+                                                                },
+                                                              ),
+                                                              Obx(() => Text(
+                                                                controller.exploreModel.sharesCount.toString(),
+                                                                style: const TextStyle(fontSize: 14),
+                                                                overflow: TextOverflow.ellipsis,
+                                                                maxLines: 1,
+                                                              )),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                      // Share Button
-                                                      SizedBox(
-                                                        width: 80,
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            IconButton(
-                                                              padding: EdgeInsets.zero,
-                                                              constraints: const BoxConstraints(),
-                                                              icon: const Icon(Icons.share,
-                                                                  size: 20, color: Colors.grey),
-                                                              onPressed: () {
-                                                                controller.exploreModel.sharesCount++;
-                                                                exploreController.shareRequest(
-                                                                  controller.exploreModel.id,
-                                                                );
-                                                                var title = controller.exploreModel.title
-                                                                    .replaceAll(' ', '-');
-                                                                var url =
-                                                                    "${AppEnvironment.baseWebUrl}/donationRequest/$title";
-                                                                Share.share(url, subject: 'TALLeaders');
-                                                              },
-                                                            ),
-                                                            Obx(() => Text(
-                                                              controller.exploreModel.sharesCount.toString(),
-                                                              style: const TextStyle(fontSize: 14),
-                                                              overflow: TextOverflow.ellipsis,
-                                                              maxLines: 1,
-                                                            )),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
                                               ),

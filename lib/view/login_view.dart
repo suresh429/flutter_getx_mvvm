@@ -74,9 +74,13 @@ class LoginView extends StatelessWidget {
                   ),
                 )),
                 const SizedBox(height: 15),
-                const Align(
+                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text("Forgot Password/Email?"),
+                  child: InkWell(
+                    onTap: (){
+                      Get.toNamed('/forgotPassword');
+                    },
+                      child: const Text("Forgot Password/Email?")),
                 ),
                 const SizedBox(height: 20),
 
