@@ -30,6 +30,9 @@ class MainRepository {
   static const String _share = "donationRequest/analytics";
   static const String _user = "user";
   static const String _reminder = "donationRequest/reminder/donee";
+  static const String _forgot_password = "forgotpassword";
+  static const String _change_password = "changepassword";
+  static const String _verifyotp = "verifyotp";
 
   // Add new endpoint constants
   static const String _voteLeadersAction = "voteLeaders/action";
@@ -499,6 +502,51 @@ class MainRepository {
       );
     } catch (e) {
       print('Repository error: $e');
+      rethrow;
+    }
+  }
+
+  // sendPasswordResetOtp
+  Future<CommonModel> sendPasswordResetOtp(Map<String, dynamic> payload) async {
+    try {
+      final res = await service.post<CommonModel>(
+        _forgot_password,
+        payload,
+            (data) => CommonModel.fromJson(data),
+      );
+      return res;
+    } catch (e) {
+      print('sendPasswordResetOtp error: $e');
+      rethrow;
+    }
+  }
+
+  // verify OTP
+  Future<CommonModel> verifyOtp(Map<String, dynamic> payload) async {
+    try {
+      final res = await service.post<CommonModel>(
+        _verifyotp,
+        payload,
+            (data) => CommonModel.fromJson(data),
+      );
+      return res;
+    } catch (e) {
+      print('sendPasswordResetOtp error: $e');
+      rethrow;
+    }
+  }
+
+  // verify OTP
+  Future<CommonModel> resetPassword(Map<String, dynamic> payload) async {
+    try {
+      final res = await service.post<CommonModel>(
+        _change_password,
+        payload,
+            (data) => CommonModel.fromJson(data),
+      );
+      return res;
+    } catch (e) {
+      print('sendPasswordResetOtp error: $e');
       rethrow;
     }
   }
