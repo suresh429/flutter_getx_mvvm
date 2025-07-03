@@ -1,6 +1,10 @@
 import 'package:TALLeaders/view/comment_reply_page.dart';
+import 'package:TALLeaders/view/email_otp_verify_screen.dart';
 import 'package:TALLeaders/view/forgot_password_view.dart';
+import 'package:TALLeaders/view/password_change_screen.dart';
 import 'package:TALLeaders/view/recover_email_password_screen.dart';
+import 'package:TALLeaders/view/reset_password_screen.dart';
+import 'package:TALLeaders/view_model/login_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +34,7 @@ void commonMain() async {
   ));
 
   Get.put(ConnectivityService()); // Initialize the ConnectivityService
+  Get.put(LoginController(), permanent: true);
   // local storage
   await GetStorage.init();
 
@@ -134,6 +139,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/commentReply', page: () =>   CommentReplyPage()),
         GetPage(name: '/forgotPassword', page: () =>   const ForgotPasswordView()),
         GetPage(name: '/recoverEmailPassword', page: () =>   const RecoverEmailPasswordScreen()),
+        GetPage(name: '/verifyOtp', page: () =>    const EmailOtpVerifyScreen()),
+        GetPage(name: '/resetPassword', page: () => const ResetPasswordScreen()),
 
       ],
     );

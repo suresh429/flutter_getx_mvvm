@@ -12,7 +12,6 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
     final args = Get.arguments as Map<String, dynamic>?;
     final title = args != null && args.containsKey('title') ? args['title'] : 'Recover';
 
-    // subtitle + button text
     final subtitle = title == "Recover Email"
         ? "Enter your registered email (provided during the registration process) and click Continue to recover your TALLeaders email id."
         : "Enter your touchalife email id and we will send you the instructions to reset your password.";
@@ -21,7 +20,6 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
         ? "Continue"
         : "Request Password Reset";
 
-    // determine if email recovery
     final bool isRecoverEmail = title.toLowerCase().contains('email');
 
     return Scaffold(
@@ -29,8 +27,8 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Obx(() {
-          // ----------------- ACCOUNT FOUND UI -----------------
-          if (controller.isAccountFound.value && controller.userData.value != null) {
+          if (controller.isAccountFound.value && controller.userData.value != null && isRecoverEmail) {
+            // ✅ Only show account details if recovering email
             final user = controller.userData.value;
             final maskedEmail = maskEmail(user?.data?.email ?? "");
 
@@ -65,7 +63,6 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
             );
           }
 
-          // ----------------- DEFAULT INPUT UI -----------------
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -85,7 +82,6 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
               Text(subtitle, style: const TextStyle(fontSize: 14, color: Colors.grey)),
               const SizedBox(height: 20),
 
-              // Input field
               TextField(
                 controller: controller.recoverEmailController,
                 decoration: InputDecoration(
@@ -100,7 +96,13 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               ElevatedButton(
-                onPressed: controller.isLoading.value ? null : controller.findUserEmail,
+                onPressed: controller.isLoading.value ? null : () {
+                  if (isRecoverEmail) {
+                    _handleRecoverEmail(controller);
+                  } else {
+                    _handleRecoverPassword(controller);
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 45),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
@@ -114,6 +116,29 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  void _handleRecoverEmail(LoginController controller) async {
+    if (controller.recoverEmailController.text.trim().isEmpty) {
+      Get.snackbar("Validation", "Please enter email");
+      return;
+    }
+    await controller.findUserEmail();
+  }
+
+  void _handleRecoverPassword(LoginController controller) async {
+    final input = controller.recoverEmailController.text.trim();
+    if (input.isEmpty) {
+      Get.snackbar("Validation", "Please enter email");
+      return;
+    }
+    if (input.contains("@")) {
+      Get.snackbar("Validation", "Please enter email without domain");
+      return;
+    }
+
+    final fullEmail = "$input${controller.domain}";
+    await controller.sendPasswordResetOtp(fullEmail);
   }
 
   void openDialogInbox(String maskedEmail) {
@@ -135,7 +160,6 @@ class RecoverEmailPasswordScreen extends StatelessWidget {
   }
 }
 
-// util
 String maskEmail(String email) {
   final parts = email.split('@');
   if (parts.length < 2) return email;
