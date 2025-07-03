@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 
+import 'LoginModel.dart';
 import 'achievement.dart';
 import 'experience_model.dart';
 
@@ -315,140 +316,140 @@ class Data {
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    uniqueId: json["unique_id"],
-    email: json["email"],
-    phone: json["phone"],
-    username: json["username"],
-    displayName: json["display_name"],
-    name: Name.fromJson(json["name"]),
-    profileImageUrl: json["profile_image_url"],
-    accountVerified: json["account_verified"],
-    accountStatus: json["account_status"],
-    passwordVerified: json["password_verified"],
-    loginProvider: json["login_provider"],
-    emailVerified: json["email_verified"],
-    phoneVerified: json["phone_verified"],
-    address: Address.fromJson(json["address"]),
-    roles: List<String>.from(json["roles"].map((x) => x)),
-    socialVerification: SocialVerification.fromJson(json["social_verification"]),
-    tokenDetail: TokenDetail.fromJson(json["token_detail"]),
-    summary: json["summary"],
-    gender: json["gender"],
-    dob: json["dob"],
-    stripeCustomerId: json["stripeCustomerId"],
-    kindnessScore: json["kindness_score"],
-    volunteerInfo: VolunteerInfo.fromJson(json["volunteerInfo"]),
-    coverImageUrl: json["coverImageUrl"],
-    rating: json["rating"],
-    facebookProfileUrl: json["facebookProfileUrl"],
-    twitterProfileUrl: json["twitterProfileUrl"],
-    linkedInProfileUrl: json["linkedInProfileUrl"],
-    title: json["title"],
-    aboutMe: json["aboutMe"],
-    isTourCompleted: json["isTourCompleted"],
-    isKindnessEventRegistered: json["isKindnessEventRegistered"],
-    occupation: json["occupation"],
-    organization: json["organization"],
-    yearsOfExperience: json["yearsOfExperience"],
-    isHackathonRegistered: json["isHackathonRegistered"],
-    billingAddress: Address.fromJson(json["billingAddress"]),
-    totalEmailsPerMonth: json["totalEmailsPerMonth"],
-    isMentor: json["isMentor"],
-    languages: List<String>.from(json["languages"].map((x) => x)),
-    isProfileCompleted: json["isProfileCompleted"],
-    institutionName: json["institutionName"],
-    studentId: json["studentId"],
-    institutionUrl: json["institutionUrl"],
-    institutionalRole: json["institutionalRole"],
-    educationalQualification: json["educationalQualification"],
-    educationalQualificationOthers: json["educationalQualificationOthers"],
-    mentorInfo: MentorInfo.fromJson(json["mentorInfo"]),
-    isAssignMentor: json["isAssignMentor"],
-    defaultChannel: json["defaultChannel"],
-    sourceOfSignup: json["sourceOfSignup"],
-    personalTraits: List<String>.from(json["personalTraits"].map((x) => x)),
-    functionalExpertise: List<String>.from(json["functionalExpertise"].map((x) => x)),
-    isTalLeader: json["isTALLeader"],
-    areasOfInterest: List<String>.from(json["areasOfInterest"].map((x) => x)),
-    isCertificationDownloaded: json["isCertificationDownloaded"],
-    medicalRegistration: MedicalRegistration.fromJson(json["medicalRegistration"]),
-    establishmentInformation: EstablishmentInformation.fromJson(json["establishmentInformation"]),
-    specialities: List<String>.from(json["specialities"].map((x) => x)),
-    categoriesOfInterest: List<dynamic>.from(json["categoriesOfInterest"].map((x) => x)),
-    typeOfHelpAndInvolvement: List<dynamic>.from(json["typeOfHelpAndInvolvement"].map((x) => x)),
-    interestedTypeOfOrgs: List<dynamic>.from(json["interestedTypeOfOrgs"].map((x) => x)),
-    interestedRegions: List<dynamic>.from(json["interestedRegions"].map((x) => x)),
-    profileVerificationStatus: json["profileVerificationStatus"],
-    referralCode: json["referral_code"],
-    educationTimelines: List<EducationTimeline>.from(json["educationTimelines"].map((x) => EducationTimeline.fromJson(x))),
-    experience: List<Experience>.from(json["experience"].map((x) => Experience.fromJson(x))),
-    conferences: List<Conference>.from(json["conferences"].map((x) => Conference.fromJson(x))),
-    certificates: List<Certificate>.from(json["certificates"].map((x) => Certificate.fromJson(x))),
-    memberships: List<Membership>.from(json["memberships"].map((x) => Membership.fromJson(x))),
-    achievements: List<Achievement>.from(json["achievements"].map((x) => Achievement.fromJson(x))),
-    aadhaar: json["aadhaar"],
-    pan: json["pan"],
-    oneHourPerWeek: json["oneHourPerWeek"],
-    managementPosition: json["managementPosition"],
-    currentRole: json["currentRole"],
-    currentCompanyName: json["currentCompanyName"],
+    uniqueId: json["unique_id"] ?? '',
+    email: json["email"] ?? '',
+    phone: json["phone"] ?? '',
+    username: json["username"] ?? '',
+    displayName: json["display_name"] ?? '',
+    name: Name.fromJson(json["name"] ?? {}),
+    profileImageUrl: json["profile_image_url"] ?? '',
+    accountVerified: json["account_verified"] ?? false,
+    accountStatus: json["account_status"] ?? 0,
+    passwordVerified: json["password_verified"] ?? false,
+    loginProvider: json["login_provider"] ?? '',
+    emailVerified: json["email_verified"] ?? false,
+    phoneVerified: json["phone_verified"] ?? false,
+    address: Address.fromJson(json["address"] ?? {}),
+    roles: List<String>.from((json["roles"] ?? []).map((x) => x ?? '')),
+    socialVerification: SocialVerification.fromJson(json["social_verification"] ?? {}),
+    tokenDetail: TokenDetail.fromJson(json["token_detail"] ?? {}),
+    summary: json["summary"] ?? '',
+    gender: json["gender"] ?? '',
+    dob: json["dob"] ?? 0,
+    stripeCustomerId: json["stripeCustomerId"] ?? '',
+    kindnessScore: json["kindness_score"] ?? 0,
+    volunteerInfo: VolunteerInfo.fromJson(json["volunteerInfo"] ?? {}),
+    coverImageUrl: json["coverImageUrl"] ?? '',
+    rating: json["rating"] ?? 0,
+    facebookProfileUrl: json["facebookProfileUrl"] ?? '',
+    twitterProfileUrl: json["twitterProfileUrl"] ?? '',
+    linkedInProfileUrl: json["linkedInProfileUrl"] ?? '',
+    title: json["title"] ?? '',
+    aboutMe: json["aboutMe"] ?? '',
+    isTourCompleted: json["isTourCompleted"] ?? false,
+    isKindnessEventRegistered: json["isKindnessEventRegistered"] ?? false,
+    occupation: json["occupation"] ?? '',
+    organization: json["organization"] ?? '',
+    yearsOfExperience: json["yearsOfExperience"] ?? 0,
+    isHackathonRegistered: json["isHackathonRegistered"] ?? false,
+    billingAddress: Address.fromJson(json["billingAddress"] ?? {}),
+    totalEmailsPerMonth: json["totalEmailsPerMonth"] ?? 0,
+    isMentor: json["isMentor"] ?? false,
+    languages: List<String>.from((json["languages"] ?? []).map((x) => x ?? '')),
+    isProfileCompleted: json["isProfileCompleted"] ?? false,
+    institutionName: json["institutionName"] ?? '',
+    studentId: json["studentId"] ?? '',
+    institutionUrl: json["institutionUrl"] ?? '',
+    institutionalRole: json["institutionalRole"] ?? '',
+    educationalQualification: json["educationalQualification"] ?? '',
+    educationalQualificationOthers: json["educationalQualificationOthers"] ?? '',
+    mentorInfo: MentorInfo.fromJson(json["mentorInfo"] ?? {}),
+    isAssignMentor: json["isAssignMentor"] ?? false,
+    defaultChannel: json["defaultChannel"] ?? '',
+    sourceOfSignup: json["sourceOfSignup"] ?? '',
+    personalTraits: List<String>.from((json["personalTraits"] ?? []).map((x) => x ?? '')),
+    functionalExpertise: List<String>.from((json["functionalExpertise"] ?? []).map((x) => x ?? '')),
+    isTalLeader: json["isTALLeader"] ?? false,
+    areasOfInterest: List<String>.from((json["areasOfInterest"] ?? []).map((x) => x ?? '')),
+    isCertificationDownloaded: json["isCertificationDownloaded"] ?? false,
+    medicalRegistration: MedicalRegistration.fromJson(json["medicalRegistration"] ?? {}),
+    establishmentInformation: EstablishmentInformation.fromJson(json["establishmentInformation"] ?? {}),
+    specialities: List<String>.from((json["specialities"] ?? []).map((x) => x ?? '')),
+    categoriesOfInterest: List<dynamic>.from((json["categoriesOfInterest"] ?? []).map((x) => x)),
+    typeOfHelpAndInvolvement: List<dynamic>.from((json["typeOfHelpAndInvolvement"] ?? []).map((x) => x)),
+    interestedTypeOfOrgs: List<dynamic>.from((json["interestedTypeOfOrgs"] ?? []).map((x) => x)),
+    interestedRegions: List<dynamic>.from((json["interestedRegions"] ?? []).map((x) => x)),
+    profileVerificationStatus: json["profileVerificationStatus"] ?? 0,
+    referralCode: json["referral_code"] ?? '',
+    educationTimelines: List<EducationTimeline>.from((json["educationTimelines"] ?? []).map((x) => EducationTimeline.fromJson(x ?? {}))),
+    experience: List<Experience>.from((json["experience"] ?? []).map((x) => Experience.fromJson(x ?? {}))),
+    conferences: List<Conference>.from((json["conferences"] ?? []).map((x) => Conference.fromJson(x ?? {}))),
+    certificates: List<Certificate>.from((json["certificates"] ?? []).map((x) => Certificate.fromJson(x ?? {}))),
+    memberships: List<Membership>.from((json["memberships"] ?? []).map((x) => Membership.fromJson(x ?? {}))),
+    achievements: List<Achievement>.from((json["achievements"] ?? []).map((x) => Achievement.fromJson(x ?? {}))),
+    aadhaar: json["aadhaar"] ?? '',
+    pan: json["pan"] ?? '',
+    oneHourPerWeek: json["oneHourPerWeek"] ?? false,
+    managementPosition: json["managementPosition"] ?? false,
+    currentRole: json["currentRole"] ?? '',
+    currentCompanyName: json["currentCompanyName"] ?? '',
     userComments: List<dynamic>.from(json["userComments"].map((x) => x)),
     userLikes: List<UserLike>.from(json["userLikes"].map((x) => UserLike.fromJson(x))),
-    professionalExperience: json["professionalExperience"],
-    location: Location.fromJson(json["location"]),
-    acceptedTermsAndConditions: json["acceptedTermsAndConditions"],
+    professionalExperience: json["professionalExperience"] ?? '',
+    location: Location.fromJson(json["location"] ?? {}),
+    acceptedTermsAndConditions: json["acceptedTermsAndConditions"] ?? false,
     ipAddress: json["ipAddress"],
     reviewedBy: List<dynamic>.from(json["reviewedBy"].map((x) => x)),
     notes: json["notes"],
-    bloodGroup: json["bloodGroup"],
-    isDonatedBefore: json["isDonatedBefore"],
-    noOfTimesDonated: json["noOfTimesDonated"],
-    lastDonatedDate: json["lastDonatedDate"],
-    isTransmissibleDiseaseHistory: json["isTransmissibleDiseaseHistory"],
-    transmissibleDiseaseHistory: json["transmissibleDiseaseHistory"],
-    bloodRequirementAlerts: json["bloodRequirementAlerts"],
-    researchParticipationInterest: json["researchParticipationInterest"],
-    sourceOfDevice: json["sourceOfDevice"],
-    isPaidBootcamp: json["isPaidBootcamp"],
-    isKindnessEventRegistered2023: json["isKindnessEventRegistered2023"],
-    userRegistrationCategory: json["userRegistrationCategory"],
+    bloodGroup: json["bloodGroup"] ?? '',
+    isDonatedBefore: json["isDonatedBefore"] ?? false,
+    noOfTimesDonated: json["noOfTimesDonated"] ?? 0,
+    lastDonatedDate: json["lastDonatedDate"] ?? 0,
+    isTransmissibleDiseaseHistory: json["isTransmissibleDiseaseHistory"] ?? false,
+    transmissibleDiseaseHistory: json["transmissibleDiseaseHistory"] ?? '',
+    bloodRequirementAlerts: json["bloodRequirementAlerts"] ?? false,
+    researchParticipationInterest: json["researchParticipationInterest"] ?? false,
+    sourceOfDevice: json["sourceOfDevice"] ?? '',
+    isPaidBootcamp: json["isPaidBootcamp"] ?? false,
+    isKindnessEventRegistered2023: json["isKindnessEventRegistered2023"] ?? false,
+    userRegistrationCategory: json["userRegistrationCategory"] ?? '',
     educationInUkOrUs: List<dynamic>.from(json["educationInUKOrUS"].map((x) => x)),
     experienceInUkOrUs: json["experienceInUKOrUS"],
-    defaultHomePage: json["defaultHomePage"],
-    registeredForEvent: json["registeredForEvent"],
-    isBasicProfileCompleted: json["isBasicProfileCompleted"],
-    isEducationProfileCompleted: json["isEducationProfileCompleted"],
-    isExperienceProfileCompleted: json["isExperienceProfileCompleted"],
-    isConferencesProfileCompleted: json["isConferencesProfileCompleted"],
-    isCertificateProfileCompleted: json["isCertificateProfileCompleted"],
-    isMembershipProfileCompleted: json["isMembershipProfileCompleted"],
-    isSpecialitiesProfileCompleted: json["isSpecialitiesProfileCompleted"],
-    isAchievementsProfileCompleted: json["isAchievementsProfileCompleted"],
-    isProfileCompletedForTalHospitals: json["isProfileCompletedForTalHospitals"],
-    salutation: json["salutation"],
-    isBloodDonor: json["isBloodDonor"],
-    isPlateletsDonor: json["isPlateletsDonor"],
-    bloodDonationCategory: List<String>.from(json["bloodDonationCategory"].map((x) => x)),
-    takingMedication: json["takingMedication"],
-    anyAllergies: json["anyAllergies"],
-    outOfCountryTravel12Months: json["outOfCountryTravel12months"],
-    countriesVisited: json["countriesVisited"],
-    isBulkUpload: json["isBulkUpload"],
-    isTourCompletedForTalHospitals: json["isTourCompletedForTalHospitals"],
-    volunteerAddress: Address.fromJson(json["volunteerAddress"]),
-    allergies: json["allergies"],
-    medication: json["medication"],
+    defaultHomePage: json["defaultHomePage"] ?? '',
+    registeredForEvent: json["registeredForEvent"] ?? '',
+    isBasicProfileCompleted: json["isBasicProfileCompleted"] ?? false,
+    isEducationProfileCompleted: json["isEducationProfileCompleted"] ?? false,
+    isExperienceProfileCompleted: json["isExperienceProfileCompleted"] ?? false,
+    isConferencesProfileCompleted: json["isConferencesProfileCompleted"] ?? false,
+    isCertificateProfileCompleted: json["isCertificateProfileCompleted"] ?? false,
+    isMembershipProfileCompleted: json["isMembershipProfileCompleted"] ?? false,
+    isSpecialitiesProfileCompleted: json["isSpecialitiesProfileCompleted"] ?? false,
+    isAchievementsProfileCompleted: json["isAchievementsProfileCompleted"] ?? false,
+    isProfileCompletedForTalHospitals: json["isProfileCompletedForTalHospitals"] ?? false,
+    salutation: json["salutation"] ?? '',
+    isBloodDonor: json["isBloodDonor"] ?? false,
+    isPlateletsDonor: json["isPlateletsDonor"] ?? false,
+    bloodDonationCategory: List<String>.from((json["bloodDonationCategory"] ?? []).map((x) => x ?? '')),
+    takingMedication: json["takingMedication"] ?? false,
+    anyAllergies: json["anyAllergies"] ?? false,
+    outOfCountryTravel12Months: json["outOfCountryTravel12months"] ?? false,
+    countriesVisited: json["countriesVisited"] ?? '',
+    isBulkUpload: json["isBulkUpload"] ?? false,
+    isTourCompletedForTalHospitals: json["isTourCompletedForTalHospitals"] ?? false,
+    volunteerAddress: Address.fromJson(json["volunteerAddress"] ?? {}),
+    allergies: json["allergies"] ?? '',
+    medication: json["medication"] ?? '',
     hideProfileCategory: json["hideProfileCategory"],
     hideProfileReason: json["hideProfileReason"],
     hideProfileEndDate: json["hideProfileEndDate"],
-    languagePreferences: List<String>.from(json["languagePreferences"].map((x) => x)),
-    userNameUpdatedAt: json["userNameUpdatedAt"],
-    eventRegistrations: List<String>.from(json["eventRegistrations"].map((x) => x)),
-    isTourCompletedForTalLeaders: json["isTourCompletedForTalLeaders"],
-    noOfCampaignsCreated: json["noOfCampaignsCreated"],
-    noOfLivesImpacted: json["noOfLivesImpacted"],
-    talLeaderPreferences: List<String>.from(json["talLeaderPreferences"].map((x) => x)),
-    weight: json["weight"],
+    languagePreferences: List<String>.from((json["languagePreferences"] ?? []).map((x) => x ?? '')),
+    userNameUpdatedAt: json["userNameUpdatedAt"] ?? 0,
+    eventRegistrations: List<String>.from((json["eventRegistrations"] ?? []).map((x) => x ?? '')),
+    isTourCompletedForTalLeaders: json["isTourCompletedForTalLeaders"] ?? false,
+    noOfCampaignsCreated: json["noOfCampaignsCreated"] ?? 0,
+    noOfLivesImpacted: json["noOfLivesImpacted"] ?? 0,
+    talLeaderPreferences: List<String>.from((json["talLeaderPreferences"] ?? []).map((x) => x ?? '')),
+    weight: json["weight"] ?? 0,
     profileStatus: List<ProfileStatus>.from(json["profileStatus"].map((x) => ProfileStatus.fromJson(x))),
   );
 
@@ -618,16 +619,16 @@ class Address {
   });
 
   factory Address.fromJson(Map<String, dynamic> json) => Address(
-    line1: json["line1"],
-    line2: json["line2"],
+    line1: json["line1"] ?? '',
+    line2: json["line2"] ?? '',
     locality: json["locality"],
-    city: json["city"],
-    state: json["state"],
-    district: json["district"],
-    mandal: json["mandal"],
-    village: json["village"],
-    country: json["country"],
-    zipCode: json["zip_code"],
+    city: json["city"] ?? '',
+    state: json["state"] ?? '',
+    district: json["district"] ?? '',
+    mandal: json["mandal"] ?? '',
+    village: json["village"] ?? '',
+    country: json["country"] ?? '',
+    zipCode: json["zip_code"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -662,12 +663,12 @@ class Certificate {
   });
 
   factory Certificate.fromJson(Map<String, dynamic> json) => Certificate(
-    id: json["_id"],
-    title: json["title"],
-    issuedBy: json["issuedBy"],
-    description: json["description"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    createdAt: DateTime.parse(json["createdAt"]),
+    id: json["_id"] ?? '',
+    title: json["title"] ?? '',
+    issuedBy: json["issuedBy"] ?? '',
+    description: json["description"] ?? '',
+    updatedAt: json["updatedAt"] != null ? DateTime.parse(json["updatedAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
+    createdAt: json["createdAt"] != null ? DateTime.parse(json["createdAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
   );
 
   Map<String, dynamic> toJson() => {
@@ -696,11 +697,11 @@ class Conference {
   });
 
   factory Conference.fromJson(Map<String, dynamic> json) => Conference(
-    id: json["_id"],
-    name: json["name"],
-    date: json["date"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    createdAt: DateTime.parse(json["createdAt"]),
+    id: json["_id"] ?? '',
+    name: json["name"] ?? '',
+    date: json["date"] ?? 0,
+    updatedAt: json["updatedAt"] != null ? DateTime.parse(json["updatedAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
+    createdAt: json["createdAt"] != null ? DateTime.parse(json["createdAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
   );
 
   Map<String, dynamic> toJson() => {
@@ -734,14 +735,14 @@ class EducationTimeline {
   });
 
   factory EducationTimeline.fromJson(Map<String, dynamic> json) => EducationTimeline(
-    id: json["_id"],
-    education: json["education"],
-    degree: json["degree"],
-    fieldOfStudy: json["fieldOfStudy"],
-    educationalStartDate: json["educationalStartDate"],
-    educationalEndDate: json["educationalEndDate"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    createdAt: DateTime.parse(json["createdAt"]),
+    id: json["_id"] ?? '',
+    education: json["education"] ?? '',
+    degree: json["degree"] ?? '',
+    fieldOfStudy: json["fieldOfStudy"] ?? '',
+    educationalStartDate: json["educationalStartDate"] ?? 0,
+    educationalEndDate: json["educationalEndDate"] ?? 0,
+    updatedAt: json["updatedAt"] != null ? DateTime.parse(json["updatedAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
+    createdAt: json["createdAt"] != null ? DateTime.parse(json["createdAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
   );
 
   Map<String, dynamic> toJson() => {
@@ -774,12 +775,12 @@ class EstablishmentInformation {
   });
 
   factory EstablishmentInformation.fromJson(Map<String, dynamic> json) => EstablishmentInformation(
-    line1: json["line1"],
-    line2: json["line2"],
-    city: json["city"],
-    state: json["state"],
-    country: json["country"],
-    zipCode: json["zip_code"],
+    line1: json["line1"] ?? '',
+    line2: json["line2"] ?? '',
+    city: json["city"] ?? '',
+    state: json["state"] ?? '',
+    country: json["country"] ?? '',
+    zipCode: json["zip_code"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -803,8 +804,8 @@ class Location {
   });
 
   factory Location.fromJson(Map<String, dynamic> json) => Location(
-    type: json["type"],
-    coordinates: List<double>.from(json["coordinates"].map((x) => (x ?? 0.0).toDouble())),
+    type: json["type"] ?? '',
+    coordinates: json["coordinates"] == null ? <double>[] : List<double>.from((json["coordinates"] as List).map((x) => (x ?? 0.0).toDouble())),
   );
 
   Map<String, dynamic> toJson() => {
@@ -825,9 +826,9 @@ class MedicalRegistration {
   });
 
   factory MedicalRegistration.fromJson(Map<String, dynamic> json) => MedicalRegistration(
-    registrationNumber: json["registrationNumber"],
-    registrationCouncil: json["registrationCouncil"],
-    registrationYear: json["registrationYear"],
+    registrationNumber: json["registrationNumber"] ?? '',
+    registrationCouncil: json["registrationCouncil"] ?? '',
+    registrationYear: json["registrationYear"] ?? 0,
   );
 
   Map<String, dynamic> toJson() => {
@@ -855,12 +856,12 @@ class Membership {
   });
 
   factory Membership.fromJson(Map<String, dynamic> json) => Membership(
-    id: json["_id"],
-    membership: json["membership"],
-    startDate: json["startDate"],
-    endDate: json["endDate"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    createdAt: DateTime.parse(json["createdAt"]),
+    id: json["_id"] ?? '',
+    membership: json["membership"] ?? '',
+    startDate: json["startDate"] ?? 0,
+    endDate: json["endDate"] ?? 0,
+    updatedAt: json["updatedAt"] != null ? DateTime.parse(json["updatedAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
+    createdAt: json["createdAt"] != null ? DateTime.parse(json["createdAt"]) : DateTime.fromMillisecondsSinceEpoch(0),
   );
 
   Map<String, dynamic> toJson() => {
@@ -873,43 +874,79 @@ class Membership {
   };
 }
 
-class MentorInfo {
-  String firstName;
-  String lastName;
+class UserLike {
+  Name name;
+  Address address;
+  String displayName;
   String phone;
+  String imageUrl;
+  String studentId;
+  bool isTalLeader;
+  String id;
+  String username;
   String email;
-  String organization;
-  String organizationWebsite;
-  String educationalQualification;
+  String currentRole;
+  String currentCompanyName;
 
-  MentorInfo({
-    required this.firstName,
-    required this.lastName,
+  UserLike({
+    required this.name,
+    required this.address,
+    required this.displayName,
     required this.phone,
+    required this.imageUrl,
+    required this.studentId,
+    required this.isTalLeader,
+    required this.id,
+    required this.username,
     required this.email,
-    required this.organization,
-    required this.organizationWebsite,
-    required this.educationalQualification,
+    required this.currentRole,
+    required this.currentCompanyName,
   });
 
-  factory MentorInfo.fromJson(Map<String, dynamic> json) => MentorInfo(
-    firstName: json["firstName"],
-    lastName: json["lastName"],
-    phone: json["phone"],
-    email: json["email"],
-    organization: json["organization"],
-    organizationWebsite: json["organizationWebsite"],
-    educationalQualification: json["educationalQualification"],
+  factory UserLike.fromJson(Map<String, dynamic> json) => UserLike(
+    name: Name.fromJson(json["name"] ?? {}),
+    address: Address.fromJson(json["address"] ?? {}),
+    displayName: json["display_name"] ?? '',
+    phone: json["phone"] ?? '',
+    imageUrl: json["image_url"] ?? '',
+    studentId: json["studentId"] ?? '',
+    isTalLeader: json["isTALLeader"] ?? false,
+    id: json["_id"] ?? '',
+    username: json["username"] ?? '',
+    email: json["email"] ?? '',
+    currentRole: json["currentRole"] ?? '',
+    currentCompanyName: json["currentCompanyName"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
-    "firstName": firstName,
-    "lastName": lastName,
+    "name": name.toJson(),
+    "address": address.toJson(),
+    "display_name": displayName,
     "phone": phone,
+    "image_url": imageUrl,
+    "studentId": studentId,
+    "isTALLeader": isTalLeader,
+    "_id": id,
+    "username": username,
     "email": email,
-    "organization": organization,
-    "organizationWebsite": organizationWebsite,
-    "educationalQualification": educationalQualification,
+    "currentRole": currentRole,
+    "currentCompanyName": currentCompanyName,
+  };
+}
+
+class VolunteerInfo {
+  dynamic isInterested;
+
+  VolunteerInfo({
+    required this.isInterested,
+  });
+
+  factory VolunteerInfo.fromJson(Map<String, dynamic> json) => VolunteerInfo(
+    isInterested: json["isInterested"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "isInterested": isInterested,
   };
 }
 
@@ -925,9 +962,9 @@ class Name {
   });
 
   factory Name.fromJson(Map<String, dynamic> json) => Name(
-    middleName: json["middle_name"],
-    firstName: json["first_name"],
-    lastName: json["last_name"],
+    middleName: json["middle_name"] ?? '',
+    firstName: json["first_name"] ?? '',
+    lastName: json["last_name"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -993,11 +1030,11 @@ class SocialVerification {
   });
 
   factory SocialVerification.fromJson(Map<String, dynamic> json) => SocialVerification(
-    googleVerified: json["google_verified"],
-    facebookVerified: json["facebook_verified"],
-    linkedinVerified: json["linkedin_verified"],
-    twitterVerified: json["twitter_verified"],
-    appleVerified: json["apple_verified"],
+    googleVerified: json["google_verified"] ?? false,
+    facebookVerified: json["facebook_verified"] ?? false,
+    linkedinVerified: json["linkedin_verified"] ?? false,
+    twitterVerified: json["twitter_verified"] ?? false,
+    appleVerified: json["apple_verified"] ?? false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -1019,8 +1056,8 @@ class TokenDetail {
   });
 
   factory TokenDetail.fromJson(Map<String, dynamic> json) => TokenDetail(
-    token: json["token"],
-    type: json["type"],
+    token: json["token"] ?? '',
+    type: json["type"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -1029,78 +1066,3 @@ class TokenDetail {
   };
 }
 
-class UserLike {
-  Name name;
-  Address address;
-  String displayName;
-  String phone;
-  String imageUrl;
-  String studentId;
-  bool isTalLeader;
-  String id;
-  String username;
-  String email;
-  String currentRole;
-  String currentCompanyName;
-
-  UserLike({
-    required this.name,
-    required this.address,
-    required this.displayName,
-    required this.phone,
-    required this.imageUrl,
-    required this.studentId,
-    required this.isTalLeader,
-    required this.id,
-    required this.username,
-    required this.email,
-    required this.currentRole,
-    required this.currentCompanyName,
-  });
-
-  factory UserLike.fromJson(Map<String, dynamic> json) => UserLike(
-    name: Name.fromJson(json["name"]),
-    address: Address.fromJson(json["address"]),
-    displayName: json["display_name"],
-    phone: json["phone"],
-    imageUrl: json["image_url"],
-    studentId: json["studentId"],
-    isTalLeader: json["isTALLeader"],
-    id: json["_id"],
-    username: json["username"],
-    email: json["email"],
-    currentRole: json["currentRole"],
-    currentCompanyName: json["currentCompanyName"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "name": name.toJson(),
-    "address": address.toJson(),
-    "display_name": displayName,
-    "phone": phone,
-    "image_url": imageUrl,
-    "studentId": studentId,
-    "isTALLeader": isTalLeader,
-    "_id": id,
-    "username": username,
-    "email": email,
-    "currentRole": currentRole,
-    "currentCompanyName": currentCompanyName,
-  };
-}
-
-class VolunteerInfo {
-  dynamic isInterested;
-
-  VolunteerInfo({
-    required this.isInterested,
-  });
-
-  factory VolunteerInfo.fromJson(Map<String, dynamic> json) => VolunteerInfo(
-    isInterested: json["isInterested"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "isInterested": isInterested,
-  };
-}
