@@ -485,4 +485,21 @@ class MainRepository {
       token: token,
     );
   }
+
+
+
+  // get find user by email
+  Future<LoginModel> findUserEmail(String email) async {
+    try {
+      print('Making API call to user endpoint with ID: $email');
+      return await service.get<LoginModel>(
+          '$_user/data/$email',
+            (data) => LoginModel.fromJson(data),
+            params: {'secondaryEmail': true},
+      );
+    } catch (e) {
+      print('Repository error: $e');
+      rethrow;
+    }
+  }
 }

@@ -14,9 +14,13 @@ class LoginController extends GetxController {
   var domain = '@touchalife.org';
   final storage = GetStorage();
 
+  final recoverEmailController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   var isPasswordHidden = true.obs;
+
+  var isAccountFound = false.obs;
+  var userData = Rxn<LoginModel>();
 
   var isLoading = false.obs;
   final MainRepository repository = MainRepository();
@@ -96,8 +100,44 @@ class LoginController extends GetxController {
     }
   }
 
+  Future<void> findUserEmail() async {
+    if (recoverEmailController.text.trim().isEmpty) {
+      Get.snackbar("Validation", "Please enter email");
+      return;
+    }
+    try {
+      isLoading.value = true;
+      final email = recoverEmailController.text.trim();
+
+      // 🔥 Directly get parsed LoginModel
+      final response = await repository.findUserEmail(email);
+
+      if (response.status == "success" && response.data != null) {
+        userData.value = response;
+        isAccountFound.value = true;
+      } else {
+        Get.snackbar("Error", response.message ?? "No account found with this email");
+        isAccountFound.value = false;
+      }
+
+
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+  void clearFoundState() {
+    isAccountFound.value = false;
+    userData.value = null;
+    recoverEmailController.clear();
+  }
+
   @override
   void onClose() {
+    recoverEmailController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.onClose();
