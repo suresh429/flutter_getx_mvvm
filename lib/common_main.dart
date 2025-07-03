@@ -1,4 +1,6 @@
 import 'package:TALLeaders/view/comment_reply_page.dart';
+import 'package:TALLeaders/view/forgot_password_view.dart';
+import 'package:TALLeaders/view/recover_email_password_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,6 +132,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/comments', page: () => const CommentsScreen()),
         GetPage(name: '/publicProfile', page: () =>  const PublicProfileScreen()),
         GetPage(name: '/commentReply', page: () =>   CommentReplyPage()),
+        GetPage(name: '/forgotPassword', page: () =>   const ForgotPasswordView()),
+        GetPage(name: '/recoverEmailPassword', page: () =>   const RecoverEmailPasswordScreen()),
 
       ],
     );
